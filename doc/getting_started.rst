@@ -4,28 +4,28 @@ Getting started
 The commands and tutorials below are designed for a Unix environment, 
 and were tested under the OS Linux Mint Debian Edition (LMDE). 
 
-They assume that the gene-regulation library is downloaded or cloned 
+They assume that the SnakeChunks library is downloaded or cloned 
 into your home directory. You can specify any other preferred directory.
 
-Download Gene-regulation
+Download SnakeChunks
 ----------------------------------------------------------------
 
 ::
 
     cd ${HOME}
-    wget --no-clobber https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz
     tar xvzf 4.0.tar.gz
-    GENE_REG_PATH=${HOME}/gene-regulation-4.0
+    SNAKECHUNKS_PATH=${HOME}/SnakeChunks-4.0
 
-Clone Gene-regulation
+Clone SnakeChunks
 ----------------------------------------------------------------
 
 ::
 
     cd ${HOME}
-    git clone https://github.com/rioualen/gene-regulation.git
+    git clone https://github.com/SnakeChunks/SnakeChunks.git
 
-Run Gene-regulation
+Run SnakeChunks
 ----------------------------------------------------------------
 
-Please refer yourself to the `Tutorials section <http://gene-regulation.readthedocs.io/en/latest/tutorials.html#>`__. 
+Please refer yourself to the `Tutorials section <http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#>`__. 

@@ -2,7 +2,7 @@ Dependencies
 ================================================================
 
 These manuals aim at helping you install programs and
-dependencies used in the Gene-regulation library. 
+dependencies used in the SnakeChunks library. 
 
 Some of them are mandatory, and some are optional, depending 
 on the Snakemake workflows you need to run. 
@@ -225,7 +225,7 @@ It is the first system to support the use of automatically inferred multiple nam
 -  `Forum <https://groups.google.com/forum/#!forum/snakemake>`__
 -  See also Snakemake section for tutorials. 
 
-NB: Python 3 and pip3 are required (see `this section <http://gene-regulation.readthedocs.io/en/latest/dependencies.html#python>`__). 
+NB: Python 3 and pip3 are required (see `this section <http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#python>`__). 
 
 ::
 
@@ -328,7 +328,7 @@ We recommend installing it manually:
     ln -s -f $HOME/app_sources/FastQC/fastqc $HOME/bin/fastqc
 
 NB: FastQC requires to have Java installed (even for commandline use). 
-See dedicated `section <http://gene-regulation.readthedocs.io/en/latest/dependencies.html#java>`__ to install it.
+See dedicated `section <http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#java>`__ to install it.
 
 Check installation:
 
@@ -614,7 +614,7 @@ The following tools can be used to perform ChIP-seq peak-calling.
 Homer
 ****************************************************************
 
-Required in order to run the `tutorials <http://gene-regulation.readthedocs.io/en/latest/tutorials.html#>`__. 
+Required in order to run the `tutorials <http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#>`__. 
 
 `Web page <http://homer.salk.edu/>`__
 
@@ -641,7 +641,7 @@ To install packages, simply use the -install option and the name(s) of
 the package(s).
 
 However, Homer can also work with custom genomes in FASTA format and gene
-annotations in GTF format. Thus the Gene-regulation workflows don't require to install any genome. 
+annotations in GTF format. Thus the SnakeChunks workflows don't require to install any genome. 
 
 Check installation: 
 
@@ -652,7 +652,7 @@ Check installation:
 MACS 1.4
 ****************************************************************
 
-Required in order to run the demo workflow "ChIP-seq" on dataset GSE20870 (in the  `tutorials <http://gene-regulation.readthedocs.io/en/latest/tutorials.html#>`__ section). 
+Required in order to run the demo workflow "ChIP-seq" on dataset GSE20870 (in the  `tutorials <http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#>`__ section). 
 
 
 -  `Documentation <http://liulab.dfci.harvard.edu/MACS/00README.html>`__
@@ -676,7 +676,7 @@ Check installaiton:
 MACS 2
 ****************************************************************
 
-Required in order to run the `tutorials <http://gene-regulation.readthedocs.io/en/latest/tutorials.html#>`__. 
+Required in order to run the `tutorials <http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#>`__. 
 
 -  `Webpage <https://github.com/taoliu/MACS/>`__
 
@@ -1012,12 +1012,12 @@ Other
 Makefile
 ----------------------------------------------------------------
 
-The Gene-regulation library comprises a makefile that can install most of the 
+The SnakeChunks library comprises a makefile that can install most of the 
 dependencies described in the previous section. It is recommended when you're setting up a virtual environments, 
-as described in `these tutorials <http://gene-regulation.readthedocs.io/en/latest/environments.html>`_. 
+as described in `these tutorials <http://SnakeChunks.readthedocs.io/en/latest/environments.html>`_. 
 
 If you want to run the workflows on your personal computer or on a server, you should follow the `manual installation 
-<http://gene-regulation.readthedocs.io/en/latest/dependencies.html#manual-installation>`_, or contact a sysadmin. 
+<http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#manual-installation>`_, or contact a sysadmin. 
 
 The makefile currently allows running the following workflows:
 
@@ -1029,15 +1029,15 @@ It is not yet handling al the RNA-seq dependencies.
 
 ::
 
-    # it is assumed that you have defined a global variable with the path to the Gene-regulation library
-    cd ${GENE_REG_PATH}
+    # it is assumed that you have defined a global variable with the path to the SnakeChunks library
+    cd ${SNAKECHUNKS_PATH}
     make -f scripts/makefiles/install_tools_and_libs.mk all
     source ~/.bashrc
 
 ..
 Conda
 ----------------------------------------------------------------
-A number of dependencies of Gene-regulation can be installed through a Conda environment. 
+A number of dependencies of SnakeChunks can be installed through a Conda environment. 
 This list is not exhaustive. 
     conda install -c bioconda sickle=0.5 
     conda install -c bioconda bowtie=1.2.0 

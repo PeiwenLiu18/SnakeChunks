@@ -1,10 +1,10 @@
-.. GeneRegulation documentation master file, created by
+.. SnakeChunks documentation master file, created by
    sphinx-quickstart on Tue Mar 14 14:04:28 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
    
    
-Gene Regulation
+SnakeChunks
 ================================================================
 
 This git repository holds shared code for the analysis of Next

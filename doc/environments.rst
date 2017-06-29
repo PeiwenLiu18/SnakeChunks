@@ -1,7 +1,7 @@
 Virtual environments
 ================================================================
 
-Tutorials on how to run Gene-regulation workflows in virtual environments 
+Tutorials on how to run SnakeChunks workflows in virtual environments 
 or virtual machines (VM).
 
 These protocols were developed on a Unix computer, with the OS
@@ -56,8 +56,8 @@ useful links:
 The first parts of this tutorial will explain you how to use the IFB cloud 
 for general purposes. 
 
-For a specific use of the Gene-regulation appliance, you should refer yourself to 
-`this section <http://gene-regulation.readthedocs.io/en/latest/environments.html#using-the-gene-regulation-appliance>`__.
+For a specific use of the SnakeChunks appliance, you should refer yourself to 
+`this section <http://SnakeChunks.readthedocs.io/en/latest/environments.html#using-the-SnakeChunks-appliance>`__.
 
 User account creation & configuration
 ****************************************************************
@@ -171,7 +171,7 @@ existing one. You just need to chose a "base" to build it on.
        ssh -A -p 22 root@192.54.201.XXX
 
 Once you're connected to your appliance, you can install all the programs 
-that you want. You can check out `this section <http://gene-regulation.readthedocs.io/en/latest/dependencies.html#>`__ for a manual on how to install NGS tools. 
+that you want. You can check out `this section <http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#>`__ for a manual on how to install NGS tools. 
 Beware that the amount of disk space of the appliance itself 
 is limited!
 
@@ -214,7 +214,7 @@ Software installation
 
 Once you're connected to the VM through ``ssh``, you can install any
 program just the way you would do it locally (see tutorials in `this
-directory <http://gene-regulation.readthedocs.io/en/latest/dependencies.html#>`__
+directory <http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#>`__
 for instance).
 
 Configuration
@@ -247,7 +247,7 @@ Fetch following paragraph and uncomment command ``force-color``.
     source ~/.bashrc
 
 
-Using the Gene-regulation appliance
+Using the SnakeChunks appliance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Requirements
@@ -274,7 +274,7 @@ Appliances usually have a limited amount of disk space (up to 10 or 20Go).
 If the instance to be run necessitates disk space, you have to create a
 virtual disk (vDisk) prior to launching it.
 
-Check out `this section <http://gene-regulation.readthedocs.io/en/latest/environments.html#virtual-disk-creation>`__ 
+Check out `this section <http://SnakeChunks.readthedocs.io/en/latest/environments.html#virtual-disk-creation>`__ 
 for details.
 
 1. Click *New vDisk* button.
@@ -323,14 +323,14 @@ default under ``/root/mydisk``, or ``~/mydisk``.
 Here we create a folder to store the source data files and the files 
 that will results from the execution of our workflow. 
 
-We also create a link to the gene-regulation library. 
+We also create a link to the SnakeChunks library. 
 
 ::
 
     ANALYSIS_DIR=${HOME}/mydisk/ChIP-seq_SE_GSE20870
     mkdir -p ${ANALYSIS_DIR}
     cd ${ANALYSIS_DIR}
-    ln -s ${HOME}/gene-regulation-4.0 gene-regulation
+    ln -s ${HOME}/SnakeChunks-4.0 SnakeChunks
 
 Download data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -372,18 +372,18 @@ You can use the option ``-n`` to make a dry run.
 ::
 
     cd  ${ANALYSIS_DIR}
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/import_from_sra.wf --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml -n
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml -n
 
 If there is no error, you can procede with the analysis:
 
 ::
 
     # This workflow extracts .fastq files from the .sra archives
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/import_from_sra.wf --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
     # This workflow performs quality check and trimming on the raw data
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
     # This workflow perform a classic ChIP-seq analysis, including mapping, peak-calling and motif search
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/ChIP-seq.wf --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
 Using 4CPU & 8Go of RAM, the workflow should take about 12mn to complete.
 
@@ -500,13 +500,13 @@ You can visualize the peaks by running IGV from the terminal.
 .. figure:: ../img/igv.png
    :alt: 
 
-Create your own Gene-regulation appliance
+Create your own SnakeChunks appliance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creating a new appliance from scratch is very similar to using one. You
-have to satisfy the requirements described `here <http://gene-regulation.readthedocs.io/en/latest/environments.html#ifb-cloud-utilities>`__.
+have to satisfy the requirements described `here <http://SnakeChunks.readthedocs.io/en/latest/environments.html#ifb-cloud-utilities>`__.
 
-If you want to manipulate data, you should also create a vDisk following `these instructions <http://gene-regulation.readthedocs.io/en/latest/environments.html#virtual-disk-creation>`__.
+If you want to manipulate data, you should also create a vDisk following `these instructions <http://SnakeChunks.readthedocs.io/en/latest/environments.html#virtual-disk-creation>`__.
 
 Creation of an *appliance*
 ****************************************************************
@@ -533,19 +533,19 @@ The new instance should appear in orange bold fonts in the dashboard.
 
 You can connect to the instance through ``ssh`` as shown in previous sections.
 
-Get the ``gene-regulation`` repository
+Get the ``SnakeChunks`` repository
 ****************************************************************
 
 ::
 
-    wget -nc https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz
+    wget -nc https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz
     tar zvxf 4.0.tar.gz
 
 Run makefile to install the dependencies
 ****************************************************************
 
-The Gene-regulation library contains a makefile that installs most of the dependencies required to execute the snakemake workflows. 
-You can also install tools manually, following `these instructions <http://gene-regulation.readthedocs.io/en/latest/dependencies.html#manual-installation>`__. 
+The SnakeChunks library contains a makefile that installs most of the dependencies required to execute the snakemake workflows. 
+You can also install tools manually, following `these instructions <http://SnakeChunks.readthedocs.io/en/latest/dependencies.html#manual-installation>`__. 
 
 The execution of the makefile may take a while (up to 30mn-1h), mostly because of the python libraries that are necessary to several NGS tools. 
 
@@ -553,17 +553,17 @@ Then you should source the ``.bashrc`` in order to update the ``$PATH`` accordin
 
 ::
 
-    make -f gene-regulation-4.0/scripts/makefiles/install_tools_and_libs.mk all
+    make -f SnakeChunks-4.0/scripts/makefiles/install_tools_and_libs.mk all
     source ~/.bashrc
 
-If you want to install the x2go server on the VM for visualization purposes, as shown `here <http://gene-regulation.readthedocs.io/en/latest/environments.html#visualizing-results>`__, 
+If you want to install the x2go server on the VM for visualization purposes, as shown `here <http://SnakeChunks.readthedocs.io/en/latest/environments.html#visualizing-results>`__, 
 you can also execute this rule:
 
 ::
 
-    make -f gene-regulation-4.0/scripts/makefiles/install_tools_and_libs.mk add_repos desktop_and_x2go
+    make -f SnakeChunks-4.0/scripts/makefiles/install_tools_and_libs.mk add_repos desktop_and_x2go
 
-You should now be able to execute the example workflow by following instructions from `here <http://gene-regulation.readthedocs.io/en/latest/environments.html#download-source-data>`__. 
+You should now be able to execute the example workflow by following instructions from `here <http://SnakeChunks.readthedocs.io/en/latest/environments.html#download-source-data>`__. 
 
 In order for your appliance to remain persistant and be available to
 other users on the IFB cloud, you should contact an admin. 
@@ -635,8 +635,10 @@ Switch back to azerty:
 -->
 
 
-Gene-regulation with Docker
+SnakeChunks with Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*This section is not up to date*
 
 Create shared repositories and download source data
 ****************************************************************

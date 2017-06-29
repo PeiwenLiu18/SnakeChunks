@@ -40,7 +40,7 @@ a second telomere-binding protein also functions as a transcriptional regulator 
 Setup analysis environment
 ****************************************************************
 
-Here, we create a directory that will contain the raw data, the Gene-regulation library, 
+Here, we create a directory that will contain the raw data, the SnakeChunks library, 
 the reference genome data and the results of the workflow(s) used. 
 
 We are going to use a global variable: $ANALYSIS_DIR. 
@@ -52,23 +52,23 @@ We are going to use a global variable: $ANALYSIS_DIR.
     cd ${ANALYSIS_DIR}
 
 
-Download Gene-regulation
+Download SnakeChunks
 ****************************************************************
 
-We are going to download the Gene-regulation library in the analysis directory. 
-Another possibility would be to download Gene-regulation in a fixed place, and create a symlink 
+We are going to download the SnakeChunks library in the analysis directory. 
+Another possibility would be to download SnakeChunks in a fixed place, and create a symlink 
 to the analysis directory. 
 
 ::
 
-    wget --no-clobber https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
-    ln -s gene-regulation-4.0 gene-regulation
+    ln -s SnakeChunks-4.0 SnakeChunks
 
 Download reference genome & annotations
 ****************************************************************
 
-Here, we are going to download the geneome sequence and annotation files in the analysis directory. 
+Here, we are going to download the genome sequence and annotation files in the analysis directory. 
 It is also possible to define a fixed location to store genomes and then create a symlink to it. 
 
 It can be useful to store all the genomes in one place, in order to avoid duplication of 
@@ -103,7 +103,7 @@ The purpose of this workflow is to convert .sra files to .fastq files.
 The .sra format (Short Read Archive) is used by the GEO database, but 
 for downstream analyses we need to dispose of fastq-formatted files. 
 You can check out the `glossary
-<http://gene-regulation.readthedocs.io/en/latest/wiki.html#glossary>`_ to find out more about file formats. 
+<http://SnakeChunks.readthedocs.io/en/latest/wiki.html#glossary>`_ to find out more about file formats. 
 
 
 Workflow execution
@@ -119,7 +119,7 @@ You should then be able to run the following command:
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
 .. figure:: ../img/import_from_sra_rulegraph.png
    :alt: 
@@ -129,7 +129,7 @@ Workflow 'quality_control'
 
 This workflow can be run after the workflow 'import_from_sra', or directly on properly-organized fastq files 
 (see `this section
-<http://gene-regulation.readthedocs.io/en/latest/tutorials.html#running-gene-regulation-workflows-on-your-own-data>`_ if you dispose of your own data).
+<http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#running-SnakeChunks-workflows-on-your-own-data>`_ if you dispose of your own data).
 
 The purpose of this workflow is to perform quality check with `FastQC https://www.bioinformatics.babraham.ac.uk/projects/fastqc/`_. 
 
@@ -142,7 +142,7 @@ Workflow execution
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf -p --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
 .. figure:: ../img/quality_control_rulegraph.png
    :alt: 
@@ -153,7 +153,7 @@ Workflow 'ChIP-seq'
 This workflows performs:
  - mapping with various algorithms
  - genome coverage in different formats (check out our `glossary
-<http://gene-regulation.readthedocs.io/en/latest/wiki.html#glossary>`_)
+<http://SnakeChunks.readthedocs.io/en/latest/wiki.html#glossary>`_)
  - peak-calling with various algorithms
  - motifs search using the `RSAT suite <rsat.eu>`_
 
@@ -166,7 +166,7 @@ Workflow execution
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile gene-regulation/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
 .. figure:: ../img/ChIP-seq_rulegraph.png
    :alt: 
@@ -197,14 +197,14 @@ Setup workdir
     mkdir ${ANALYSIS_DIR}
     cd ${ANALYSIS_DIR}
 
-Download the Gene-regulation library
+Download the SnakeChunks library
 ****************************************************************
 
 ::
 
-    wget --no-clobber https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
-    ln -s gene-regulation-4.0 gene-regulation
+    ln -s SnakeChunks-4.0 SnakeChunks
 
 
 Download reference genome & annotations
@@ -251,9 +251,9 @@ And you should be able to execute it like this:
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile gene-regulation/examples/ChIP-seq_GSE55357/config.yml
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf -p --configfile gene-regulation/examples/ChIP-seq_GSE55357/config.yml
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile gene-regulation/examples/ChIP-seq_GSE55357/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
 
 
 
@@ -284,9 +284,9 @@ And you should be able to execute it like this:
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile gene-regulation/examples/RNA-seq_GSE55316/config.yml
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf -p --configfile gene-regulation/examples/RNA-seq_GSE55316/config.yml
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/RNA-seq.wf -p --configfile gene-regulation/examples/RNA-seq_GSE55316/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
 
 
 
@@ -310,10 +310,10 @@ Workflow 'integration_ChIP_RNA'
 
 
 
-Running Gene-regulation workflows on your own data
+Running SnakeChunks workflows on your own data
 ----------------------------------------------------------------
 
-Gene-regulation library & genome data
+SnakeChunks library & genome data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -327,10 +327,10 @@ Hereafter is a suggestion for the organization of your files.
 
 ::
 
-    # Download the Gene-regulation library
-    wget --no-clobber https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz 
+    # Download the SnakeChunks library
+    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
-    ln -s gene-regulation-4.0 gene-regulation
+    ln -s SnakeChunks-4.0 SnakeChunks
 
 ::
 
@@ -370,7 +370,7 @@ directory and distinguished using a suffix of any sort.
 Metadata
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Running the workflows provided by the Gene-regulation library 
+Running the workflows provided by the SnakeChunks library 
 requires the use of three configuration files. 
 
 samples.tab
@@ -423,10 +423,10 @@ config.yml
 ****************************************************************
 
 You can find examples of configuration files in the examples section of 
-the gene-regulation directory. 
+the SnakeChunks directory. 
 
 Directories should be defined relative to the working directory 
-defined in the beginning: genome, gene-regulation, fastq, etc. 
+defined in the beginning: genome, SnakeChunks, fastq, etc. 
 Same goes for configuration files.
 
 Genome filenames should be mentionned as they appear in the defined genome 
@@ -467,11 +467,11 @@ You can verify it by doing dry runs:
 
     cd ${ANALYSIS_DIR}
     # Run the quality check
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf --config-file metadata/config.yml -p -n
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf --config-file metadata/config.yml -p -n
     # Run the ChIP-seq workflow
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/ChIP-seq.wf --config-file metadata/config.yml -p -n
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf --config-file metadata/config.yml -p -n
     # Run the RNA-seq workflow
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/RNA-seq.wf --config-file metadata/config.yml -p -n
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq.wf --config-file metadata/config.yml -p -n
 
 Just remove the `-n` option to actually run them. 
 

@@ -1,4 +1,4 @@
-Gene-regulation library
+SnakeChunks library
 ================================================================
 
 The library contains a variety of files, including scripts and 

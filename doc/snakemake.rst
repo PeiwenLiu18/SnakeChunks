@@ -46,9 +46,9 @@ Tuto material
 
 ::
 
-    wget https://github.com/rioualen/gene-regulation/archive/1.0.tar.gz
+    wget https://github.com/rioualen/SnakeChunks/archive/1.0.tar.gz
     tar xvzf 1.0.tar.gz
-    cd gene-regulation-1.0/doc/snakemake_tutorial
+    cd SnakeChunks-1.0/doc/snakemake_tutorial
 
 Samtools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -61,7 +61,7 @@ Samtools
     cd samtools-1.3
     make
     sudo make install
-    cd gene-regulation-1.0/doc/snakemake_tutorial
+    cd SnakeChunks-1.0/doc/snakemake_tutorial
 
 Rsamtools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,7 +243,7 @@ Workflow 5: Configuration file
 
     # file: config.yml   
     samples: "GSM521934 GSM521935"    
-    outdir: "gene-regulation-1.0/doc/snakemake_tutorial/results/"
+    outdir: "SnakeChunks-1.0/doc/snakemake_tutorial/results/"
     samtools:     
         threads: "2"
 
