@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# GeneRegulation documentation build configuration file, created by
+# SnakeChunks documentation build configuration file, created by
 # sphinx-quickstart on Tue Mar 14 14:04:28 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'GeneRegulation'
+project = u'SnakeChunks'
 copyright = u'2017, Claire Rioualen, Jacques van Helden'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -207,7 +207,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'GeneRegulationdoc'
+htmlhelp_basename = 'SnakeChunksdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -227,7 +227,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'GeneRegulation.tex', u'GeneRegulation Documentation',
+  ('index', 'SnakeChunks.tex', u'SnakeChunks Documentation',
    u'Claire Rioualen, Jacques van Helden', 'manual'),
 ]
 
@@ -257,7 +257,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'generegulation', u'GeneRegulation Documentation',
+    ('index', 'SnakeChunks', u'SnakeChunks Documentation',
      [u'Claire Rioualen, Jacques van Helden'], 1)
 ]
 
@@ -271,8 +271,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'GeneRegulation', u'GeneRegulation Documentation',
-   u'Claire Rioualen, Jacques van Helden', 'GeneRegulation', 'One line description of project.',
+  ('index', 'SnakeChunks', u'SnakeChunks Documentation',
+   u'Claire Rioualen, Jacques van Helden', 'SnakeChunks', 'One line description of project.',
    'Miscellaneous'),
 ]
 
