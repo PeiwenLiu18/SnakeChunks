@@ -23,9 +23,9 @@ RUN pip3 install snakemake pyyaml psutil
 
 ## Gene-regulation
 
-RUN wget https://github.com/rioualen/gene-regulation/archive/4.0.tar.gz && \
+RUN wget https://github.com/snakechunks/snakechunks/archive/4.0.tar.gz && \
     tar zvxf 4.0.tar.gz && \
-    ln -s gene-regulation-4.0 gene-regulation && \
+    ln -s snakechunks-4.0 snakechunks && \
     rm 4.0.tar.gz
 
 ## Programs
