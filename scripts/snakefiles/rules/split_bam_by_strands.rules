@@ -5,10 +5,14 @@ if not "qsub" in config.keys():
     sys.exit("The parameter qsub must be defined in the config file")
 
 rule split_bam_strands:
-    """Split a bam file in two separate bam files containing respectively 
+    """
+    Split a bam file in two separate bam files containing respectively 
     the reads on the plus and minus strand. 
 
-    Copyright: Jacques van Helden
+    Required parameters:
+        config["qsub"]
+
+    Contributors: Jacques van Helden
     """
     input: "{reads}.bam"
     output: min="{reads}_min.bam", plus="{reads}_plus.bam" #

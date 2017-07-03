@@ -6,7 +6,7 @@ if not "qsub" in config.keys():
 rule dot_to_image:
     """Following rule dot_graph, this rule creates png and pdf outputs for dot graphs from snakemake. 
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: "{graph}.dot"
     output: "{graph}.{ext,(pdf|png|svg)}"

@@ -51,6 +51,7 @@ rule homer:
         - a fasta file (see http://homer.salk.edu/homer-fdr{fdr}_peaks/introduction/update.html)          TO be changed
 
     Required parameters:
+        config["qsub"]
         config["dir"]["samples"]
         config["dir"]["peaks"]
         config["genome"]["fasta_file"]
@@ -63,7 +64,7 @@ rule homer:
         config["homer"]["P"]
         config["homer"]["fdr"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bed",

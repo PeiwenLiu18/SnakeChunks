@@ -13,7 +13,8 @@ if not "fastq" in config["dir"].keys():
 
 # Rule
 rule sra_to_fastq_split:
-    """Converts SRA files in separate fastq files por paired-end data with SRA toolkit. 
+    """
+    Converts SRA files in separate fastq files por paired-end data with SRA toolkit. 
 
     Required parameters:
         config["qsub"]
@@ -26,8 +27,7 @@ rule sra_to_fastq_split:
     Usage example :
         IMPORT = expand(FASTQ_DIR + "/{samples}/{samples}.fastq", samples=SAMPLE_IDS) 
 
-    Copyright: 
-        Claire Rioualen
+    Copntributors: Claire Rioualen
     """
 #    input: datadir = config["dir"]["reads_source"] + "/"
     output:

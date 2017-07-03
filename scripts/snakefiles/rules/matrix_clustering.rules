@@ -17,7 +17,7 @@ rule matrix_clustering:
     Optional parameters:
         ...
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: "{caller_dir}/{peaks}.fasta"
     output: "{caller_dir}/peak-motifs/{peaks}_peak-motifs_synthesis.html"

@@ -10,14 +10,15 @@ if not "fastq" in config["dir"].keys():
 
 # Rule
 rule sra_to_fastq:
-    """Converts SRA files in fastq format with SRA toolkit. 
+    """
+    Converts SRA files in fastq format with SRA toolkit. 
 
     Required parameters:
         config["qsub"]
         config["dir"]["reads_source"]
         config["dir"]["fastq"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
 #    input: datadir = config["dir"]["reads_source"] + "/"
     output: "{results}/{sample}/{sample}.fastq"

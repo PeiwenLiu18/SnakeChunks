@@ -17,6 +17,10 @@ rule md5sum:
            -s gene-regulation/scripts/snakefiles/rules/md5sum.rules \
            --configfile metadata/Glossina_palpalis.yml
 
+    Required parameters:
+        config["qsub"]
+
+    Contributors: Jacques van Helden
     """
     input: "{file}"
     output: "{file}.md5sum"

@@ -49,7 +49,8 @@ if not "locfunc" in config["DESeq2"].keys():
 
 # Rule
 rule sartools_DESeq2:
-    """This rule is designed to perform differential expression analysis of RNA-seq data
+    """
+    This rule is designed to perform differential expression analysis of RNA-seq data
     with DESeq2, using the R package SARTools (https://github.com/PF2-pasteur-fr/SARTools/). 
 
     It requires replicated data to run properly.
@@ -73,8 +74,7 @@ rule sartools_DESeq2:
         config["DESeq2"]["typeTrans"]
         config["DESeq2"]["locfunc"]
 
-    Copyright: 
-        Claire Rioualen (claire.rioualen@inserm.fr)
+    Contributors: Claire Rioualen
     """
     input: 
         targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"

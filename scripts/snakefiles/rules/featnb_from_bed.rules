@@ -8,7 +8,7 @@ rule featnb_from_bed:
     Required parameters:
         config["qsub"]
 
-    Copyright Jacques van Helden
+    Contributors: Jacques van Helden
     """
     input: "{file}.bed"
     output: "{file}_bed_nb.txt"

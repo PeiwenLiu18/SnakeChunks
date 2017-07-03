@@ -43,7 +43,8 @@ def sickle_inputs(wildcards):
     return reads
 
 rule sickle:
-    """Trim one a single end raw reads file with sickle.
+    """
+    Trimming raw reads with sickle.
 
     Required parameters:
         config["qsub"]
@@ -55,8 +56,7 @@ rule sickle:
         config["sickle"]["qual_type"]
         config["metadata"]["strands"]
 
-    Authors:
-        Claire Rioualen, Lucie Khamvongsa
+    Contributors: Claire Rioualen, Lucie Khamvongsa
     """
     input: reads = sickle_inputs
     output:

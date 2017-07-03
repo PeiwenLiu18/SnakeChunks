@@ -46,7 +46,7 @@ rule mosaics:
         config["mosaics"]["bin_size"]
         config["mosaics"]["type"]
 
-    Author Claire Rioualen, Mishael Sanchez-Perez
+    Contributors: Claire Rioualen, Mishael Sanchez-Perez
     """
     input:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bed",

@@ -15,7 +15,8 @@ subread_dir = os.path.join(config["dir"]["genome"], "subread-align")
 
 # Rule
 rule subread_index:
-    """Rule for the creation of subread index. Has to be done only once.  The
+    """
+    Rule for the creation of subread index. Has to be done only once.  The
     output file is used to test whether the index already exists
     when aligning.
 
@@ -31,7 +32,7 @@ rule subread_index:
 
     Optional parameters:
 
-    Copyright Claire Rioualen, Jacques van Helden
+    Contributors: Claire Rioualen, Jacques van Helden
     """
     input: os.path.join(config["dir"]["genome"], config["genome"]["fasta_file"])
     output: subread_index = os.path.join(subread_dir, config["genome"]["fasta_file"])

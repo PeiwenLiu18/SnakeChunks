@@ -43,7 +43,8 @@ if not "normalizationMethod" in config["edgeR"].keys():
 
 # Rule
 rule sartools_edgeR:
-    """This rule is designed to perform differential expression analysis of RNA-seq data
+    """
+    This rule is designed to perform differential expression analysis of RNA-seq data
     with edgeR, using the R package SARTools (https://github.com/PF2-pasteur-fr/SARTools/). 
 
     It requires replicated data to run properly.
@@ -66,7 +67,7 @@ rule sartools_edgeR:
         config["edgeR"]["gene_selection"]
         config["edgeR"]["normalizationMethod"]
 
-    Copyright: Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: 
         targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"

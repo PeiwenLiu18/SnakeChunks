@@ -25,7 +25,8 @@ dir_swembl = os.path.join(config["dir"]["peaks"], "{treatment}_vs_{control}/swem
 
 # Rule
 rule swembl:
-    """Peak-calling with SWEMBL.
+    """
+    Peak-calling with SWEMBL.
 
     Beware: for SWEMBL the peaks MUST be sorted by position, other wise SWEMBL runs indefinitely. 
     Usually by default we sort all bam files by position after alignment. 
@@ -40,7 +41,7 @@ rule swembl:
         config["swembl"]["R"]
         config["swembl"]["N"]
 
-    Copyright Claire Rioualen, Lucie Khamvongsa
+    Contributors: Claire Rioualen, Lucie Khamvongsa
     """
     input:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bed",

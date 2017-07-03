@@ -14,7 +14,10 @@ if not "reports" in config["dir"].keys():
 rule dot_graph:
     """This rule generates dot files for snakemake's DAG and rulegraph. 
 
-    Copyright: Claire Rioualen, Jacques van Helden
+    Required parameter: 
+        config["metadata"]["configfile"]
+
+    Contributors: Claire Rioualen, Jacques van Helden
     """
     output: "{path}{graph,(rulegraph|dag)}.dot"
     params: 

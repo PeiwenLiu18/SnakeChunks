@@ -37,7 +37,7 @@ rule sartools_targetfile:
         config["dir"]["samples"]
         config["dir"]["diffexpr"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: 
         count_files = targetfiles_inputs

@@ -61,7 +61,7 @@ rule bwa:
         config["bwa"]["dir"]
         config["bwa"]["threads"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input:
         reads = bwa_inputs, 

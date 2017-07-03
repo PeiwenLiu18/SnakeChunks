@@ -38,7 +38,7 @@ rule matrix_quality
     Optional parameters:
         ...
 
-    Copyright Claire Rioualen, Jacques van Helden
+    Contributors: Claire Rioualen, Jacques van Helden
     """
     input: 
         peakfiles = matrix_quality_inputs,

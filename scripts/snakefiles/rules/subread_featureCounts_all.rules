@@ -56,7 +56,8 @@ diffexpr_dir = config["dir"]["diffexpr"]
 
 # Rule
 rule subread_featureCounts_all:
-    """featureCounts from the subread toolkit. 
+    """
+    featureCounts from the subread toolkit. 
 
     Required parameters:
         config["qsub"]
@@ -72,7 +73,7 @@ rule subread_featureCounts_all:
     Usage: 
         Usage: featureCounts [options] -a <annotation_file> -o <output_file> input_file1 [input_file2] ... 
 
-    Copyright Jacques van Helden, Claire Rioualen
+    Contributors: Jacques van Helden, Claire Rioualen
     """
     input: 
         bam = featureCounts_inputs,

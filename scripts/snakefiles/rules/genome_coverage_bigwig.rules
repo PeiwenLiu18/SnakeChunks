@@ -11,7 +11,7 @@ rule genome_coverage_bigwig:
     Required parameters:
         config["qsub"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: 
         bam = "{reads}_sorted_pos.bam",

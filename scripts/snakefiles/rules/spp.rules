@@ -16,7 +16,8 @@ dir_spp = os.path.join(config["dir"]["peaks"], "{treatment}_vs_{control}/spp")
 
 # Rule
 rule spp:
-    """Peak-calling with SPP (R package).
+    """
+    Peak-calling with SPP (R package).
         Input: bam
         Output: narrowPeak + bed format
 
@@ -28,7 +29,7 @@ rule spp:
     Optional parameters:
         config["spp"]["fdr"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bam",

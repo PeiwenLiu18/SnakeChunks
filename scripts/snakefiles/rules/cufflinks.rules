@@ -23,9 +23,6 @@ rule cufflinks:
     Assemble transcripts from RNA-seq data and produce a file with
     the location of detected transcripts.
 
-
-    Copyright Jacques van Helden, Claire Rioualen
-
     Required parameters:
         config["qsub"]
         config["dir"]["genome"]
@@ -40,6 +37,7 @@ rule cufflinks:
         assembly_files
         cuffmerge_transcripts
 
+    Contributors: Jacques van Helden, Claire Rioualen
     """
     input:
         bam = "{reads}_sorted_pos.bam", \

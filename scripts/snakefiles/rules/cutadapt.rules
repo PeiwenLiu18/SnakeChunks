@@ -54,8 +54,7 @@ rule cutadapt:
         config["cutadapt"]["qual_threshold"]
         config["metadata"]["strands"]
 
-    Authors:
-        Claire Rioualen, Lucie Khamvongsa
+    Contributors: Claire Rioualen
     """
     input: reads = cutadapt_inputs
     output:

@@ -49,16 +49,17 @@ def subread_inputs(wildcards):
 
 # Rule
 rule subread_align:
-    """Align each sample with the R-package subread.
+    """
+    Align each sample with the R-package subread.
 
-       To align each sample on the reference genome the R-package subread
-       first needs to build a index with the function builindex(). The
-       alignment is then executed with the function align(), which calls
-       the tool read mapping tool Subread.  
+    To align each sample on the reference genome the R-package subread
+    first needs to build a index with the function builindex(). The
+    alignment is then executed with the function align(), which calls
+    the tool read mapping tool Subread.  
 
-       Reference: Liao Y, Smyth GK and Shi W (2013). The Subread aligner:
-       fast, accurate and scalable read mapping by seed-and-vote.  Nucleic
-       Acids Research, 41(10):e108
+    Reference: Liao Y, Smyth GK and Shi W (2013). The Subread aligner:
+    fast, accurate and scalable read mapping by seed-and-vote.  Nucleic
+    Acids Research, 41(10):e108
 
     Required parameters:
         config["dir"]["fastq"]
@@ -75,7 +76,7 @@ rule subread_align:
         config["subread-align"]["align_options"]
         config["subread-align"]["seq_data"]
 
-    Copyright Jacques van Helden, Claire Rioualen
+    Contributors: Jacques van Helden, Claire Rioualen
     """
     input:
         reads = subread_inputs, 

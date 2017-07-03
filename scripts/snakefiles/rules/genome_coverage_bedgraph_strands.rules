@@ -14,6 +14,10 @@ rule genome_coverage_bedgraph_strands:
     Required parameters: 
         config["qsub"]
 
+    # TODO
+    Optional parameters:
+        config["metadata"]["strands"]
+
     Copyright Jacques van Helden, Claire Rioualen
     """
     input: reads = "{reads}_sorted_pos.bam"
