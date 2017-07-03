@@ -1,32 +1,32 @@
 ################################################################
 ## REQUIRED PARAMETERS
-
-  author: "Claire Rioualen"
-  qsub: "-V -m a -d ."
+author: "Claire Rioualen"
+  qsub: "-V -m a -d ."                                                  # Required, even if empty quotes
   genome:
     organism: "Saccharomyces cerevisiae"
-    size: "12500000"                                                            # required. if using macs2, macs14, homer...
-    version: "sacCer3"                                                                                      # required. has to match genome filenames and directories
+    size: "12500000"
+    version: "sacCer3"
     fasta_file: "Saccharomyces_cerevisiae.R64-1-1.30.dna.genome.fa"
     gff3_file: "Saccharomyces_cerevisiae.R64-1-1.30.gff3"
     gtf_file: "Saccharomyces_cerevisiae.R64-1-1.30.gtf"
+#    fasta_url: "http://hgdownload.soe.ucsc.edu/goldenPath/sacCer1/bigZips/chromFa.zip"
 
   metadata:
-    samples: "gene-regulation/examples/ChIP-seq_GSE55357/samples.tab"           # required. has to contain at least sample ids
-    design: "gene-regulation/examples/ChIP-seq_GSE55357/design.tab"             # required. has to contain at least ids of pairs of samples to be compared
-    configfile: "gene-regulation/examples/ChIP-seq_GSE55357/config.yml"         # required for flowcharts generation
+    samples: "SnakeChunks/examples/ChIP-seq_GSE55357/samples.tab"       # Contains at least an "ID" column
+    design: "SnakeChunks/examples/ChIP-seq_GSE55357/design.tab"         # Contains 2 columns with ID or groups of samples to be compared
+    configfile: "SnakeChunks/examples/ChIP-seq_GSE55357/config.yml"     # Required for flowcharts generation; should be revised
     seq_type: "se"
 
   dir:
-    reads_source: "data"                                      # required. dir containing raw data organized in sub directories named after the samples
-    fastq: "fastq"                                            # required. dir containing fastq files (trimmed or not) and fastqc reports
-    genome: "genome"                                                            # required. where to store genomes
-    results: "results"                                        # required. dir for all result files that are produced by the pipeline
-    gene_regulation: "gene-regulation"                                          # required. location of the libraries
+    reads_source: "data"                                                # Raw data (sra)
+    fastq: "fastq"                                                      # Fastq location, either raw data or converted sra files 
+    genome: "genome"                                                    # Location of the genome files (fasta, gff3, gtf) or symlink to location
+    results: "results"
+    snakechunks: "SnakeChunks"                                          # Location of the library or symlink to library
 
-    samples: "results/samples"                                # optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
-    peaks: "results/peaks"                                    # optional. will hold comparison data (peak-calling, motifs search...). If not mentioned, will be config["dir"]["results"]
-    reports: "results/reports"                                # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    samples: "results/samples"
+    diffexpr: "results/diffexpr"
+    reports: "results/reports"
 
   tools:
     trimming: ""
@@ -36,23 +36,24 @@
 
 ################################################################
 ## OPTIONAL PARAMETERS
-
+##
+## These are the parameters that are used by rules & programs. 
+## They all have default parameters, so everything below is optional. 
   bowtie2:
-    threads: "1"                                                                # optional. number of threads to speed up calculations (def. 1)
-    max_mismatches: "1"                                                         # optional (def. 0)
-
+    threads: "10"                                                       # Default 1
+    max_mismatches: "0"                                                 # Default 0 (0 or 1 only)
 
   macs2: 
-    qval: "0.001"                                                               # optional (def. 0.05)
-    keep_dup: "all"                                                             # optional (def. 1)
-    mfold_min: "2"                                                              # optional (def. 5)
-    mfold_max: "50"                                                             # optional (def. 50)
-    other_options: "--call-summits"                                             # optional can include --call-summits, --broad...
+    qval: "0.001"                                                       # Default 0.05
+    keep_dup: "all"                                                     # Default 1
+    mfold_min: "2"                                                      # Default 5
+    mfold_max: "50"                                                     # Default 50
+    other_options: "--call-summits"                                     # optional can include --call-summits, --broad...
 
   homer: 
-    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
-    F: "2"                                                                      # optional (def. 4)
-    L: "2"                                                                      # optional (def. 4)
-    P: "0.05"                                                                   # optional (def. 0.0001)
-    fdr: "0.05"                                                                 # optional (def. 0.001)
+    style: "factor"                                                     # Default 'factor'; else 'histone', 'groseq', 'tss', 'dnase', 'super', 'mC' (beware of output filenames)
+    F: "2"                                                              # Default 4
+    L: "2"                                                              # Default 4
+    P: "0.05"                                                           # Default 0.0001
+    fdr: "0.05"                                                         # Default 0.001
 
