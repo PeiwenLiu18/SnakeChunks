@@ -50,7 +50,7 @@ annotate_peaks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This rule runs a program that is part of the HOMER tools suite. 
-It outputs a list of gene identifiers using a bed file, a fasta file and a gtf file.
+It outputs a list of gene identifiers using a bed file, a fasta file and a gtf file. 
 The bed file can be a peak file produces by any peak-calling rule. 
 
 More: http://homer.salk.edu/homer/ngs/annotation.html
@@ -105,41 +105,214 @@ Required parameters:
 bbduk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Performs trimming of raw reads using bbduk of the bbmap suite. 
+Currently only handling single-end data. 
+
+Required parameters:
+
+- config["qsub"]
+- config["metadata"]["seq_type"]
+
+Optional parameters:
+
+- config["bbduk"]["length_threshold"]
+- config["bbduk"]["qual_threshold"]
+- config["metadata"]["strands"]
+
+
 bed_to_fasta
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Get a fasta file from a bedfile using the 'fetch-sequences' tool from the RSAT suite. 
+
+Fetch sequences from UCSC to obtain a fasta file from a set of 
+genomic coordinates described in a bed file. Requires RSAT installation. 
+
+Alternative is to use getfasta.rules .
+
+Example: 
+
+::
+
+    mkdir -p test/fetch_seq; cd test/fetch_seq; 
+    wget http://pedagogix-tagc.univ-mrs.fr/rsat/demo_files/fetch-sequences_Schmidt_2011_mm9_CEBPA_SWEMBL_R0.12_702peaks.bed; 
+    cd -
+    snakemake --snakefile ${RSAT}/snakemake_files/chip-seq_motifs.py test/fetch_seq/fetch-sequences_Schmidt_2011_mm9_CEBPA_SWEMBL_R0.12_702peaks.fasta
+
+Required parameters:
+
+- config["qsub"]
 
 bedgraph_to_bigwig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Convert bedgraph to bigWig format using Deeptools. 
+
+Required parameters:
+
+- config["qsub"]
+
 bedgraph_to_tdf
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Convert bedgraph to TDF format, which is recommended to load coverage data in IGV.
+
+The conversion relies on `igvtools <https://www.broadinstitute.org/software/igv/igvtools>`__.
+
+Required parameters:
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["fasta_file"]
+
 
 bedtools_closest
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Bedtools closest searches for overlapping features in two coordinate files. 
+In the event that no feature in B overlaps the current feature in A, closest will report the nearest 
+(that is, least genomic distance from the start or end of A) feature in B. 
+
+Usage: bedtools closest [OPTIONS] -a <FILE> -b <FILE1, FILE2, ..., FILEN>
+
+More: http://bedtools.readthedocs.io/en/latest/content/tools/closest.html
+
+Required parameters: 
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["gff3_file"]
+
 bedtools_intersect
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Bedtools intersect allows one to screen for overlaps between two sets of genomic features. 
+Moreover, it allows one to have fine control as to how the intersections are reported. 
+bedtools intersect works with both BED/GFF/VCF and BAM files as input.
+
+More: http://bedtools.readthedocs.io/en/latest/content/tools/intersect.html
+
+Required parameters: 
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["gff3_file"]
 
 bedtools_window
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Similar to bedtools intersect, window searches for overlapping features in A and B. 
+However, window adds a specified number (1000, by default) of base pairs upstream 
+and downstream of each feature in A. In effect, this allows features in B that are 
+near features in A to be detected.
+
+More: http://bedtools.readthedocs.io/en/latest/content/tools/window.html
+
+Required parameters: 
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["gff3_file"]
+
+Opional parameters:
+
+- config["bedtools"]["window"]
+
 blast_formatdb
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Run the formatdb program of the BLAST suite in order to index all 
+k-mers of the reference database. This has to be done only once, then 
+the DB can be used for multiple searches with blastall.
+
+Required parameters:
+
+- config["qsub"]
 
 blastall
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Where {blast_program} should be replaced by one of the supported 
+program options in blastall: blastp, blastn, blastx, tblastn.
+
+Output file name: {query}_{blast_program}_hits.txt
+
+Required parameters:
+
+- config["qsub"]
+- config["blastall"]["db"]
+
+Optional parameters:
+
+- config["blastall"]["matrix"]
+- config["blastall"]["expect"]
+- config["blastall"]["view"]
+
+
 bowtie_index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Rule for the creation of Bowtie 1 index. Has to be done only once.
+The output file is used to test whether the index already exists when aligning.
+
+Required parameters:
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["version"]
+- config["genome"]["fasta_file"]
 
 bowtie
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Read mapping using bowtie. 
+Requires the indexing to have previously been done (using the rule bowtie_index).
+
+Required parameters:
+
+- config["genome"]["version"]
+- config["genome"]["fasta_file"]
+- config["qsub"]
+- config["dir"]["fastq"]
+- config["dir"]["samples"]
+
+Optional parameters:
+
+- config["bowtie"]["max_mismatches"]
+- config["bowtie"]["threads"]
+
+
 bowtie2_index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Rule for the creation of Bowtie 2 index. Has to be done only once.
+The output file is used to test whether the index already exists when aligning.
+
+Required parameters:
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["fasta_file"]
+
 bowtie2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read mapping using Bowtie2. 
+Requires the indexing to have previously been done (using the rule bowtie2_index).
+
+Required parameters:
+
+- config["genome"]["version"]
+- config["genome"]["fasta_file"]
+- config["qsub"]
+- config["dir"]["fastq"]
+- config["dir"]["samples"]
+
+Optional parameters:
+
+- config["bowtie2"]["threads"]
+- config["bowtie2"]["max_mismatches"]
+
 
 bPeaks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
