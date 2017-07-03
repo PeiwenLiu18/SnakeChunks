@@ -49,17 +49,58 @@ For details on the tools and how to install them, please check `this section <ht
 annotate_peaks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+This rule runs a program that is part of the HOMER tools suite. 
+It outputs a list of gene identifiers using a bed file, a fasta file and a gtf file.
+The bed file can be a peak file produces by any peak-calling rule. 
+
+More: http://homer.salk.edu/homer/ngs/annotation.html
+
+Required parameters:
+
+- config["qsub"]
+- config["dir"]["genome"]
+- config["genome"]["fasta_file"]
+- config["genome"]["gtf_file"]
+
 bam_by_name
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sort aligned reads (in bam format) by positions using 'samtools sort'. 
+
+Required parameters:
+
+- config["qsub"]
 
 bam_by_pos
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Sort aligned reads (in bam format) by name, using 'samtools sort'. 
+
+Required parameters:
+
+- config["qsub"]
+
 bam_stats
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Computes mapping statistics using the 'samtools flagstat' tool.
+
+Requires samtools 1.3+ version (not in apt-get repository as of 2016-03).
+
+Required parameters:
+
+- config["qsub"]
+
+
 bam_to_bed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Converts bam files into bed files using 'bedtools bamtobed'.
+
+Required parameters:
+
+- config["qsub"]
+
 
 bbduk
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -102,6 +143,25 @@ bowtie2
 
 bPeaks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+bPeaks is a peak-calling tool running in R.
+It was specifically designed for small eucaryotic organisms, such as the yeast.
+It is thus not recommanded for bigger genomes, as it could be very slow. 
+You should choose parameters carefully. Input in bam, output in bed.
+
+Required parameters:
+- config["qsub"]
+- config["dir"]["samples"]
+- config["dir"]["peaks"]
+
+Optional parameters:
+- config["bPeaks"]["IPcoeff"]
+- config["bPeaks"]["controlCoeff"]
+- config["bPeaks"]["log2FC"]
+- config["bPeaks"]["averageQuantiles"]
+- config["bPeaks"]["windowSize"]
+- config["bPeaks"]["windowOverlap"]
+
 
 bwa_index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -199,8 +259,8 @@ Motif discovery using the peak-motifs pipeline from `RSAT <rsat.eu>`__.
 
 Required parameters:
 
-- `config["qsub"]`
-- `config["peak-motifs"]["motif_db"]`
+- config["qsub"]
+- config["peak-motifs"]["motif_db"]
 
 Optional parameters:
 
