@@ -3,6 +3,7 @@
 ; sub series GSE55357
 ; Organism: Saccharomyces cerevisiae
 ; Experiment type: ChIP-seq
+;
 ID	Condition	Scan Name
 GSM1334674	input	SRR1176905
 GSM1334676	input	SRR1176907

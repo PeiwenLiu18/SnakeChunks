@@ -1,4 +1,7 @@
-; Design for the peak-calling of ChIP-seq analysis
+; Design file
+; Organism: Saccharomyces cerevisiae
+; Experiment type: ChIP-seq
+;
 treatment	control
 GSM1334679	GSM1334674
 GSM1334677	GSM1334676
