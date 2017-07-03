@@ -21,7 +21,7 @@ rule bed_to_fasta:
     Required parameters:
         config["qsub"]
 
-    Copyright Jacques van Helden, Claire Rioualen
+    Contributors: Jacques van Helden, Claire Rioualen
     """
     input: "{regions}.bed"
     output: "{regions}.fasta"

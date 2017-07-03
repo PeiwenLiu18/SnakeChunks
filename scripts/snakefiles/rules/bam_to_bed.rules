@@ -9,7 +9,7 @@ rule bam_to_bed:
     Required parameters:
         config["qsub"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: "{reads}.bam"
     output: "{reads}.bed"

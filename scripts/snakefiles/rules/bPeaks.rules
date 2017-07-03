@@ -53,8 +53,7 @@ rule bPeaks:
         config["bPeaks"]["windowSize"]
         config["bPeaks"]["windowOverlap"]
 
-    Copyright: 
-        Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bam", \
