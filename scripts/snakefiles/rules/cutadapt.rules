@@ -19,9 +19,6 @@ if not "qual_threshold" in config["cutadapt"].keys():
 if not "length_threshold" in config["cutadapt"].keys():
     config["cutadapt"]["length_threshold"] = "20"
 
-if not "qual" in config["cutadapt"].keys():
-    config["cutadapt"]["qual"] = "sanger"
-
 if not "fastq" in config["dir"].keys():
     sys.exit("config['dir']['fastq'] must be in the config file.")
 
