@@ -5,8 +5,11 @@ if not "qsub" in config.keys():
 if not "peak-motifs" in config.keys():
     config["peak-motifs"] = {}
 
+#if not "motif_db" in config["peak-motifs"].keys():
+#    sys.exit("The parameter peak-motif:motif_db must be defined in the config file")
+
 if not "motif_db" in config["peak-motifs"].keys():
-    sys.exit("The parameter peak-motif:motif_db must be defined in the config file")
+    config["peak-motifs"]["motif_db"] = ""
 
 if not "tasks" in config["peak-motifs"].keys():
     config["peak-motifs"]["tasks"] = "all"
