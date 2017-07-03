@@ -193,15 +193,17 @@ mosaics
 peak_motifs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Motif discovery using the peak-motifs pipeline.
+Motif discovery using the peak-motifs pipeline from `RSAT <rsat.eu>`__.
 
-Find out more @ http://floresta.eead.csic.es/rsat/help.peak-motifs.html
+`Documentation <http://floresta.eead.csic.es/rsat/help.peak-motifs.html>`__.
 
 Required parameters:
-- config["qsub"]
-- config["peak-motifs"]["motif_db"]
+
+- `config["qsub"]`
+- `config["peak-motifs"]["motif_db"]`
 
 Optional parameters:
+
 - config["peak-motifs"]["tasks"]
 - config["peak-motifs"]["disco"]
 
