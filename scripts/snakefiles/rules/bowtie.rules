@@ -49,7 +49,7 @@ def bowtie_inputs(wildcards):
 
 # Rule
 rule bowtie:
-    """Read mapping for single end data using bowtie. 
+    """Read mapping using bowtie. 
     Requires the indexing to have previously been done (using the
     rule bowtie_index).
 
@@ -64,7 +64,7 @@ rule bowtie:
         config["bowtie"]["max_mismatches"]
         config["bowtie"]["threads"]
 
-    Copyright Claire Rioualen, Jacques van Helden, Lucie Khamvongsa
+    Contributors: Claire Rioualen, Jacques van Helden, Lucie Khamvongsa
     """
     input:
         reads = bowtie_inputs, 

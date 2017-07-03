@@ -33,7 +33,7 @@ rule blastall:
         config["blastall"]["expect"]
         config["blastall"]["view"]
 
-    Copyright Jacques van Helden
+    Contributors: Jacques van Helden
     """
     input: query="{query}.fa", db_index=config["blastall"]["db"] + ".psi"
     output: hits="{query}_{blast_program}_hits.tsv"

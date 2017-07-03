@@ -58,8 +58,7 @@ rule bbduk:
         config["bbduk"]["qual_threshold"]
         config["metadata"]["strands"]
 
-    Authors:
-        Claire Rioualen, Lucie Khamvongsa
+    Contributors: Claire Rioualen
     """
     input: reads = bbduk_inputs
     output:

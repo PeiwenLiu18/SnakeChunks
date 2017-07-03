@@ -23,7 +23,7 @@ rule bedgraph_to_tdf:
         config["dir"]["genome"]
         config["genome"]["fasta_file"]
 
-    Copyright: Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: "{coverage}.bedgraph"
     output: "{coverage}.tdf"

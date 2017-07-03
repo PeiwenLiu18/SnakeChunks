@@ -13,7 +13,7 @@ rule blast_formatdb:
     
     ## type (formatdb option -p): sequence type: peptidic (-pT) or nucleic (-pF)
 
-    Copyright Jacques van Helden
+    Contributors: Jacques van Helden
     """
     input: fasta_seq="{ref_db}.fa"
     output: "{ref_db}_blastdb_p{type}.{extensions,(phr|psq|psi|psd|pin)}"

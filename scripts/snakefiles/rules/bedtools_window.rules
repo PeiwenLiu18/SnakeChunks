@@ -39,7 +39,7 @@ rule bedtools_window:
     Opional parameters:
         config["bedtools"]["window"]
 
-    Copyright Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: bed = "{regions}.bed", gff3 = gff3_file
     output: "{regions}_window_annot.bed"
