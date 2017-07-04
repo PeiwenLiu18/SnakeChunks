@@ -75,7 +75,6 @@ rule bPeaks:
     log: config["dir"]["peaks"] + "/{treatment}_vs_{control}/bPeaks/{treatment}_vs_{control}{preprocess,.*}_bPeaks.log"
     benchmark: config["dir"]["peaks"] + "/{treatment}_vs_{control}/bPeaks/{treatment}_vs_{control}{preprocess,.*}_bPeaks_benchmark.txt"
     run:
-        #shell("mkdir {params.outdir}") ## to remove
         R("""sink("{log}")
 
         library("bPeaks")
@@ -93,8 +92,9 @@ rule bPeaks:
         IPcoeff={params.IPcoeff}, controlCoeff={params.controlCoeff}, log2FC={params.log2FC}, averageQuantiles={params.averageQuantiles}, windowSize={params.windowSize}, windowOverlap={params.windowOverlap}, 
         peakDrawing = FALSE, resultName="{params.name}")
 
-        file.rename("{params.name}_bPeaks_allGenome.bed", "{output.peaks_bed}")
+        file.rename("{params.name}_bPeaks_allGenome.bed", "{params.name}_bPeaks.bed")
 
         sink()
 
         """)
+
