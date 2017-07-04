@@ -129,7 +129,9 @@ init: create_bin update_bashrc
 
 ## ???
 add_pub_key:
-	for i in '$(PUB_KEY)'; do echo "PUB_KEY: $$i"; sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $$i; done
+	#for i in '$(PUB_KEY)'; do echo "PUB_KEY: $$i"; sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com $$i; done
+	gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E084DAB9
+	gpg -a --export E084DAB9 | sudo apt-key add -
 
 add_repos: 
 	sudo apt-get install --yes python-software-properties
