@@ -1,6 +1,6 @@
 ################################################################
 ## REQUIRED PARAMETERS
-author: "Claire Rioualen"
+  author: "Claire Rioualen"
   qsub: "-V -m a -d ."                                                  # Required, even if empty quotes
   genome:
     organism: "Saccharomyces cerevisiae"
