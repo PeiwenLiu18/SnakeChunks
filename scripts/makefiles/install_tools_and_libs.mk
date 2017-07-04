@@ -167,7 +167,7 @@ R_lib:
 	pack <- pack.list[!(pack.list %in% installed.packages()[,'Package'])];\
 	if(length(pack)) biocLite(pack);\
 	library(devtools);\
-	install_github('PF2-pasteur-fr/SARTools', build_vignettes=TRUE)
+	install_github('PF2-pasteur-fr/SARTools', build_vignettes=TRUE);\
 	install_github('hms-dbmi/spp', build_vignettes = TRUE)"
 
 Rstudio: 
