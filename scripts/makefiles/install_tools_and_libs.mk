@@ -409,6 +409,7 @@ ngs_tools: \
 	sratoolkit\
 	fastqc\
 	sickle\
+	cutadapt\
 	bowtie\
 	bowtie2\
 	bwa\
