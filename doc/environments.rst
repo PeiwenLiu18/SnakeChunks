@@ -589,7 +589,7 @@ Create a Docker account
 
 Instructions `here <https://docs.docker.com/engine/installation/linux/ubuntu/>`__ (linux users).
 
-Install Docker on your local host
+Install Docker on your local host (Linux)
 ****************************************************************
 
 Instructions for a linux install can be found
@@ -630,68 +630,8 @@ Switch back to azerty:
 
     setxkbmap fr
 
-<!-- Run the following command:
-    sudo apt-get --yes install docker
--->
-
-
-SnakeChunks with Docker
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-*This section is not up to date*
-
-Create shared repositories and download source data
-****************************************************************
-
-In order to execute the study case GSE55357, you should enter the
-following commands:
-
-::
-
-    export ANALYSIS_DIR=~/ChIP-seq_GSE55357
-    mkdir $ANALYSIS_DIR
-    cd $ANALYSIS_DIR
-
-
-**Download reference genome & annotations**
-
-::
-
-    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.30.dna.genome.fa.gz -P ${ANALYSIS_DIR}/genome
-    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gff3.gz -P ${ANALYSIS_DIR}/genome
-    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gtf.gz -P ${ANALYSIS_DIR}/genome
-    gunzip ${ANALYSIS_DIR}/genome/*.gz
-
-**Download ChIP-seq data**
-
-::
-
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
-
-Fetch the Docker image and run it with shared folders
-****************************************************************
-
-::
-
-    docker pull snakechunks/snakechunks:4.0
-    docker run -v $ANALYSIS_DIR:~/ChIP-seq_GSE55357 -it rioualen/snakechunks/snakechunks:4.0 /bin/bash
-
-You can share as many folders as desired, using this syntax:
-``-v /path/on/host/:/path/on/docker/``.
-
-Execute the pipeline
-****************************************************************
-
-::
-
-    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/factor_workflow.py --configfile gene-regulation/examples/GSE20870/GSE20870.yml
-
-
 On Mac OSX
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+****************************************************************
 
 1. Install docker
 
@@ -806,6 +746,63 @@ rioualen/gene-regulation:0.3 509 docker run -v
     snakemake -s scripts/snakefiles/workflows/factor_workflow.py -np
     history
     snakemake -s scripts/snakefiles/workflows/factor_workflow.py -np
+
+
+SnakeChunks with Docker
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+*This section is not up to date*
+
+Create shared repositories and download source data
+****************************************************************
+
+In order to execute the study case GSE55357, you should enter the
+following commands:
+
+::
+
+    export ANALYSIS_DIR=~/ChIP-seq_GSE55357
+    mkdir $ANALYSIS_DIR
+    cd $ANALYSIS_DIR
+
+
+**Download reference genome & annotations**
+
+::
+
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.30.dna.genome.fa.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gff3.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gtf.gz -P ${ANALYSIS_DIR}/genome
+    gunzip ${ANALYSIS_DIR}/genome/*.gz
+
+**Download ChIP-seq data**
+
+::
+
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
+
+Fetch the Docker image and run it with shared folders
+****************************************************************
+
+::
+
+    docker pull snakechunks/snakechunks:4.0
+    docker run -v $ANALYSIS_DIR:~/ChIP-seq_GSE55357 -it rioualen/snakechunks/snakechunks:4.0 /bin/bash
+
+You can share as many folders as desired, using this syntax:
+``-v /path/on/host/:/path/on/docker/``.
+
+Execute the pipeline
+****************************************************************
+
+::
+
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/factor_workflow.py --configfile gene-regulation/examples/GSE20870/GSE20870.yml
+
+
 
 ..
 Questions
