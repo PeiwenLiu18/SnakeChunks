@@ -29,7 +29,7 @@ rule annotate_peaks:
         config["genome"]["fasta_file"]
         config["genome"]["gtf_file"]
 
-    COntributors: Claire Rioualen
+    Contributors: Claire Rioualen
     """
     input: 
         bed = "{regions}.bed",
@@ -39,7 +39,6 @@ rule annotate_peaks:
     log: "{regions}_gene_list.log"
     benchmark: "{regions}_gene_list_benchmark.txt"
     params: 
-        wd = config["dir"]["base"], 
         qsub = config["qsub"] + " -e {regions}_gene_list_qsub.err -o {regions}_gene_list_qsub.out"
     run:
         shell("annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}")
