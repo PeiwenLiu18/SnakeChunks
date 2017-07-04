@@ -75,7 +75,7 @@ rule bPeaks:
     log: config["dir"]["peaks"] + "/{treatment}_vs_{control}/bPeaks/{treatment}_vs_{control}{preprocess,.*}_bPeaks.log"
     benchmark: config["dir"]["peaks"] + "/{treatment}_vs_{control}/bPeaks/{treatment}_vs_{control}{preprocess,.*}_bPeaks_benchmark.txt"
     run:
-        shell("mkdir {params.outdir}") ## to remove
+        #shell("mkdir {params.outdir}") ## to remove
         R("""sink("{log}")
 
         library("bPeaks")
