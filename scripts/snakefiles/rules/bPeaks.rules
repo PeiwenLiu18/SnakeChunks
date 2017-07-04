@@ -73,7 +73,7 @@ rule bPeaks:
           + " -e " + dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_qsub.err" \
           + " -o " + dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_qsub.out"
     log: dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks.log"
-    benchmark: dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_benchmark.txt"
+#    benchmark: dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_benchmark.txt"
     run:
         R("""sink("{log}")
 
