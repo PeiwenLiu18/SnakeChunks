@@ -42,9 +42,9 @@ import datetime
 import re
 import pandas as pd
 
-workdir = os.getcwd()
+wd = os.getcwd()
 
-GENEREG_LIB = os.path.join(workdir, config["dir"]["snakechunks"])
+GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
 include: os.path.join(GENEREG_LIB, "scripts/python_lib/util.py")
 include: os.path.join(GENEREG_LIB, "scripts/python_lib/igv_session.py")
