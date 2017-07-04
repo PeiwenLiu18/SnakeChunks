@@ -643,30 +643,41 @@ SnakeChunks with Docker
 Create shared repositories and download source data
 ****************************************************************
 
-In order to execute the study case GSE20870, you should enter the
+In order to execute the study case GSE55357, you should enter the
 following commands:
 
 ::
 
-    export ANALYSIS_DIR=~/ChIP-seq_SE_GSE20870
+    export ANALYSIS_DIR=~/ChIP-seq_GSE55357
     mkdir $ANALYSIS_DIR
     cd $ANALYSIS_DIR
 
+
+**Download reference genome & annotations**
+
 ::
 
-    mkdir data/GSM521934 
-    wget -nc ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX%2FSRX021%2FSRX021358/SRR051929/SRR051929.sra -P data/GSM521934
+wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.30.dna.genome.fa.gz -P ${ANALYSIS_DIR}/genome
+wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gff3.gz -P ${ANALYSIS_DIR}/genome
+wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gtf.gz -P ${ANALYSIS_DIR}/genome
+gunzip ${ANALYSIS_DIR}/genome/*.gz
 
-    mkdir data/GSM521935
-    wget -nc ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX%2FSRX021%2FSRX021359/SRR051930/SRR051930.sra -P data/GSM521935
+**Download ChIP-seq data**
+
+::
+
+wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
+wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
+wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
+wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
 
 Fetch the Docker image and run it with shared folders
 ****************************************************************
 
 ::
 
-    docker pull rioualen/gene-regulation:2.0
-    docker run -v $ANALYSIS_DIR:~/ChIP-seq_SE_GSE20870 -it rioualen/gene-regulation:2.0 /bin/bash
+    docker pull snakechunks/snakechunks:4.0
+    docker run -v $ANALYSIS_DIR:~/ChIP-seq_GSE55357 -it rioualen/snakechunks/snakechunks:4.0 /bin/bash
 
 You can share as many folders as desired, using this syntax:
 ``-v /path/on/host/:/path/on/docker/``.
@@ -676,7 +687,7 @@ Execute the pipeline
 
 ::
 
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/factor_workflow.py --configfile gene-regulation/examples/GSE20870/GSE20870.yml
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/factor_workflow.py --configfile gene-regulation/examples/GSE20870/GSE20870.yml
 
 
 On Mac OSX
