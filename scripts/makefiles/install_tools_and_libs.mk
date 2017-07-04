@@ -83,6 +83,7 @@ SPP_VER=1.11
 STAR_VER=2.5.2b
 SUBREAD_VER=1.5.2
 SWEMBL_VER=3.3.1
+TRIM_GALORE_VER=0.4.3
 
 # ================================================================
 # General configuration
@@ -269,6 +270,14 @@ sickle:
 	cd sickle-$(SICKLE_VER) && \
 	make && \
 	cp sickle $(BIN_DIR)
+
+cutadapt:
+	cd $(SOURCE_DIR) && \
+	pip install --user --upgrade cutadapt && \
+	mv /root/.local/bin/cutadapt $(BIN_DIR) && \
+	curl -fsSL https://github.com/FelixKrueger/TrimGalore/archive/$(TRIM_GALORE_VER).tar.gz -o trim_galore.tar.gz && \
+	tar xvzf trim_galore.tar.gz && \
+	mv TrimGalore-$(TRIM_GALORE_VER)/trim_galore $(BIN_DIR)
 
 # ----------------------------------------------------------------
 # Mapping tools
