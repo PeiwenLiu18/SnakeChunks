@@ -57,7 +57,7 @@ usage:
 
 
 CRAN_PACK_LIST='XML', 'bPeaks', 'caTools', 'VennDiagram', 'devtools'
-BIOC_PACK_LIST='affy', 'biomaRt', 'Rsamtools', 'genefilter', 'GenomicFeatures', 'edgeR', 'DESeq2'
+BIOC_PACK_LIST='affy', 'biomaRt', 'Rsamtools', 'genefilter', 'GenomicFeatures', 'edgeR', 'DESeq2', 'mosaics'
 PUB_KEY=51716619E084DAB9
 #E084DAB9 51716619E084DAB9 F7B8CEA6056E8E56 06F90DE5381BA480
 
@@ -158,8 +158,6 @@ R_installation:
 	sudo apt-get -y install r-base r-base-dev libcurl4-openssl-dev libxml2-dev
 	echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" >> ~/.Rprofile
 
-
-
 R_lib: 
 	sudo Rscript -e "pack.list <- c($(CRAN_PACK_LIST));\
 	pack <- pack.list[!(pack.list %in% installed.packages()[,'Package'])];\
@@ -169,12 +167,8 @@ R_lib:
 	pack <- pack.list[!(pack.list %in% installed.packages()[,'Package'])];\
 	if(length(pack)) biocLite(pack);\
 	library(devtools);\
-	install_github('PF2-pasteur-fr/SARTools', build_vignettes=TRUE)"
-
-
-#    require(devtools)
-#    devtools::install_github('hms-dbmi/spp', build_vignettes = FALSE)
-
+	install_github('PF2-pasteur-fr/SARTools', build_vignettes=TRUE)
+	install_github('hms-dbmi/spp', build_vignettes = TRUE)"
 
 Rstudio: 
 	cd $(SOURCE_DIR) && \
@@ -348,33 +342,11 @@ macs1:
 macs2:
 	sudo pip install MACS2
 
-#spp:
-#	cd $(SOURCE_DIR) && \
-#	wget -nc http://compbio.med.harvard.edu/Supplements/ChIP-seq/spp_$(SPP_VER).tar.gz && \
-#	sudo R CMD INSTALL spp_$(SPP_VER).tar.gz
-
-
-#swembl:
-#	cd $(SOURCE_DIR) && \
-#	wget "http://www.ebi.ac.uk/~swilder/SWEMBL/SWEMBL.$(SWEMBL_VER).tar.bz2" && \
-#	bunzip2 -f SWEMBL.$(SWEMBL_VER).tar.bz2 && \
-#	tar xvf SWEMBL.$(SWEMBL_VER).tar && \
-#	rm SWEMBL.$(SWEMBL_VER).tar && \
-#	chown -R ubuntu-user SWEMBL.$(SWEMBL_VER) && \
-#	cd SWEMBL.$(SWEMBL_VER) && \
-#	make
-## Currently not working -> see w/ S.Wilder, new version to come?
-## Correction
-##gcc main.c IO.c calc.c stack.c summit.c refcalc.c wiggle.c overlap.c -o SWEMBL -lz -lm
-
-
-#testé OK le 21/06/17
-#git clone https://github.com/stevenwilder/SWEMBL.git
-#cd SWEMBL
-#make 
-#cp SWEMBL $(BIN_DIR)
-
-
+swembl:
+	git clone https://github.com/stevenwilder/SWEMBL.git && \
+	cd SWEMBL && \
+	make && \
+	cp SWEMBL $(BIN_DIR)
 
 homer:
 	mkdir $(SOURCE_DIR)/homer && \
@@ -417,7 +389,8 @@ ngs_tools: \
 	tophat2\
 	macs1\
 	macs2\
-	homer
+	homer\
+	swembl\
 
 # BEDOPS, DEEPTOOLS
 
