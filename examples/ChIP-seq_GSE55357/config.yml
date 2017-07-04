@@ -25,7 +25,7 @@
     snakechunks: "SnakeChunks"                                          # Location of the library or symlink to library
 
     samples: "results/samples"
-    diffexpr: "results/diffexpr"
+    peaks: "results/peaks"
     reports: "results/reports"
 
   tools:
