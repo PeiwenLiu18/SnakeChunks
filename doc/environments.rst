@@ -538,7 +538,7 @@ Get the ``SnakeChunks`` repository
 
 ::
 
-    wget -nc https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz
+    wget -nc https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz
     tar zvxf 4.0.tar.gz
 
 Run makefile to install the dependencies
