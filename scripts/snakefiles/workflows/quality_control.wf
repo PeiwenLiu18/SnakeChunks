@@ -49,7 +49,7 @@ import pandas as pd
 
 wd = os.getcwd()
 
-GENEREG_LIB = os.path.join(wd, config["dir"]["gene_regulation"])
+GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
 # Python includes
 PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
