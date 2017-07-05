@@ -758,8 +758,6 @@ rioualen/gene-regulation:0.3 509 docker run -v
 SnakeChunks with Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*This section is not up to date*
-
 Create shared repositories and download source data
 ****************************************************************
 
