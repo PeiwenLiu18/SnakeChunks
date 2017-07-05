@@ -290,7 +290,7 @@ Creation of an instance
 ****************************************************************
 
 1. Click *New Instance* button.
-2. Choose appliance **Gene regulation 4.0** in the drop-down menu.
+2. Choose appliance **SnakeChunks 4.0** in the drop-down menu.
 3. Name your VM.
 4. Choose the amount of CPU and RAM to grant the VM.
 5. Attach the vDisk.
@@ -330,7 +330,7 @@ We also create a link to the SnakeChunks library.
     ANALYSIS_DIR=${HOME}/mydisk/ChIP-seq_SE_GSE20870
     mkdir -p ${ANALYSIS_DIR}
     cd ${ANALYSIS_DIR}
-    ln -s ${HOME}/SnakeChunks-4.0 SnakeChunks
+    ln -s ${HOME}/SnakeChunks SnakeChunks
 
 Download data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -382,21 +382,28 @@ If there is no error, you can procede with the analysis:
     snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
     # This workflow performs quality check and trimming on the raw data
     snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
-    # This workflow perform a classic ChIP-seq analysis, including mapping, peak-calling and motif search
-    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
+    # This workflow perform a classic ChIP-seq analysis, including mapping, peak-calling and motif search, using 4 CPU
+    snakemake -p -j 4 -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
-Using 4CPU & 8Go of RAM, the workflow should take about 12mn to complete.
+
+Using 4CPU & 8Go of RAM, the workflows take ~30mn to complete.
 
 Congratulations! You just executed these wonderful workflows:
 
-.. figure:: ../img/import_to_fastq_rulegraph.png
+.. figure:: ../img/import_from_sra_rulegraph.png
    :alt: 
+
+    Workflow 'import_from_sra'
 
 .. figure:: ../img/quality_control_rulegraph.png
    :alt: 
 
+    Workflow 'quality_control'
+
 .. figure:: ../img/ChIP-seq_rulegraph.png
    :alt: 
+
+    Workflow 'ChIP-seq'
 
 
 Visualizing results
@@ -468,7 +475,7 @@ navigator. Fetch the ``html`` files located in the sample directories.
        firefox /root/mydisk/ChIP-seq_SE_GSE20870/fastq/GSM521934/GSM521934_fastqc/GSM521934_fastqc.html
        firefox /root/mydisk/ChIP-seq_SE_GSE20870/fastq/GSM521935/GSM521935_fastqc/GSM521935_fastqc.html
 
--  After trimming:
+-  After trimming with Sickle:
 
    ::
 
