@@ -790,7 +790,13 @@ Fetch the Docker image and run it with shared folders
 ::
 
     docker pull snakechunks/snakechunks:4.0
-    docker run -v $ANALYSIS_DIR:~/ChIP-seq_GSE55357 -it rioualen/snakechunks/snakechunks:4.0 /bin/bash
+    docker run -v $ANALYSIS_DIR:$HOME/ChIP-seq_GSE55357 -it snakechunks/snakechunks:4.0 /bin/bash
+
+    docker pull snakechunks/snakechunks:latest
+    docker run -v $ANALYSIS_DIR:$HOME/ChIP-seq_GSE55357 -it snakechunks/snakechunks:latest /bin/bash
+
+docker run -v $ANALYSIS_DIR:$ANALYSIS_DIR -e ANALYSIS_DIR=$ANALYSIS_DIR -e HOME=$HOME -it snakechunks/snakechunks:latest /bin/bash
+
 
 You can share as many folders as desired, using this syntax:
 ``-v /path/on/host/:/path/on/docker/``.
@@ -800,18 +806,7 @@ Execute the pipeline
 
 ::
 
-    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/factor_workflow.py --configfile gene-regulation/examples/GSE20870/GSE20870.yml
-
-
-
-..
-Questions
-****************************************************************
-1. Quand on fait un login dans la vm gene--regulation, on entre dans un
-   shell basique (pas bash). Est-il possible de configurer docker pour
-   qu'on entre automatiquement en bash ?
-Entry point /bin/bash
-2. Il faut ajouter le bashrc dans le /etc du docker.
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
 
 
 
