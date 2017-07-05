@@ -11,21 +11,19 @@ RUN apt-get update \
     libncurses5-dev libncursesw5-dev libboost-dev \
     python3-pip 
 
-RUN pip3 install snakemake pyyaml psutil
+RUN pip3 install snakemake pyyaml psutil numexpr --upgrade
 
 #    python-software-properties\
 #    build-essential \
 #    python3-software-properties \
 #    software-properties-common \
-# libncurses5-dev libncursesw5-dev libboost-dev
+#    libncurses5-dev libncursesw5-dev libboost-dev
 
-#docutils 
-
-## Gene-regulation
+## SnakeChunks
 
 RUN wget https://github.com/snakechunks/snakechunks/archive/4.0.tar.gz && \
     tar zvxf 4.0.tar.gz && \
-    ln -s snakechunks-4.0 snakechunks && \
+    ln -s snakechunks-4.0 SnakeChunks && \
     rm 4.0.tar.gz
 
 ## Programs
@@ -71,10 +69,6 @@ RUN mkdir Homer && \
 	cp `find bin/ -maxdepth 1 -executable -type f` /usr/local/bin
 
 RUN pip3 install -U pandas
-
-#RUN echo export SHELL=/bin/bash >> /root/.bashrc
-#RUN echo export PATH=$PATH:/root/bin >> /root/.bashrc
-
 
 MAINTAINER Claire Rioualen <claire.rioualen@inserm.fr> 
 
