@@ -23,7 +23,7 @@ RUN pip3 install snakemake pyyaml psutil numexpr --upgrade
 
 RUN wget https://github.com/snakechunks/snakechunks/archive/4.0.tar.gz && \
     tar zvxf 4.0.tar.gz && \
-    ln -s snakechunks-4.0 SnakeChunks && \
+    ln -s SnakeChunks-4.0 SnakeChunks && \
     rm 4.0.tar.gz
 
 ## Programs
