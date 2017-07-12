@@ -298,7 +298,10 @@ Workflow 'integration_ChIP_RNA'
 
 
 
-Workflow alternative transcripts
+Demo: alternative transcripts with RNA-seq
+----------------------------------------------------------------
+
+Case: C.elegans
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Setup workdir
