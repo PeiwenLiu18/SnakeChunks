@@ -296,15 +296,56 @@ Workflow 'integration_ChIP_RNA'
 
 
 
-.. *Study case yet to find*
-.. ----------------------------------------------------------------
-.. Workflow alternative transcripts
-.. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. *Study case yet to find*
+
+
+Workflow alternative transcripts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Setup workdir
+****************************************************************
+
+::
+
+    ANALYSIS_DIR=$HOME/GSE59705_RNA-seq_splicing
+    mkdir ${ANALYSIS_DIR}
+    cd ${ANALYSIS_DIR}
+
+Download the SnakeChunks library
+****************************************************************
+
+::
+
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
+    tar xvzf 4.0.tar.gz
+    ln -s SnakeChunks-4.0 SnakeChunks
+
+
+Download reference genome & annotations
+****************************************************************
+
+::
+
+    wget -nc ftp://ftp.wormbase.org/pub/wormbase/releases/WS220/species/c_elegans/c_elegans.WS220.genomic.fa.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.wormbase.org/pub/wormbase/releases/WS220/species/c_elegans/c_elegans.WS220.annotations.gff3.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.wormbase.org/pub/wormbase/releases/WS253/species/c_elegans/PRJNA13758/c_elegans.PRJNA13758.WS253.canonical_geneset.gtf.gz -P ${ANALYSIS_DIR}/genome
+    gunzip ${ANALYSIS_DIR}/genome/*.gz
+
+::
+
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443914
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443914
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443915
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443915
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443916
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443916
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443917
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443917
+
+
 .. ----------------------------------------------------------------
 .. Workflow orthologs
 .. ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. *todo after we revise the Glossine dataset analysis*
+
 
 
 
