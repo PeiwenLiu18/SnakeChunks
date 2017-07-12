@@ -1,0 +1,56 @@
+################################################################
+## REQUIRED PARAMETERS
+  author: "Claire Rioualen"
+  qsub: "-V -m a -d ."                                                  # Required, even if empty quotes
+  genome:
+    organism: "Caenorhabditis elegans"
+    size: "100200000"
+    version: "ce10"
+    fasta_file: "c_elegans.WS220.genomic.fa"
+    gff3_file: "c_elegans.WS220.annotations.gff3"
+    gtf_file: "c_elegans.PRJNA13758.WS253.canonical_geneset.gtf"
+
+  metadata:
+    samples: "SnakeChunks/examples/RNA-seq_GSE59705/samples.tab"       # Contains at least an "ID" column
+    design: "SnakeChunks/examples/RNA-seq_GSE59705/design.tab"         # Contains 2 columns with ID or groups of samples to be compared
+    configfile: "SnakeChunks/examples/RNA-seq_GSE59705/config.yml"     # Required for flowcharts generation; should be revised
+    seq_type: "se"
+
+  dir:
+    reads_source: "data"                                                # Raw data (sra)
+    fastq: "fastq"                                                      # Fastq location, either raw data or converted sra files 
+    genome: "genome"                                                    # Location of the genome files (fasta, gff3, gtf) or symlink to location
+    results: "results"
+    snakechunks: "SnakeChunks"                                          # Location of the library or symlink to library
+
+    samples: "results/samples"
+    diffexpr: "results/diffexpr"
+    reports: "results/reports"
+
+  tools:
+    trimming: ""
+    mapping: "tophat"
+    read_counts: "featureCounts"
+    infer_transcripts: "cufflinks"
+
+################################################################
+## OPTIONAL PARAMETERS
+##
+## These are the parameters that are used by rules & programs. 
+##
+## If nothing is mentionned  below, all prgrams will use their default parameters. 
+  tophat:
+    max_mismatches: 1                                                   # Default 2
+    threads: 1                                                          # Default 1
+
+  subread-featureCounts:
+    attr_type: "gene_id"                                                # Default 'gene_id'
+    feature_type: "exon"
+    strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
+    multi_mapping: ""
+
+
+  cufflinks:
+    threads: "4"
+    libtype: "fr-firststrand"
+

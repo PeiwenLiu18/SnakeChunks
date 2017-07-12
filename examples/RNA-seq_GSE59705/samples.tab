@@ -1,0 +1,16 @@
+; RNA-seq samples from GEO series GSE59705
+; Organism: Caenorhabditis elegans
+;
+ID	Condition
+GSM1443914	control
+GSM1443914	control
+GSM1443915	spk1
+GSM1443915	spk1
+GSM1443916	control
+GSM1443916	control
+GSM1443917	spk1
+GSM1443917	spk1
+
+
+
+
