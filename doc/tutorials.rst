@@ -61,7 +61,7 @@ to the analysis directory.
 
 ::
 
-    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
     ln -s SnakeChunks-4.0 SnakeChunks
 
@@ -131,9 +131,9 @@ This workflow can be run after the workflow 'import_from_sra', or directly on pr
 (see `this section
 <http://SnakeChunks.readthedocs.io/en/latest/tutorials.html#running-SnakeChunks-workflows-on-your-own-data>`_ if you dispose of your own data).
 
-The purpose of this workflow is to perform quality check with `FastQC https://www.bioinformatics.babraham.ac.uk/projects/fastqc/`_. 
+The purpose of this workflow is to perform quality check with `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_. 
 
-Optionally, trimming can be performed using the tools `Sickle <https://github.com/najoshi/sickle>`_. or `Cutadapt <http://cutadapt.readthedocs.io/en/stable/>`_.
+Optionally, trimming can be performed using the tools `Sickle <https://github.com/najoshi/sickle>`_ or `Cutadapt <http://cutadapt.readthedocs.io/en/stable/>`_.
 
 
 Workflow execution
@@ -152,10 +152,9 @@ Workflow 'ChIP-seq'
 
 This workflows performs:
  - mapping with various algorithms
- - genome coverage in different formats (check out our `glossary
-<http://SnakeChunks.readthedocs.io/en/latest/wiki.html#glossary>`_)
+ - genome coverage in different formats (check out our `glossary <http://SnakeChunks.readthedocs.io/en/latest/wiki.html#glossary>`__)
  - peak-calling with various algorithms
- - motifs search using the `RSAT suite <rsat.eu>`_
+ - motifs search using the `RSAT suite <http://rsat.eu>`__
 
 You must have run at least the workflow "import_from_sra", and optionally the workflow "quality_control". 
 
@@ -202,7 +201,7 @@ Download the SnakeChunks library
 
 ::
 
-    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
     ln -s SnakeChunks-4.0 SnakeChunks
 
@@ -328,7 +327,7 @@ Hereafter is a suggestion for the organization of your files.
 ::
 
     # Download the SnakeChunks library
-    wget --no-clobber https://github.com/rioualen/SnakeChunks/archive/4.0.tar.gz 
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
     tar xvzf 4.0.tar.gz
     ln -s SnakeChunks-4.0 SnakeChunks
 
