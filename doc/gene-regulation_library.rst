@@ -51,7 +51,7 @@ annotate_peaks
 
 This rule runs a program that is part of the HOMER tools suite. 
 It outputs a list of gene identifiers using a bed file, a fasta file and a gtf file. 
-The bed file can be a peak file produces by any peak-calling rule. 
+The bed file can be a peak file produced by any peak-calling rule. 
 
 More: http://homer.salk.edu/homer/ngs/annotation.html
 
