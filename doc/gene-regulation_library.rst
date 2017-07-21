@@ -65,7 +65,7 @@ Required parameters:
 bam_by_name
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sort aligned reads (in bam format) by positions using 'samtools sort'. 
+Sort aligned reads (in bam format) by name using 'samtools sort'. 
 
 Required parameters:
 
@@ -74,7 +74,7 @@ Required parameters:
 bam_by_pos
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sort aligned reads (in bam format) by name, using 'samtools sort'. 
+Sort aligned reads (in bam format) by positions, using 'samtools sort'. 
 
 Required parameters:
 
