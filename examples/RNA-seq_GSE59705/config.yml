@@ -14,7 +14,8 @@
     samples: "SnakeChunks/examples/RNA-seq_GSE59705/samples.tab"       # Contains at least an "ID" column
     design: "SnakeChunks/examples/RNA-seq_GSE59705/design.tab"         # Contains 2 columns with ID or groups of samples to be compared
     configfile: "SnakeChunks/examples/RNA-seq_GSE59705/config.yml"     # Required for flowcharts generation; should be revised
-    seq_type: "se"
+    seq_type: "pe"
+    strands: "1 2"
 
   dir:
     reads_source: "data"                                                # Raw data (sra)
