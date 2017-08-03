@@ -187,14 +187,19 @@ Musinu Zakari
 - ChIP-seq: `GSE55357 <http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE55357>`__
 - RNA-seq: `GSE55316 <http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE55316>`__
 
-Setup workdir
-****************************************************************
+
+
+
+
+Workflow 'ChIP-seq'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-    ANALYSIS_DIR=$HOME/GSE55358_Integrated_analysis
+    ANALYSIS_DIR=$HOME/ChIP-seq_GSE55357
     mkdir ${ANALYSIS_DIR}
     cd ${ANALYSIS_DIR}
+
 
 Download the SnakeChunks library
 ****************************************************************
@@ -218,19 +223,15 @@ Download reference genome & annotations
 
 
 
-
-Workflow 'ChIP-seq'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Download ChIP-seq data 
 ****************************************************************
 
 ::
 
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/ChIP-seq_GSE55357/data/GSM1334674
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/ChIP-seq_GSE55357/data/GSM1334676
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/ChIP-seq_GSE55357/data/GSM1334679
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/ChIP-seq_GSE55357/data/GSM1334677
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
 
 Workflow execution
 ****************************************************************
@@ -259,15 +260,44 @@ And you should be able to execute it like this:
 Workflow 'RNA-seq' for differential expression analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+::
+
+    ANALYSIS_DIR=$HOME/ChIP-seq_GSE55357
+    mkdir ${ANALYSIS_DIR}
+    cd ${ANALYSIS_DIR}
+
+
+Download the SnakeChunks library
+****************************************************************
+
+::
+
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
+    tar xvzf 4.0.tar.gz
+    ln -s SnakeChunks-4.0 SnakeChunks
+
+
+Download reference genome & annotations
+****************************************************************
+
+::
+
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.30.dna.genome.fa.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gff3.gz -P ${ANALYSIS_DIR}/genome
+    wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gtf.gz -P ${ANALYSIS_DIR}/genome
+    gunzip ${ANALYSIS_DIR}/genome/*.gz
+
+
+
 Download RNA-seq data
 ****************************************************************
 
 ::
 
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476122/SRR1176894/SRR1176894.sra -P ${ANALYSIS_DIR}/RNA-seq_GSE55316/data/GSM1334027
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476124/SRR1176896/SRR1176896.sra -P ${ANALYSIS_DIR}/RNA-seq_GSE55316/data/GSM1334029
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476128/SRR1176900/SRR1176900.sra -P ${ANALYSIS_DIR}/RNA-seq_GSE55316/data/GSM1334033
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476129/SRR1176901/SRR1176901.sra -P ${ANALYSIS_DIR}/RNA-seq_GSE55316/data/GSM1334034
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476122/SRR1176894/SRR1176894.sra -P ${ANALYSIS_DIR}/data/GSM1334027
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476124/SRR1176896/SRR1176896.sra -P ${ANALYSIS_DIR}/data/GSM1334029
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476128/SRR1176900/SRR1176900.sra -P ${ANALYSIS_DIR}/data/GSM1334033
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476129/SRR1176901/SRR1176901.sra -P ${ANALYSIS_DIR}/data/GSM1334034
 
 Workflow execution
 ****************************************************************
@@ -335,15 +365,21 @@ Download reference genome & annotations
 
 ::
 
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443914
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443914
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443915
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443915
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443916
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443916
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_2.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443917
-    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_1.fastq.gz -P ${ANALYSIS_DIR}/data/GSM1443917
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_2.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443914
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/001/SRR1523361/SRR1523361_1.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443914
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_2.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443915
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/002/SRR1523362/SRR1523362_1.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443915
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_2.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443916
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/003/SRR1523363/SRR1523363_1.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443916
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_2.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443917
+    wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR152/004/SRR1523364/SRR1523364_1.fastq.gz -P ${ANALYSIS_DIR}/fastq/GSM1443917
+    gunzip ${ANALYSIS_DIR}/fastq/*/*.gz
 
++ rename
+
+::
+
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq_transcripts.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE59705/config.yml -n
 
 .. ----------------------------------------------------------------
 .. Workflow orthologs
