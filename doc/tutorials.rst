@@ -242,10 +242,6 @@ Your directory should now look like this:
 .. figure:: ../img/tuto_integrated_1.png
    :alt: 
 
-
-.. figure:: ../img/tuto_integrated_2.png
-   :alt: 
-
 And you should be able to execute it like this: 
 
 ::
@@ -262,7 +258,7 @@ Workflow 'RNA-seq' for differential expression analysis
 
 ::
 
-    ANALYSIS_DIR=$HOME/ChIP-seq_GSE55357
+    ANALYSIS_DIR=$HOME/RNA-seq_GSE55316
     mkdir ${ANALYSIS_DIR}
     cd ${ANALYSIS_DIR}
 
@@ -286,7 +282,6 @@ Download reference genome & annotations
     wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gff3.gz -P ${ANALYSIS_DIR}/genome
     wget -nc ftp://ftp.ensemblgenomes.org/pub/fungi/release-30/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.30.gtf.gz -P ${ANALYSIS_DIR}/genome
     gunzip ${ANALYSIS_DIR}/genome/*.gz
-
 
 
 Download RNA-seq data
