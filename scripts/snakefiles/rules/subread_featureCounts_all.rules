@@ -1,8 +1,3 @@
-GENEREG_LIB = os.path.abspath(config["dir"]["gene_regulation"])
-
-# Python includes
-PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
-include: os.path.join(PYTHON, "util.py")
 
 from snakemake.utils import R
 
