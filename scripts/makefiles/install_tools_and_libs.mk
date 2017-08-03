@@ -83,6 +83,7 @@ SPP_VER=1.11
 STAR_VER=2.5.2b
 SUBREAD_VER=1.5.2
 SWEMBL_VER=3.3.1
+TOPHAT_VER=2.1.1
 TRIM_GALORE_VER=0.4.3
 
 # ================================================================
