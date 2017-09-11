@@ -63,6 +63,7 @@ rule swembl:
 (SWEMBL -i {input.treatment} -r {input.control} -B -R {params.R} -N {params.N} -x {params.x} -o {output.peaks_swembl}; \
 grep -v '^#' {output.peaks_swembl} \
   | awk -F'\t' '$1 != "Region" || $2 != "Start pos." {{print $1"\t"$2"\t"$3"\t{params.compa_name}_SWEMBL\t"$7"\t+"}}'> {output.peaks_bed}
-) &> {log}
+) &> {log} \
+|| (touch {output})
 """
 

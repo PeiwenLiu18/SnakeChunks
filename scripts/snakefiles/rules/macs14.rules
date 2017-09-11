@@ -76,6 +76,7 @@ rule macs14:
 (mkdir -p {params.outdir}
 macs -t {input.treatment} -c {input.control} -f BED -g {params.genome_size} -m {params.mfold} --pvalue {params.pval} --keep-dup {params.keep_dup} --outdir {params.outdir} -n {params.name} --bw {params.bandwidth} {params.other_options}
 mv {params.outdir}/{params.name}_peaks.bed {params.outdir}/{params.name}.bed ;
-) &> {log}
+) &> {log} \
+|| (touch {output})
 """
 

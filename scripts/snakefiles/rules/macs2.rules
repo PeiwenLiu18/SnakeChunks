@@ -92,5 +92,6 @@ callpeak -t {input.treatment} -c {input.control} --gsize {params.genome_size} \
 --mfold {params.mfold_min} {params.mfold_max} \
 --outdir {params.outdir} --name {params.name} \
 {params.other_options} ; \
-cp {output.peaks} {output.peaks_bed}) &> {log}
+cp {output.peaks} {output.peaks_bed}) &> {log} \
+|| (touch {output})
 """

@@ -96,16 +96,23 @@ rule spp:
         #bp <- add.broad.peak.regions(treatment.data.qua, control.data.qua, bp, window.size=1000,z.thr=3)
         write.narrowpeak.binding(bp,"{output.peaks_narrowPeak}")
 
-        bed <- read.table("{output.peaks_narrowPeak}")
-
-        # replace neg values with 0
-        for(i in 1:nrow(bed)){{
-            if(bed[i,2] < 0){{
-                bed[i,2] <- 0
+        # check if peak file is empty or not
+        bed <- matrix()
+        if (file.size("{output.peaks_narrowPeak}") > 0){{
+            bed <- read.table("{output.peaks_narrowPeak}")
+            # replace negative values with 0
+            for(i in 1:nrow(bed)){{
+                if(bed[i,2] < 0){{
+                    bed[i,2] <- 0
+                }}
             }}
+        write.table(bed, "{output.peaks_bed}", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
+        }} else {{
+            file.create("{output.peaks_narrowPeak}", "{output.peaks_bed}", "{output.pdf}", "{output.sm_density_wig}", "{output.enrich_est_wig}", "{output.peaks_broadPeak}", "{output.bdg_positions}")
         }}
 
-        write.table(bed, "{output.peaks_bed}", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
+
+
 
         sink()
         """) 
