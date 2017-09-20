@@ -41,6 +41,7 @@ import sys
 import datetime
 import re
 import pandas as pd
+from pathlib import Path
 
 wd = os.getcwd()
 
@@ -48,6 +49,10 @@ GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
 include: os.path.join(GENEREG_LIB, "scripts/python_lib/util.py")
 include: os.path.join(GENEREG_LIB, "scripts/python_lib/igv_session.py")
+#include: os.path.join(GENEREG_LIB, "scripts/python_lib/generate_report.py")
+include: os.path.join(GENEREG_LIB, "scripts/python_lib/statistics.py")
+
+#import generate_report
 
 
 
@@ -111,6 +116,7 @@ include: os.path.join(RULES, "annotate_peaks.rules")
 include: os.path.join(RULES, "bam_by_pos.rules")
 include: os.path.join(RULES, "bam_to_bed.rules")
 include: os.path.join(RULES, "bam_stats.rules")
+include: os.path.join(RULES, "bed_formatting.rules")
 include: os.path.join(RULES, "bedgraph_to_tdf.rules")
 include: os.path.join(RULES, "bedtools_closest.rules")
 include: os.path.join(RULES, "bedtools_intersect.rules")
@@ -132,6 +138,7 @@ include: os.path.join(RULES, "getfasta.rules")
 include: os.path.join(RULES, "get_chrom_sizes.rules")
 include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "homer.rules")
+include: os.path.join(RULES, "html_report.rules")
 include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "index_fasta.rules")
 include: os.path.join(RULES, "macs2.rules")
@@ -218,19 +225,28 @@ GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}
 PEAK_MOTIFS     = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/peak-motifs/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_peak-motifs_synthesis.html", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
 # ----------------------------------------------------------------
-# Visualization & reports
+# Flowcharts
 # ----------------------------------------------------------------
 
-## Snakemake flowcharts
 GRAPHICS = expand(REPORTS_DIR + "/flowcharts/ChIP-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
 
-## IGV
-## gene-regulation/scripts/python/igv_session.py - under developemment
-#xml_file = REPORTS_DIR + "/igv_session.xml"
-#if not os.path.exists(REPORTS_DIR):
-#    os.makedirs(REPORTS_DIR)
+# ----------------------------------------------------------------
+# Reports
+# ----------------------------------------------------------------
+
+
+
+
+HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
+
+
 #igv_session(xml_file, genome=GENOME_FASTA, gff3=GENOME_GFF3, gtf=GENOME_GTF, peaks=PEAKS, coverage=GENOME_COV_GZ)
 
+IGV_SESSION = REPORTS_DIR + "/igv_session.xml"
+
+
+
+FORMAT_PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_formatted.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
 #================================================================#
 #                        Rule all                                #
@@ -250,13 +266,15 @@ rule all:
             ALL_COVERAGE,
 #            SORTED_BED,
             PEAKS,
-#            GENOMIC_FEAT,
-#            GENE_LIST,
+            FORMAT_PEAKS,
+            GET_FASTA,
+            GENOMIC_FEAT,
+            GENE_LIST,
 #            PEAK_MOTIFS,
+            HTML_REPORT,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
-
 
 
 

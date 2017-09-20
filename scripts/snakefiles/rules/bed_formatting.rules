@@ -1,0 +1,50 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+# Rule
+rule bedtools_formatting:
+    """
+    Rule to format bed files outputted from peak-calling rules:
+    - sort by peak coordinates
+    - remove unnecessary comments and columns
+    - add columns containing following information: control sample ID, ChIPped sample ID, trimming tool, alignment tool, peak-caller, peak ID
+
+    Required parameters: 
+        config["qsub"]
+
+    Author: Claire Rioualen
+    """
+    input: "{dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}.bed"
+    output: "{dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}_formatted.bed"
+    log: "{dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}_formatted.log"
+    benchmark: "{dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}_formatted_benchmark.tab"
+    params: 
+        qsub = config["qsub"] + " -e {dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}_formatted_qsub.err -o {dir}/{treatment}_vs_{control}{preprocess,.*}_{peakcaller}_formatted_qsub.out"
+    shell:"""
+cut -f 1-3 {input} > temp
+grep -v '#' temp > temp2
+sort -k1,1 -k2,2n temp2 > {output}
+
+IFS='_' read -r -a preprocess <<< {wildcards.preprocess}
+
+echo ${{#preprocess[@]}}
+echo ${{preprocess[0]}}
+
+if [ ${{#preprocess[@]}} -eq 2 ]
+then
+    trim=${{preprocess[0]}}
+    aln=${{preprocess[1]}}
+elif [ ${{#preprocess[@]}} -eq 1 ]
+then
+    trim="-" 
+    aln=${{preprocess[0]}}
+elif [ ${{#preprocess[@]}} -eq 0 ]
+then
+    trim="-" 
+    aln="-"
+fi
+
+echo $trim
+echo $aln
+"""

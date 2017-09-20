@@ -25,6 +25,16 @@ import pandas as pd
 import numpy as np
 import os
 
+filename = snakemake.output[0]
+genome = snakemake.params["genome_fasta"]
+gff3 = snakemake.params["genome_gff3"]
+gtf = snakemake.params["genome_gtf"]
+
+if __name__ == '__main__':
+    igv_session(filename, genome, gff3, gtf)
+
+
+
 def igv_session(filename, genome, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
 
     genome_version = config["genome"]["version"]
