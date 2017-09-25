@@ -59,6 +59,7 @@ rule bPeaks:
         treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bam", \
         control = dir_samples + "/{control}/{control}{preprocess,.*}_sorted_pos.bam"
     output: 
+#        peaks_all = dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_allGenome.bed", \
         peaks_bed = dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks.bed"
     params:
         outdir = dir_bPeaks, \
@@ -92,9 +93,28 @@ rule bPeaks:
         IPcoeff={params.IPcoeff}, controlCoeff={params.controlCoeff}, log2FC={params.log2FC}, averageQuantiles={params.averageQuantiles}, windowSize={params.windowSize}, windowOverlap={params.windowOverlap}, 
         peakDrawing = FALSE, resultName="{params.name}")
 
-        file.rename("{params.name}_bPeaks_allGenome.bed", "{params.name}_bPeaks.bed")
+        dir <- getwd()
+        file.rename(from=paste(dir, "{params.name}_bPeaks_allGenome.bed", sep="/"), to=paste(dir, "{params.name}_bPeaks.bed", sep="/"))
 
         sink()
 
         """)
+
+
+#        library("bPeaks")
+
+#        setwd(".")
+
+#        system("genomeCoverageBed -ibam results/samples/GSM521934/GSM521934_sickle_bowtie2_sorted_pos.bam -d > results/peaks/GSM521935_vs_GSM521934/bPeaks/INPUT_genomeCoverage.txt")
+#        system("genomeCoverageBed -ibam results/samples/GSM521935/GSM521935_sickle_bowtie2_sorted_pos.bam -d > results/peaks/GSM521935_vs_GSM521934/bPeaks/IP_genomeCoverage.txt")
+
+#        setwd("results/peaks/GSM521935_vs_GSM521934/bPeaks")
+
+#        seqResult = dataReading("IP_genomeCoverage.txt", "INPUT_genomeCoverage.txt")
+
+#        bPeaksAnalysis(IPdata = seqResult$IPdata, controlData = seqResult$controlData, 
+#        IPcoeff=2, controlCoeff=2, log2FC=2, averageQuantiles=0.9, windowSize=150, windowOverlap=50, 
+#        peakDrawing = FALSE, resultName="GSM521935_vs_GSM521934_sickle_bowtie2")
+
+#        file.rename("GSM521935_vs_GSM521934_sickle_bowtie2_bPeaks_allGenome.bed", "GSM521935_vs_GSM521934_sickle_bowtie2_bPeaks.bed")
 
