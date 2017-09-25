@@ -1,0 +1,28 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+# Rule
+rule peaks_vs_TFBS:
+    """
+    This rule computes comparisons between a bedfile containing ChIP-seq peaks and a bedfile containing TFBS, 
+    using the Bioconductor library GenomicRanges (https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)
+
+    Required parameters: 
+        config["qsub"]
+
+    Authors: Claire Rioualen, Jacques van Helden
+    """
+    input: 
+        peaks = "{peaks}.bed",
+        tfbs = "{tfbs}.bed"
+    output: 
+        tfbs_coverage = "{peaks}_{tfbs}.bed"
+    log: "{peaks}_{tfbs}.log"
+    benchmark: "{peaks}_{tfbs}_benchmark.txt"
+    params: 
+        qsub = config["qsub"] + " -e {peaks}_{tfbs}_qsub.err -o {peaks}_{tfbs}_qsub.out"
+    shell:"""
+
+"""
+
