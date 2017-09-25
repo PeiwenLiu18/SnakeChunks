@@ -34,6 +34,9 @@
 #' peakVsRegDB <- PeaksVsTFBS(peakFile, TFBSFile, drawPlots=TRUE)
 #' 
 #' @export
+peakFile <- snakemake@input[["peaks"]]
+TFBSFile <- snakemake@input[["tfbs"]]
+
 PeaksVsTFBS <- function(peakFile,
                         TFBSFile,
                         verbose = FALSE,
