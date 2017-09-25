@@ -26,25 +26,25 @@ cut -f 1-3 {input} > temp
 grep -v '#' temp > temp2
 sort -k1,1 -k2,2n temp2 > {output}
 
-IFS='_' read -r -a preprocess <<< {wildcards.preprocess}
+#IFS='_' read -r -a preprocess <<< {wildcards.preprocess}
 
-echo ${{#preprocess[@]}}
-echo ${{preprocess[0]}}
+#echo ${{#preprocess[@]}}
+#echo ${{preprocess[0]}}
 
-if [ ${{#preprocess[@]}} -eq 2 ]
-then
-    trim=${{preprocess[0]}}
-    aln=${{preprocess[1]}}
-elif [ ${{#preprocess[@]}} -eq 1 ]
-then
-    trim="-" 
-    aln=${{preprocess[0]}}
-elif [ ${{#preprocess[@]}} -eq 0 ]
-then
-    trim="-" 
-    aln="-"
-fi
+#if [ ${{#preprocess[@]}} -eq 2 ]
+#then
+#    trim=${{preprocess[0]}}
+#    aln=${{preprocess[1]}}
+#elif [ ${{#preprocess[@]}} -eq 1 ]
+#then
+#    trim="-" 
+#    aln=${{preprocess[0]}}
+#elif [ ${{#preprocess[@]}} -eq 0 ]
+#then
+#    trim="-" 
+#    aln="-"
+#fi
 
-echo $trim
-echo $aln
+#echo $trim
+#echo $aln
 """

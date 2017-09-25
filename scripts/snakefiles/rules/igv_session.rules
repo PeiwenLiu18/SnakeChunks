@@ -20,11 +20,12 @@ genome_dir = config["dir"]["genome"]
 
 rule igv_session:
 #    input: 
-    output: "{dir}/index.html"
+    output:  "{dir}/igv_session.xml"
     params:
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
-        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"])
+        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]),
+	genome_version = config["genome"]["version"]
 #        samples_ids = read_table(config["metadata"]["samples"])["ID"],
 #        samples_dir = config["dir"]["fastq"],
 #        trim_tools = config["tools"]["trimming"],
