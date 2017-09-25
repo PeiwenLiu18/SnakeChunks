@@ -1,4 +1,3 @@
-
 #' @title Compare peaks with transcription factor binding sites (TFBSs)
 #'
 #' @author Claire Rioualen (\email{rioualenclaire@gmail.com}) Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
@@ -34,8 +33,17 @@
 #' peakVsRegDB <- PeaksVsTFBS(peakFile, TFBSFile, drawPlots=TRUE)
 #' 
 #' @export
-peakFile <- snakemake@input[["peaks"]]
-TFBSFile <- snakemake@input[["tfbs"]]
+
+
+## !!!!!!
+## JvH:  Il ne faut pas passer ces paramètres dans la fonction R elle-même, sinon elle ne peut être utilisée qu'à partir de snakemake. 
+## Ces paramètres pourraient sans doute être spécifiés dans le bloc de code R de la règle. 
+## A discuter; pour le moment je les commente pour pouvoir travailler hors snakemake. 
+##
+# peakFile <- snakemake@input[["peaks"]]
+# TFBSFile <- snakemake@input[["tfbs"]]
+##
+## !!!!!!
 
 PeaksVsTFBS <- function(peakFile,
                         TFBSFile,
@@ -76,6 +84,7 @@ PeaksVsTFBS <- function(peakFile,
   
   ## Peak statistics
   result <- list()
+  result$peakNb <- peakNb
   result$sitesPerPeak <- sitesPerPeak ## Distribution of the number of sites per peak
   result$sitesPerPeakDistrib <- as.data.frame.table(table(sitesPerPeak))
   result$coveredPeaks <- sum(sitesPerPeak > 0)  ## Number of sites overlapped by at least one peak
