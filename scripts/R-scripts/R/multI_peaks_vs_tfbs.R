@@ -9,6 +9,7 @@
 #' First version: 2017-09
 #' @param peakFiles a vector contianing a list of files. Each file is supposed to contain a set of genomic regions, in bed format.   
 #' @param sites path to a bed-formatted file containing the reference TFBSs. Passed to 
+#' @param peakSetLabels a vector of the same size as peakFiles indicating a label for each peak set. 
 #' @param verbose=FALSE if true, print messages during the execution
 #' @param drawPlots=FALSE if true, draw diagnostic plots
 #' @param ... Additional parameters are passed to plot()
@@ -30,22 +31,27 @@
 #' mainDir <- "~/RegulonHT_results/GSE93506"
 #' setwd(mainDir)
 #' 
-#' ## Define the directory containing the peaks
-#' peakDir <- file.path(mainDir, "results", "peaks", "Nac_vs_WT", "macs2")
-#' 
-#' ## Identify all the peaks in this directory (recursive search in all subfolders)
-#' peakFiles <- list.files(path=peakDir, pattern="*macs2.bed$", recursive=TRUE, full.names = TRUE)
-#' message("Peak directory contains ", length(peakFiles), " bed files")
-#' 
 #' ## File containing the reference TF binding sites
 #' TFBSFile <- file.path(mainDir, "RegulonDB", "Nac_unique_sites.bed")
 #' 
+#' ## Define the directory containing the peaks
+#' peakDir <- file.path(mainDir, "results", "peaks", "Nac_vs_WT")
+#' 
+#' ## Identify all the peaks in this directory (recursive search in all subfolders)
+#' peakFiles <- list.files(path=peakDir, pattern=c(".*sickle_bowtie2.*\\.bed$"), recursive=TRUE, full.names = TRUE)
+#' message("Peak directory contains ", length(peakFiles), " bed files")
+#' 
 #' ## Compare peaks and TFBSs
-#' multiPeakVsRegDB <- MultiPeaksVsTFBS(peakFiles, TFBSFile, drawPlots=TRUE)
+#' multiPeakVsRegDB <- MultiPeaksVsTFBS(
+#'   peakFiles, 
+#'   peakSetLabels = basename(sub(peakFiles, pattern="\\.bed$", replacement = "")), 
+#'   TFBSFile, verbose=TRUE, 
+#'   drawPlots=TRUE)
 #' 
 #' @export
 MultiPeaksVsTFBS <- function(peakFiles,
                              TFBSFile,
+                             peakSetLabels=NULL,
                              verbose = FALSE,
                              drawPlots = FALSE,
                              ...) {
@@ -53,6 +59,15 @@ MultiPeaksVsTFBS <- function(peakFiles,
     message("Comparing ", length(peakFiles), " peak files with one TFBS file.")
   }
 
+  ## Check if peakset-specitic labels were specified
+  if (!is.null(peakSetLabels)) {
+    ## Check it there are the sanem number of labels as peaks sets
+    if (length(peakFiles) != length(peakSetLabels)) {
+      stop("MultiPeaksVsTFBS() error: peakFiles and peakSetLabels have different lengths.")
+    }
+  }
+  
+  
   ## Prepare result list
   result <- list()
   result$nbPeakFiles <- length(peakFiles)
@@ -60,7 +75,14 @@ MultiPeaksVsTFBS <- function(peakFiles,
   result$TFBSFile <- TFBSFile
   result$peaksVsTFBStable <- data.frame()
   
-  for (peakFile in peakFiles) {
+  
+  #peakFile <- peakFiles[1]
+  for (i in 1:length(peakFiles)) {
+    peakFile <- peakFiles[i]
+    if (verbose) {
+      message("MultiPeaksVsTFBS, peak file: ", peakFile)
+    }
+    
     ## Run the comparison between one peakset and the reference TFBS
     onePeakSetCompa <- PeaksVsTFBS(peakFile, TFBSFile, verbose, drawPlots)
     
@@ -68,25 +90,46 @@ MultiPeaksVsTFBS <- function(peakFiles,
     result$peaksVsTFBStable <- rbind (
       result$peaksVsTFBStable,
       data.frame(
-        peakNb=onePeakSetCompa$peakNb,
-        coveredPeaks=onePeakSetCompa$coveredPeaks,
-        missedPeaks=onePeakSetCompa$missedPeaks,
-        peakCoverage=onePeakSetCompa$peakCoverage,
-        siteNb=onePeakSetCompa$siteNb,
-        coveredSites=onePeakSetCompa$coveredSites,
-        missedSites=onePeakSetCompa$missedSites,
-        siteCoverage=onePeakSetCompa$siteCoverage
+        peakNb = onePeakSetCompa$peakNb,
+        coveredPeaks = onePeakSetCompa$coveredPeaks,
+        missedPeaks = onePeakSetCompa$missedPeaks,
+        peakCoverage = onePeakSetCompa$peakCoverage,
+        siteNb = onePeakSetCompa$siteNb,
+        coveredSites = onePeakSetCompa$coveredSites,
+        missedSites = onePeakSetCompa$missedSites,
+        siteCoverage = onePeakSetCompa$siteCoverage,
+        peakFile = peakFile
       )
-    )
+     )
+    if (is.null(peakSetLabels)) {
+      result$peakSetLabel <- 1:length(peakFiles)
+    } else {
+      result$peakSetLabel <- result$peakSetLabels
+    }
   }
   
   ## Draw a summary plot
   if (drawPlots) {
-    plot(result$peaksVsTFBStable$siteCoverage,
-         result$peaksVsTFBStable$peakCoverage,
-         xlim=c(0,1), xlab = "TFBS coverage by peaks",
-         ylim=c(0,1), ylab = "peak coverage by TFBSs"
+    
+    ## Cverage plot
+    x <- 100*result$peaksVsTFBStable$siteCoverage
+    y <- 100*result$peaksVsTFBStable$peakCoverage
+    plot(x, y,
+         main = "Mutual coverage plot",
+         xlim = c(0,100), 
+         ylim = c(0, max(y) * 2), 
+         xlab = "% TFBS",
+         ylab = "% peaks",
+         las=1,
+         panel.first=grid(lty="solid", col="gray")
     )
+    abline(v=seq(from=0, to=100, by=10), col="gray")
+    text(x, y, labels = 1:length(peakFiles), pos = 4)
+    if (!is.null(peakSetLabels)) {
+      legend("topleft", 
+             legend = paste(1:length(peakFiles), peakSetLabels), 
+             cex=0.7)
+    }
   }
   
   return(result)
