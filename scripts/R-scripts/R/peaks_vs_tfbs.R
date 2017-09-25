@@ -70,14 +70,14 @@ PeaksVsTFBS <- function(peakFile,
   }
   
   
-  overlaps <- GenomicRanges::findOverlaps(peaks, sites, type = "any")
-  
-  intersections <- GenomicRanges::intersect(peaks, sites)
-  class(intersections) ## Check the classof the resulting object
-  attributes(intersections) ## Get the names of attibutes for this lass of objects
-  intersectNames <- intersections@seqnames ## Get the attribute "seqname" of the intersections object
-  class(intersectNames)
-  
+  ## We don't use this later, I comment it
+  # overlaps <- GenomicRanges::findOverlaps(peaks, sites, type = "any")
+  # intersections <- GenomicRanges::intersect(peaks, sites)
+  # class(intersections) ## Check the classof the resulting object
+  # attributes(intersections) ## Get the names of attibutes for this lass of objects
+  # intersectNames <- intersections@seqnames ## Get the attribute "seqname" of the intersections object
+  # class(intersectNames)
+
   ## Count the number of sites per peak
   sitesPerPeak <- GenomicRanges::countOverlaps(peaks, sites, type = "any")
   peaksPerSite <- GenomicRanges::countOverlaps(sites, peaks, type = "any")
@@ -89,7 +89,11 @@ PeaksVsTFBS <- function(peakFile,
   result$sitesPerPeakDistrib <- as.data.frame.table(table(sitesPerPeak))
   result$coveredPeaks <- sum(sitesPerPeak > 0)  ## Number of sites overlapped by at least one peak
   result$missedPeaks <- sum(sitesPerPeak == 0)  ## Number of sites overlapped by at least one peak
-  result$peakCoverage <- result$coveredPeaks / peakNb
+  if (peakNb == 0) {
+    result$peakCoverage <- 0
+  } else {
+    result$peakCoverage <- result$coveredPeaks / peakNb
+  }
   
   ## Site statistics
   result$siteNb <- siteNb
@@ -97,8 +101,12 @@ PeaksVsTFBS <- function(peakFile,
   result$peaksPerSiteDistrib <- as.data.frame.table(table(peaksPerSite))
   result$coveredSites <- sum(peaksPerSite > 0)  ## Number of sites overlapped by at least one peak
   result$missedSites <- sum(peaksPerSite == 0)  ## Number of sites overlapped by at least one peak
-  result$siteCoverage <- result$coveredSites / siteNb
-  
+  if (siteNb == 0) {
+    result$siteCoverage <- 0
+  } else {
+    result$siteCoverage <- result$coveredSites / siteNb
+  }
+      
   ################################################
   ## Draw some diagnostic plots if requested
   
@@ -113,17 +121,29 @@ PeaksVsTFBS <- function(peakFile,
     par(las=1)
     
     ## Peaks per site
-    hist(peaksPerSite, breaks = seq(from=min(peaksPerSite), to=max(peaksPerSite)+1)-0.5, 
-         col=myColors["sites"], main="Peaks per sites", 
-         xlab="Number of peaks", 
-         ylab="Number of sites", ...)
+    if (siteNb == 0) {
+      plot(0, 0, main = "Not a single site", type="n", 
+           xlab="Number of peaks", 
+           ylab="Number of sites")
+    } else {
+      hist(peaksPerSite, breaks = seq(from=min(peaksPerSite), to=max(peaksPerSite)+1)-0.5, 
+           col=myColors["sites"], main="Peaks per sites", 
+           xlab="Number of peaks", 
+           ylab="Number of sites", ...)
+    }
 
     ## Sites per peak
-    hist(sitesPerPeak, breaks = seq(from=min(sitesPerPeak), to=max(sitesPerPeak)+1)-0.5, 
+    if (peakNb == 0) {
+      plot(0, 0, main = "Not a single peak", type="n", 
+           xlab="Number of sites", 
+           ylab="Number of peaks")
+    } else {
+      hist(sitesPerPeak, breaks = seq(from=min(sitesPerPeak), to=max(sitesPerPeak)+1)-0.5, 
          col=myColors["peaks"], main="Sites per peak", 
          xlab="Number of sites", 
          ylab="Number of peaks", ...)
-    
+    }
+    par(mfrow=c(1,1))
     par <- par.ori ## Restore original parameters
   }
     
