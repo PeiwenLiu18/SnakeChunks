@@ -1,0 +1,34 @@
+# Author Claire Rioualen 
+# This is a draft rule for generating html reports
+
+
+    
+if not "title" in config.keys():
+    sys.exit("Project title must be defined in the config file")
+
+if not "dataset" in config.keys():
+    sys.exit("Dataset ID must be defined in the config file")
+
+if not "title" in config.keys():
+    sys.exit("Project title must be defined in the config file")
+
+
+#def html_report_inputs:
+#(read_count, avg_read_length, gc_rate) = fastq_stats("/data/analyses/ChIP-seq_SE_GSE20870/fastq/GSM521934/GSM521934.fastq")
+
+rule html_report:
+#    input: 
+    output: "{dir}/index.html"
+    params:
+        samples_ids = read_table(config["metadata"]["samples"])["ID"],
+        samples_dir = config["dir"]["fastq"],
+        trim_tools = config["tools"]["trimming"],
+        outdir = "{dir}",
+        dataset = config["dataset"],
+        project_name = config["title"]
+    log: "{dir}/index.log"
+    benchmark: "{dir}/index_benchmark.tab"
+    script:
+        "../../python_lib/generate_report.py"
+
+
