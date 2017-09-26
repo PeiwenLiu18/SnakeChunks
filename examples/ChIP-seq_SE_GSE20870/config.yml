@@ -31,7 +31,7 @@
   tools:
     trimming: "sickle cutadapt"
     mapping: "bowtie2 subread-align bowtie bwa"
-    peakcalling: "macs2 macs14 homer spp swembl mosaics bPeaks"
+    peakcalling: "macs2 macs14 homer spp swembl mosaics" # bPeaks"
     annotation: "intersect" # window closest"
 
 ################################################################
