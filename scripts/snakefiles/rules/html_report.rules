@@ -17,12 +17,14 @@ if not "title" in config.keys():
 #(read_count, avg_read_length, gc_rate) = fastq_stats("/data/analyses/ChIP-seq_SE_GSE20870/fastq/GSM521934/GSM521934.fastq")
 
 rule html_report:
-#    input: 
+    input: "synthesis.done"
     output: "{dir}/index.html"
     params:
         samples_ids = read_table(config["metadata"]["samples"])["ID"],
         samples_dir = config["dir"]["fastq"],
         trim_tools = config["tools"]["trimming"],
+        map_tools = config["tools"]["mapping"],
+        pc_tools = config["tools"]["peakcalling"],
         outdir = "{dir}",
         dataset = config["dataset"],
         project_name = config["title"]
