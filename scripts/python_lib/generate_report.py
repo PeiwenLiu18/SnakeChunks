@@ -5,7 +5,7 @@
 import os
 import sys
 import pandas as pd
-import yaml
+#import yaml
 import collections
 
 import web
@@ -25,21 +25,36 @@ project_name = snakemake.params["project_name"]
 samples_ids = snakemake.params["samples_ids"]
 samples_dir = snakemake.params["samples_dir"]
 trim_tools = snakemake.params["trim_tools"]
+map_tools = snakemake.params["map_tools"]
+#pc_tools = snakemake.params["pc_tools"]
+
 
 d_samples = {}
-
 for sample in samples_ids:
     path = samples_dir + "/" + sample + "/" + sample + ".fastq"
     d_samples[sample] = {}
     d_samples[sample]["path"] = path
 
+#tfs = read_table(config["metadata"]["design"])['treatment'].split()
+tfs = ["Nac", "NtrC", "OmpR"]
+pc_tools = ["macs2", "spp", "homer", "swembl"]
 
+d_peaks = {}
+for tf in tfs:
+    d_peaks[tf] = {}
+    for pc in pc_tools:
+#        key = tf + pc
+        path = "results/peaks/" + tf + "_vs_" + "WT" + "/" + pc + "/" + tf + "_vs_" + "WT" + "_" + trim_tools + "_" + map_tools + "_" + pc + ".bed"
+#        d_peaks[key] = {}
+        d_peaks[tf][pc] = path
+
+#print(d_peaks)
 
 if __name__ == '__main__':
     web.indexPage(outputdir, project_name, dataset_id)
     web.homePage(outputdir, project_name, dataset_id, "home", description="")
-    web.writeCategory(outputdir, project_name, dataset_id, "chip", "chip", d_samples)
-    web.downloadPage(outputdir, project_name, dataset_id, "download", description="")
+    web.writeCategory(outputdir, project_name, dataset_id, "chip", "chip", d_samples, d_peaks)
+    #web.downloadPage(outputdir, project_name, dataset_id, "download", description="")
 
 
 
