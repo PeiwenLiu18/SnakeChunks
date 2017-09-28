@@ -2194,8 +2194,8 @@ def header(filecontent, project_name, dataset_id, datatype, menu, tab, level):
 #    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"" + os.environ['HOME'] + "/HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
 
     filecontent = filecontent + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js\"></script>\n"
-    filecontent = filecontent + "<script src=\"" + prefix + "HTML-KickStart-master/js/kickstart.js\"></script>\n"                                      ## !! abs path, to be parametrized
-    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"" + prefix + "HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
+    filecontent = filecontent + "<script src=\"" + prefix + "../../HTML-KickStart-master/js/kickstart.js\"></script>\n"                                      ## !! abs path, to be parametrized
+    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"" + prefix + "../../HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
 
     filecontent = filecontent + "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n"
 
