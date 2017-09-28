@@ -51,6 +51,7 @@
 #' @export
 MultiPeaksVsTFBS <- function(peakFiles,
                              TFBSFile,
+                             PNGFile,
                              peakSetLabels=NULL,
                              verbose = FALSE,
                              drawPlots = FALSE,
@@ -98,7 +99,7 @@ MultiPeaksVsTFBS <- function(peakFiles,
         coveredSites = onePeakSetCompa$coveredSites,
         missedSites = onePeakSetCompa$missedSites,
         siteCoverage = onePeakSetCompa$siteCoverage,
-        peakFile = peakFile
+        peakFile = onePeakSetCompa$peakFile
       )
      )
     if (is.null(peakSetLabels)) {
@@ -111,9 +112,10 @@ MultiPeaksVsTFBS <- function(peakFiles,
   ## Draw a summary plot
   if (drawPlots) {
     
-    ## Cverage plot
+    ## Coverage plot
     x <- 100*result$peaksVsTFBStable$siteCoverage
     y <- 100*result$peaksVsTFBStable$peakCoverage
+    png(PNGFile)
     plot(x, y,
          main = "Mutual coverage plot",
          xlim = c(0,100), 
@@ -130,6 +132,7 @@ MultiPeaksVsTFBS <- function(peakFiles,
              legend = paste(1:length(peakFiles), peakSetLabels), 
              cex=0.7)
     }
+    dev.off()
   }
   
   return(result)
