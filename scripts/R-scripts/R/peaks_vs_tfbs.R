@@ -106,7 +106,8 @@ PeaksVsTFBS <- function(peakFile,
   } else {
     result$siteCoverage <- result$coveredSites / siteNb
   }
-      
+  
+  result$peakFile <- c(toString(peakFile))
   ################################################
   ## Draw some diagnostic plots if requested
   
@@ -126,10 +127,12 @@ PeaksVsTFBS <- function(peakFile,
            xlab="Number of peaks", 
            ylab="Number of sites")
     } else {
+      png(paste(peakFile, "_peaks_per_site.png", sep=""))
       hist(peaksPerSite, breaks = seq(from=min(peaksPerSite), to=max(peaksPerSite)+1)-0.5, 
            col=myColors["sites"], main="Peaks per sites", 
            xlab="Number of peaks", 
            ylab="Number of sites", ...)
+      dev.off()
     }
 
     ## Sites per peak
@@ -138,10 +141,12 @@ PeaksVsTFBS <- function(peakFile,
            xlab="Number of sites", 
            ylab="Number of peaks")
     } else {
+      png(paste(peakFile, "_sites_per_peak.png", sep=""))
       hist(sitesPerPeak, breaks = seq(from=min(sitesPerPeak), to=max(sitesPerPeak)+1)-0.5, 
          col=myColors["peaks"], main="Sites per peak", 
          xlab="Number of sites", 
          ylab="Number of peaks", ...)
+      dev.off()
     }
     par(mfrow=c(1,1))
     par <- par.ori ## Restore original parameters
