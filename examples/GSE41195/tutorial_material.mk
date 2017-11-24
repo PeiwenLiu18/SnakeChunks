@@ -46,8 +46,8 @@ download_chipseq_data:
 	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224 $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220 && \
 	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220 && \
 	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224 && \
-	gunzip -c $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220/SRR576934.fastq.gz > $(ANALYSIS_DIR)/fastq/GSM1010220/GSM1010220.fastq; rm -f $(ANALYSIS_DIR)/fastq/GSM1010220/SRR576934.fastq.gz && \
-	gunzip -c $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224/SRR576938.fastq.gz > $(ANALYSIS_DIR)/fastq/GSM1010224/GSM1010224.fastq; rm -f $(ANALYSIS_DIR)/fastq/GSM1010224/SRR576938.fastq.gz
+	gunzip -c $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220/SRR576934.fastq.gz > $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220/GSM1010220.fastq; rm -f $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220/SRR576934.fastq.gz && \
+	gunzip -c $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224/SRR576938.fastq.gz > $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224/GSM1010224.fastq; rm -f $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224/SRR576938.fastq.gz
 
 
 ### Copy metadata from SnakeChunks library to analysis directory
