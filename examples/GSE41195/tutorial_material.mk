@@ -12,7 +12,7 @@
 export LC_ALL=C
 export LANG=C
 
-export ANALYSIS_DIR=$(ANALYSIS)
+#export ANALYSIS_DIR=$(ANALYSIS)
 
 .PHONY: \
 	init\
@@ -39,9 +39,9 @@ download_genome_data:
 	gunzip $(ANALYSIS_DIR)/genome/*.gz
 
 
-### Download ChIP-seq data 
+### Download raw data 
 
-download_raw_data:
+download_chipseq_data:
 	cd $(ANALYSIS_DIR) && \
 	mkdir -p ${ANALYSIS_DIR}/ChIP-seq/fastq/GSM1010224 ${ANALYSIS_DIR}/ChIP-seq/fastq/GSM1010220 && \
 	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -P ${ANALYSIS_DIR}/ChIP-seq/fastq/GSM1010220 && \
