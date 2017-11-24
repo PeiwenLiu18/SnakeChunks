@@ -136,6 +136,7 @@ add_pub_key:
 	gpg -a --export E084DAB9 | sudo apt-key add -
 
 add_repos: 
+	sudo apt-get update
 	sudo apt-get install --yes python-software-properties
 	sudo add-apt-repository ppa:x2go/stable --yes
 	sudo apt-add-repository ppa:ubuntu-mate-dev/ppa --yes
