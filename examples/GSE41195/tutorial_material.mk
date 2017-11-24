@@ -12,7 +12,7 @@
 export LC_ALL=C
 export LANG=C
 
-export ANALYSIS_DIR=$(ANALYSIS_DIR)
+export ANALYSIS_DIR=$(ANALYSIS)
 
 .PHONY: \
 	init\
