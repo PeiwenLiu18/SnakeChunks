@@ -21,11 +21,10 @@ export LANG=C
 
 
 create_dir:
-	@echo "Creating ANALYSIS_DIR directory" && \
+	@echo "Creating $ANALYSIS_DIR directory" && \
 	export ANALYSIS_DIR=$(ANALYSIS_DIR) && \
 	mkdir -p $(ANALYSIS_DIR) && \
-	ln -sf $(HOME)/SnakeChunks-4.0 $(ANALYSIS_DIR)/SnakeChunks && \
-	cd $(ANALYSIS_DIR)
+	ln -sf $(HOME)/SnakeChunks-4.0 $(ANALYSIS_DIR)/SnakeChunks
 
 
 
