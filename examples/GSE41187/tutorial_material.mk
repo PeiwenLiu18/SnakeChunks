@@ -15,7 +15,6 @@ export LANG=C
 .PHONY: \
 	init\
 	create_dir\
-	download_gene-regulation\
 	download_genome_data\
 	download_raw_data
 
@@ -23,7 +22,8 @@ export LANG=C
 
 create_dir:
 	@echo "Creating ANALYSIS_DIR directory"
-	mkdir -p $(ANALYSIS_DIR)
+	mkdir -p $(ANALYSIS_DIR) && \
+    ln -s SnakeChunks-4.0 $(ANALYSIS_DIR)/SnakeChunks
 
 
 ### Download genome & annotations 
