@@ -12,6 +12,8 @@
 export LC_ALL=C
 export LANG=C
 
+export ANALYSIS_DIR=$(ANALYSIS_DIR)
+
 .PHONY: \
 	init\
 	create_dir\
@@ -21,8 +23,7 @@ export LANG=C
 
 
 create_dir:
-	@echo "Creating $ANALYSIS_DIR directory" && \
-	export ANALYSIS_DIR=$(ANALYSIS_DIR) && \
+	@echo "Creating $(ANALYSIS_DIR) directory" && \
 	mkdir -p $(ANALYSIS_DIR) && \
 	ln -sf $(HOME)/SnakeChunks-4.0 $(ANALYSIS_DIR)/SnakeChunks
 
