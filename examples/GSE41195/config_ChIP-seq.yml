@@ -52,9 +52,9 @@
     fdr: "0.01"                                                                 # optional (def. 0.001)
 
   mosaics:
-    FDR: 0.05
-    frag_len: 400
-    bin_size: 200
+    FDR: "0.05"
+    frag_len: "400"
+    bin_size: "200"
     type: "narrow"
 #  spp: 
 #    fdr: "0.05"                                                                 # optional (def. 0.01)
