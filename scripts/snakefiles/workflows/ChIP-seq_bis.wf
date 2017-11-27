@@ -260,8 +260,8 @@ rule all:
             PEAKS,
             FORMAT_PEAKS,
             GET_FASTA,
-            GENOMIC_FEAT,
-            GENE_LIST,
+#            GENOMIC_FEAT,
+#            GENE_LIST,
 #            PEAK_MOTIFS,
 #            HTML_REPORT,
             GRAPHICS
