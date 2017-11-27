@@ -91,9 +91,9 @@ fit <- mosaicsFit( bin, analysisType="IO", bgEst="automatic" )
 peak <- mosaicsPeak( fit, signalModel="2S", FDR={params.FDR}, maxgap=400, minsize=36, thres=10 )  ###
 peak <- extractReads( peak,
     "{input.treatment}", chipFileFormat="bed", chipPET=FALSE, chipFragLen={params.frag_len},
-    "{input.control}", controlFileFormat="bed", controlPET=FALSE, controlFragLen={params.frag_len}, parallel=FALSE, nCore=4 )
+    "{input.control}", controlFileFormat="bed", controlPET=FALSE, controlFragLen={params.frag_len}, parallel=FALSE, nCore=1 )
 
-peak  <-  findSummit(peak, parallel=FALSE,  nCore=4  )
+peak  <-  findSummit(peak, parallel=FALSE,  nCore=1  )
 export(  peak,  type="bed",  filename="{output.peaks_bed}"  )
 export(  peak,  type="narrowPeak",  filename="{output.peaks}")
 

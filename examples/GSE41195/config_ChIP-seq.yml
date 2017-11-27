@@ -44,13 +44,18 @@
 #   length-th: "25"                             # to be added
 
 
-#  homer: 
-#    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
-#    F: "2"                                                                      # optional (def. 4)
-#    L: "2"                                                                      # optional (def. 4)
-#    P: "0.01"                                                                   # optional (def. 0.0001)
-#    fdr: "0.01"                                                                 # optional (def. 0.001)
+  homer: 
+    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
+    F: "2"                                                                      # optional (def. 4)
+    L: "2"                                                                      # optional (def. 4)
+    P: "0.01"                                                                   # optional (def. 0.0001)
+    fdr: "0.01"                                                                 # optional (def. 0.001)
 
+  mosaics:
+    FDR: 0.1
+    frag_len: 100
+    bin_size: 100
+    type: "narrow"
 #  spp: 
 #    fdr: "0.05"                                                                 # optional (def. 0.01)
 
