@@ -152,15 +152,15 @@ include: os.path.join(RULES, "swembl.rules")
 # Workflow design
 #----------------------------------------------------------------#
 
-if not (("tools" in config.keys()) and ("trimming" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-TRIMMING_TOOLS = config["tools"]["trimming"].split()
+TRIMMING_TOOLS = config["trimming"].split()
 
-if not (("tools" in config.keys()) and ("mapping" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['mapping'] should be specified in the config file.")
+if not ("mapping" in config.keys()):
+    sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
-MAPPING_TOOLS = config["tools"]["mapping"].split()
+MAPPING_TOOLS = config["mapping"].split()
 
 if TRIMMING_TOOLS:
     PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
@@ -195,10 +195,10 @@ else:
 # Peak-calling
 # ----------------------------------------------------------------
 
-if not (("tools" in config.keys()) and ("peakcalling" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['peakcalling'] should be specified in the config file.")
+if not ("peakcalling" in config.keys()):
+    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
 
-PEAKCALLING_TOOLS = config["tools"]["peakcalling"].split()
+PEAKCALLING_TOOLS = config["peakcalling"].split()
 PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 GET_FASTA   = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.fasta", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
@@ -206,10 +206,10 @@ GET_FASTA   = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{t
 # Peak annotation
 # ----------------------------------------------------------------
 
-if not (("tools" in config.keys()) and ("annotation" in config["tools"].keys())):
+if not ("annotation" in config.keys()):
     sys.exit("The parameter config['tools']['annotation'] should be specified in the config file.")
 
-DISTANCE = config["tools"]["annotation"].split()
+DISTANCE = config["annotation"].split()
 GENOMIC_FEAT    = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE, prefix=PREFIX)
 
 GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
@@ -264,7 +264,7 @@ rule all:
             GENE_LIST#,
 #            PEAK_MOTIFS,
 #            HTML_REPORT,
-#            GRAPHICS
+            GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
 
