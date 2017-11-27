@@ -32,7 +32,7 @@
 #  tools:
   trimming: ""
   mapping: "bowtie2" # subread-align" # bwa bowtie
-  peakcalling: "homer" # macs14 swembl"
+  peakcalling: "homer mosaics" # macs14 swembl"
   annotation: "intersect window"
 
 
@@ -43,46 +43,21 @@
     threshold: "30"                                                             # ... 
 #   length-th: "25"                             # to be added
 
-  macs14:
-    pval: "0.00001"                                                             # opt, to be tested (def. 0.00001)
-    mfold: "10,30"                                                              # opt, to be tested (def. 10,30)
-    keep_dup: "auto"                                                            # opt, to be tested (def. auto, else int)
-    bandwidth: "300"                                                            # opt, to be tested (def. 300)
-    other_options: "--nomodel"                                                  # opt, to be tested can include -bdg (time-consuming), -wig (time-consuming), --call-summits (requires PeakSplitter)
 
-  macs2: 
-    qval: "0.0001"                                                               # optional (def. 0.05)
-    keep_dup: "all"                                                             # optional (def. 1)
-    mfold_min: "1"                                                              # optional (def. 5)
-    mfold_max: "50"                                                             # optional (def. 50)
-    other_options: "--call-summits --bw 400"                                             # optional. can include --call-summits, --broad...
+#  homer: 
+#    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
+#    F: "2"                                                                      # optional (def. 4)
+#    L: "2"                                                                      # optional (def. 4)
+#    P: "0.01"                                                                   # optional (def. 0.0001)
+#    fdr: "0.01"                                                                 # optional (def. 0.001)
 
-  swembl:
-    R: "0.1"                                                                   # optional (def. 0)
-    x: "1.2"                                                                    # optional (def. 1)
+#  spp: 
+#    fdr: "0.05"                                                                 # optional (def. 0.01)
 
-  homer: 
-    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
-    F: "2"                                                                      # optional (def. 4)
-    L: "2"                                                                      # optional (def. 4)
-    P: "0.01"                                                                   # optional (def. 0.0001)
-    fdr: "0.01"                                                                 # optional (def. 0.001)
-
-  spp: 
-    fdr: "0.05"                                                                 # optional (def. 0.01)
-
-  bPeaks: 
-    IPcoeff: "1"                                                                # optional (def. 2)
-    controlCoeff: "2"                                                           # optional (def. 2)
-    log2FC: "1"                                                                 # optional (def. 2)
-    averageQuantiles: "0.8"                                                     # optional (def. 0.9)
-    windowSize: "50"                                                            # optional (def. 150)
-    windowOverlap: "40"                                                         # optional (def. 50)
-
-  peak-motifs: 
-    tasks: "all"                                                                                                    # optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
-    max_seq_len: "0"                                                                                                # default ? curr not used
-    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # required. name format db_file
-    disco: "oligos,positions,dyads"                                                                                 # default ? oligos|dyads|positions|local_words|merged_words|meme|chipmunk
+#  peak-motifs: 
+#    tasks: "all"                                                                                                    # optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
+#    max_seq_len: "0"                                                                                                # default ? curr not used
+#    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # required. name format db_file
+#    disco: "oligos,positions,dyads"                                                                                 # default ? oligos|dyads|positions|local_words|merged_words|meme|chipmunk
 
 
