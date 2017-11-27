@@ -32,7 +32,7 @@
 #  tools:
   trimming: ""
   mapping: "bowtie2" # subread-align" # bwa bowtie
-  peakcalling: "homer mosaics" # macs14 swembl"
+  peakcalling: "homer spp" # macs14 swembl"
   annotation: "intersect window"
 
 
