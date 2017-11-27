@@ -1,7 +1,7 @@
 ---
-  description: "This workflow performs quality control and trimming. Optional parameters, if not provided, are automatically set to the default value provided with the given program."
+  description: ""
   author: "Claire Rioualen and Jacques van Helden"
-  title: "FNR analysis protocol"
+  title: "FNR analysis protocol for ChIP-seq data"
   dataset: "GSE41195"
   qsub: "-V -m a -d ." 
   genome:

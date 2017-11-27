@@ -1,0 +1,78 @@
+---
+  description: ""
+  author: "Claire Rioualen and Jacques van Helden"
+  title: "FNR analysis protocol for RNA-seq data"
+  dataset: "GSE41195"
+  qsub: "-V -m a -d ." 
+  genome:
+    organism: "Escherichia coli K12 MG1655"
+    version: "Ecoli_K12"
+    size: "4639221"
+    fasta_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa
+    gff3_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3
+    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
+
+  metadata:
+    samples: "metadata/samples_RNA-seq.tab"                            # required. has to contain at least sample ids
+    design: "metadata/design_RNA-seq.tab"                              # required. has to contain at least ids of pairs of samples to be compared
+    configfile: "metadata/config_RNA-seq.yml"                          # required for flowcharts generation; maybe this should be revised
+    seq_type: "pe"                                                                                  # required
+    strands: "1 2"
+
+  dir:
+    reads_source: "data"                                                # Raw data (sra)
+    fastq: "RNA-seq/fastq"                                                      # Fastq location, either raw data or converted sra files 
+    genome: "genome"                                                    # Location of the genome files (fasta, gff3, gtf) or symlink to location
+    results: "RNA-seq/results"
+    snakechunks: "SnakeChunks"                                          # Location of the library or symlink to library
+
+    samples: "RNA-seq/results/samples"
+    diffexpr: "RNA-seq/results/diffexpr"
+    reports: "RNA-seq/results/reports"
+
+  trimming: ""
+  mapping: "tophat"
+  read_counts: "featureCounts"
+  diffexpr: "edgeR DESeq2"
+
+################################################################
+## OPTIONAL PARAMETERS
+##
+## These are the parameters that are used by rules & programs. 
+##
+## If nothing is mentionned  below, all prgrams will use their default parameters. 
+  tophat:
+    max_mismatches: 1                                                   # Default 2
+    threads: 1                                                          # Default 1
+
+  subread-featureCounts:
+    attr_type: "gene_id"                                                # Default 'gene_id'
+    feature_type: "exon"
+    strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
+    multi_mapping: ""
+
+
+  edgeR:
+    featuresToRemove: "NULL"
+    varInt: "group"
+    condRef: "WT"
+    batch: NULL
+    alpha: "0.05"
+    pAdjustMethod: "BH"
+    cpmCutoff: "1"
+    gene_selection: "pairwise"
+    normalizationMethod: "TMM"
+
+  DESeq2:
+    featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
+    varInt: "group"
+    condRef: "WT"
+    batch: "NULL"
+    fitType: "parametric"                                               # "parametric" (default) or "local"
+    cooksCutoff: "TRUE"
+    independentFiltering: "TRUE"
+    alpha: "0.05"
+    pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
+    typeTrans: "VST"                                                    # "VST" or "rlog"
+    locfunc: "median"                                                   # "median" (default) or "shorth" to estimate the size factors
+
