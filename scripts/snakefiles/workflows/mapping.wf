@@ -198,7 +198,7 @@ ALL_COVERAGE    = GENOME_COV_BDG, GENOME_COV_BW, GENOME_COV_PLUS, GENOME_COV_MIN
 # Flowcharts
 # ----------------------------------------------------------------
 
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/ChIP-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/mapping_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
 
 # ----------------------------------------------------------------
 # Reports
