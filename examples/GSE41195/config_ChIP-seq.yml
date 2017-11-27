@@ -8,9 +8,9 @@
     organism: "Escherichia coli K12 MG1655"
     version: "Ecoli_K12"
     size: "4639221"
-    fasta_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.dna.genome.fa
-    gff3_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gff3
-    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
+    fasta_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa
+    gff3_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3
+#    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
 
   metadata:
     samples: "metadata/samples_ChIP-seq.tab"                            # required. has to contain at least sample ids
