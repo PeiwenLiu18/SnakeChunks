@@ -17,6 +17,7 @@
     seq_type: "se"                                                                                  # required
 
   dir:
+    reads_source: ""
     fastq: "ChIP-seq/fastq"
     genome: "genome"                                                                                # required. where to store genomes
     results: "ChIP-seq/results"                                                                     # required. dir for all result files that are produced by the pipeline
