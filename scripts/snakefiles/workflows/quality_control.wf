@@ -172,7 +172,7 @@ if (len(TRIMMING_TOOLS) != 0):
 # Reporting
 #----------------------------------------------------------------#
 
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "svg"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png"])
 
 #================================================================#
 #                        Rule all                                #
