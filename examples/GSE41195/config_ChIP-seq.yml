@@ -11,13 +11,12 @@
     gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
 
   metadata:
-    samples: "metadata/samples.tab"                            # required. has to contain at least sample ids
-    design: "metadata/design.tab"                              # required. has to contain at least ids of pairs of samples to be compared
-    configfile: "metadata/config.yml"                          # required for flowcharts generation; maybe this should be revised
+    samples: "metadata/samples_ChIP-seq.tab"                            # required. has to contain at least sample ids
+    design: "metadata/design_ChIP-seq.tab"                              # required. has to contain at least ids of pairs of samples to be compared
+    configfile: "metadata/config_ChIP-seq.yml"                          # required for flowcharts generation; maybe this should be revised
     seq_type: "se"                                                                                  # required
 
   dir:
-    reads_source: "data"                                                                            # required. dir containing raw data organized in sub directories named after the samples
     fastq: "fastq"
     genome: "genome"                                                                                # required. where to store genomes
     results: "results"                                                                     # required. dir for all result files that are produced by the pipeline
