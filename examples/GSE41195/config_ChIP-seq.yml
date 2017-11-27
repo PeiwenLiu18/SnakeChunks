@@ -1,6 +1,7 @@
 ---
   description: "This workflow performs quality control and trimming. Optional parameters, if not provided, are automatically set to the default value provided with the given program."
   author: "Claire Rioualen and Jacques van Helden"
+  title: "FNR analysis protocol"
   qsub: "-V -m a -d ." 
   genome:
     organism: "Escherichia coli K12 MG1655"
