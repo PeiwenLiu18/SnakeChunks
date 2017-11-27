@@ -17,14 +17,14 @@
     seq_type: "se"                                                                                  # required
 
   dir:
-    fastq: "fastq"
+    fastq: "ChIP-seq/fastq"
     genome: "genome"                                                                                # required. where to store genomes
-    results: "results"                                                                     # required. dir for all result files that are produced by the pipeline
+    results: "ChIP-seq/results"                                                                     # required. dir for all result files that are produced by the pipeline
     snakechunks: "SnakeChunks"                                                              # required. location of the snakemake library
 
-    samples: "results/samples"                                                                      # optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
-    peaks: "results/peaks"                                                                          # optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
-    reports: "results/reports"                                                                      # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    samples: "ChIP-seq/results/samples"                                                                      # optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
+    peaks: "ChIP-seq/results/peaks"                                                                          # optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
+    reports: "ChIP-seq/results/reports"                                                                      # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
 
   tools:
     trimming: ""
