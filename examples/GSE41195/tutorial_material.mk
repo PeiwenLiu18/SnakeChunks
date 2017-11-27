@@ -53,7 +53,7 @@ download_chipseq_data:
 ### Copy metadata from SnakeChunks library to analysis directory
 
 copy_metadata:
-	mkdir metadata ; cp SnakeChunks/examples/GSE41195/* metadata
+	mkdir -p metadata ; cp SnakeChunks/examples/GSE41195/* metadata
 
 ### all
 
