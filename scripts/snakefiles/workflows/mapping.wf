@@ -233,7 +233,7 @@ rule all:
             BAM_STATS,
 #            SORTED_BAM_BAI,
 #            GENOME_INDEX,
-            ALL_COVERAGE#,
+            ALL_COVERAGE,
 ##            SORTED_BED,
 #            PEAKS,
 #            FORMAT_PEAKS,
