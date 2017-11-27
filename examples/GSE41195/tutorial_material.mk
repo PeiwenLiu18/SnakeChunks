@@ -53,7 +53,7 @@ download_rnaseq_data:
 	cd $(ANALYSIS_DIR) && \
 	mkdir -p $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010244 $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010245 $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010246 $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010247 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010244 && \
-	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010245 && \
+	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344682/SRR5344682_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010245 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010246 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010247 && \
 	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010244/SRR5344681_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010244/GSM1010244_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/GSM1010244/SRR5344681_1.fastq.gz && \
