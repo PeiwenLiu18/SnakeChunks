@@ -17,6 +17,7 @@
     design: "metadata/design_ChIP-seq.tab"                              # required. has to contain at least ids of pairs of samples to be compared
     configfile: "metadata/config_ChIP-seq.yml"                          # required for flowcharts generation; maybe this should be revised
     seq_type: "se"                                                                                  # required
+    input_format: "fastq.gz"
 
   dir:
     reads_source: ""
@@ -30,18 +31,18 @@
     reports: "ChIP-seq/results/reports"                                                                      # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
 
 #  tools:
-  trimming: ""
+  trimming: "cutadapt"
   mapping: "bowtie2" # subread-align" # bwa bowtie
-  peakcalling: "homer mosaics" # macs14 swembl"
+  peakcalling: "homer" # mosaics spp"
   annotation: "intersect window"
 
 
   fastqc: 
     other_options: ""                                                           # optional (def. empty string)
 
-  sickle:
-    threshold: "30"                                                             # ... 
-#   length-th: "25"                             # to be added
+#  cutadapt:
+#    qual_threshold: "30"                                                             # ... 
+#    length-threshold: "25"                             # to be added
 
 
   homer: 

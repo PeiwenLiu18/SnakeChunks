@@ -64,7 +64,7 @@ RULES = os.path.join(GENEREG_LIB, "scripts/snakefiles/rules")
 include: os.path.join(RULES, "dot_graph.rules")
 include: os.path.join(RULES, "dot_to_image.rules")
 include: os.path.join(RULES, "fastqc.rules")
-include: os.path.join(RULES, "gzip.rules")
+#include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "sickle.rules")
 include: os.path.join(RULES, "cutadapt.rules")
 include: os.path.join(RULES, "bbduk.rules")
@@ -108,6 +108,11 @@ if (SEQ_TYPE == "pe"):
 #----------------------------------------------------------------#
 # FastQC
 #----------------------------------------------------------------#
+
+#input_format = "fastq"
+#if ("input_format" in config["metadata"].keys())):
+#    input_format =  config["metadata"]["input_format"]
+
 
 #----------------------------------------------------------------#
 # Single-end

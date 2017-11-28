@@ -33,11 +33,15 @@ if (seq_type == "pe"):
 
 # Define input files
 def cutadapt_inputs(wildcards):
+    if not "input_format" in config["metadata"].keys():
+        ext = "fastq"
+    else:
+        ext = config["metadata"]["input_format"]
     if (seq_type == "pe"):
         #reads = expand("{fastq_dir}/{samples}/{samples}_{strand}.fastq", strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
         sys.exit("Sorry; cutadapt currently only works with single-end data")
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{samples}.fastq", samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand("{fastq_dir}/{samples}/{samples}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir)
     else:
         sys.exit("Error: invalid seq_type parameter. Must be 'se' or 'pe'")
     return reads
@@ -60,11 +64,11 @@ rule cutadapt:
     output:
 #        forward = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[0] + ".fastq",
 #        reverse = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[1] + ".fastq",
-        fastq = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq"
+        fastq = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq.gz"
     params:
         qual_threshold = config["cutadapt"]["qual_threshold"],
         length_threshold = config["cutadapt"]["length_threshold"],
-        temp_output = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed.fq",
+        temp_output = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed.fq.gz",
         outdir = config["dir"]["fastq"] + "/{samples}",
         qsub = config['qsub'] \
             + " -e "+ config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_qsub.err" \

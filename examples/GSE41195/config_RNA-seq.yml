@@ -30,7 +30,7 @@
     diffexpr: "RNA-seq/results/diffexpr"
     reports: "RNA-seq/results/reports"
 
-  trimming: ""
+  trimming: "cutadapt"
   mapping: "tophat"
   read_counts: "featureCounts"
   diffexpr: "edgeR DESeq2"
