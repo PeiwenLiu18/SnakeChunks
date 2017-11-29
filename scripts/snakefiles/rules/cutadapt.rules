@@ -28,8 +28,8 @@ seq_type = config["metadata"]["seq_type"]
 
 if (seq_type == "pe"):
     strands = config["metadata"]["strands"].split()
-#elif (seq_type == "se"):
-#    strands = ["empty1","empty2"]       ## This is a temp workaround to the fact that it's not possible to have conditional outputs - 3 files are produced even in single-end settings
+elif (seq_type == "se"):
+    strands = ["empty1","empty2"]       ## This is a temp workaround to the fact that it's not possible to have conditional outputs - 3 files are produced even in single-end settings
 
 # Define input files
 def cutadapt_inputs(wildcards):
@@ -62,13 +62,15 @@ rule cutadapt:
     """
     input: reads = cutadapt_inputs
     output:
-#        forward = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[0] + ".fastq.gz",
-#        reverse = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[1] + ".fastq.gz",
+        forward = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[0] + ".fastq.gz",
+        reverse = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[1] + ".fastq.gz",
         fastq = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq.gz"
     params:
         qual_threshold = config["cutadapt"]["qual_threshold"],
         length_threshold = config["cutadapt"]["length_threshold"],
-        temp_output = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed.fq.gz",
+        temp_output_se = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed.fq.gz",
+        temp_output_pe_1 = config["dir"]["fastq"] + "/{samples}/{samples}_" + strands[0] + "_val_" + strands[0] + ".fq.gz",
+        temp_output_pe_1 = config["dir"]["fastq"] + "/{samples}/{samples}_" + strands[1] + "_val_" + strands[1] + ".fq.gz",
         outdir = config["dir"]["fastq"] + "/{samples}",
         qsub = config['qsub'] \
             + " -e "+ config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_qsub.err" \
@@ -79,10 +81,17 @@ rule cutadapt:
         if (seq_type == "pe"):
 #            shell("cutadapt pe --pe-file1 " + input.reads[0] + " --pe-file2 " + input.reads[1] + " --qual-type {params.qual_type} --qual-threshold {params.threshold} --output-pe1 {output.forward} --output-pe2 {output.reverse} --output-single {output.single} 2> {log}")
             shell("trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log}")
-            shell("mv {params.temp_output} {output.fastq}")
+            shell("mv {params.temp_output_pe_1} {output.forward}")
+            shell("mv {params.temp_output_pe_2} {output.reverse}")
 
         if (seq_type == "se"):
             shell("trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}")
-            shell("mv {params.temp_output} {output.fastq}")
+            shell("mv {params.temp_output_se} {output.fastq}")
+            shell("touch {output.forward} {output.reverse}")
+
+
+#trim_galore -o . --paired GSM1010244_1.fastq.gz GSM1010244_2.fastq.gz
+
+#GSM1010244_1_val_1.fq.gz
 
 
