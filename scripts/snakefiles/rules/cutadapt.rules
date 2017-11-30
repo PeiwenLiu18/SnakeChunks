@@ -83,9 +83,9 @@ rule cutadapt:
         if (seq_type == "pe"):
 #            shell("cutadapt pe --pe-file1 " + input.reads[0] + " --pe-file2 " + input.reads[1] + " --qual-type {params.qual_type} --qual-threshold {params.threshold} --output-pe1 {output.forward} --output-pe2 {output.reverse} --output-single {output.single} 2> {log}")
             shell("""
-trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log}
-mv {params.temp_output_pe_1} {output.forward}
-mv {params.temp_output_pe_2} {output.reverse}
+trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log};
+mv {params.temp_output_pe_1} {output.forward} &> {log};
+mv {params.temp_output_pe_2} {output.reverse} &> {log}
 """)
 
         if (seq_type == "se"):
