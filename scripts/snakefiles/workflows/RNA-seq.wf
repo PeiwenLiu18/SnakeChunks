@@ -197,7 +197,7 @@ DEG = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix
 
 
 ## Graphics & reports
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/RNA-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/RNA-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png"])
 
 #================================================================#
 #                        Rule all                                #

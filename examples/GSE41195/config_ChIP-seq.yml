@@ -1,0 +1,69 @@
+---
+  description: ""
+  author: "Claire Rioualen and Jacques van Helden"
+  title: "FNR analysis protocol for ChIP-seq data"
+  dataset: "GSE41195"
+  qsub: "-V -m a -d ." 
+  genome:
+    organism: "Escherichia coli K12 MG1655"
+    version: "Ecoli_K12"
+    size: "4639221"
+    fasta_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa
+    gff3_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3
+    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
+
+  metadata:
+    samples: "metadata/samples_ChIP-seq.tab"                            # required. has to contain at least sample ids
+    design: "metadata/design_ChIP-seq.tab"                              # required. has to contain at least ids of pairs of samples to be compared
+    configfile: "metadata/config_ChIP-seq.yml"                          # required for flowcharts generation; maybe this should be revised
+    seq_type: "se"                                                                                  # required
+    input_format: "fastq.gz"
+
+  dir:
+    reads_source: ""
+    fastq: "ChIP-seq/fastq"
+    genome: "genome"                                                                                # required. where to store genomes
+    results: "ChIP-seq/results"                                                                     # required. dir for all result files that are produced by the pipeline
+    snakechunks: "SnakeChunks"                                                              # required. location of the snakemake library
+
+    samples: "ChIP-seq/results/samples"                                                                      # optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
+    peaks: "ChIP-seq/results/peaks"                                                                          # optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
+    reports: "ChIP-seq/results/reports"                                                                      # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+
+#  tools:
+  trimming: "cutadapt"
+  mapping: "bowtie2" # subread-align" # bwa bowtie
+  peakcalling: "homer" # mosaics spp"
+  annotation: "intersect window"
+
+
+  fastqc: 
+    other_options: ""                                                           # optional (def. empty string)
+
+#  cutadapt:
+#    qual_threshold: "30"                                                             # ... 
+#    length-threshold: "25"                             # to be added
+
+
+  homer: 
+    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
+    F: "2"                                                                      # optional (def. 4)
+    L: "2"                                                                      # optional (def. 4)
+    P: "0.01"                                                                   # optional (def. 0.0001)
+    fdr: "0.01"                                                                 # optional (def. 0.001)
+
+  mosaics:
+    FDR: "0.05"
+    frag_len: "400"
+    bin_size: "200"
+    type: "narrow"
+#  spp: 
+#    fdr: "0.05"                                                                 # optional (def. 0.01)
+
+#  peak-motifs: 
+#    tasks: "all"                                                                                                    # optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
+#    max_seq_len: "0"                                                                                                # default ? curr not used
+#    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # required. name format db_file
+#    disco: "oligos,positions,dyads"                                                                                 # default ? oligos|dyads|positions|local_words|merged_words|meme|chipmunk
+
+

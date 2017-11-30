@@ -136,6 +136,7 @@ add_pub_key:
 	gpg -a --export E084DAB9 | sudo apt-key add -
 
 add_repos: 
+	sudo apt-get update
 	sudo apt-get install --yes python-software-properties
 	sudo add-apt-repository ppa:x2go/stable --yes
 	sudo apt-add-repository ppa:ubuntu-mate-dev/ppa --yes
@@ -427,7 +428,7 @@ visualization: java igv igv_tools
 
 ## to be used only in non-graphical environment (eg IFB cloud VMs)
 desktop_and_x2go:
-	add_repos
+	sudo apt-get update
 	sudo apt-get install -y x2goserver
 	sudo apt-get install -y --no-install-recommends ubuntu-mate-core ubuntu-mate-desktop
 	sudo apt-get install -y mate-desktop-environment-extra

@@ -20,7 +20,7 @@ def mkdir_p(path):
 
 #=cut
 
-def writeCategory(outputdir, project_name, dataset_id, datatype, menu, d_samples):
+def writeCategory(outputdir, project_name, dataset_id, datatype, menu, d_samples, d_peaks):
 
 #            Web::writeCategory($d_output, $d_htsnet, $d_rscript, $graphVizPath, $rh_datasets, $project, $study,
 #                               "int", $rh_int_subnets_nwa, $rh_int_subnets_nwa, $rh_int_noa,  $rh_int_eda,
@@ -132,10 +132,22 @@ def writeCategory(outputdir, project_name, dataset_id, datatype, menu, d_samples
     samplePageContent = sampleListPage(samplePageContent, project_name, dataset_id, datatype, menu, level, d_samples)
 
     samplePageName = dataset_id + "-" + datatype + "-sample.html";
-    file = open(outputdir + "/" + dataset_id + "/" + datatype + "/" + samplePageName, "w") # || die "Cannot open $subnetPageName:\n$!";
+    file = open(outputdir + "/" + dataset_id + "/" + datatype + "/" + samplePageName, "w") 
     file.write(samplePageContent)
     file.close()
 
+    peaksdir = outputdir + "/" + dataset_id + "/" + datatype + "/peaks";
+    mkdir_p(peaksdir)
+#    imageDir = "$outputdir/$dataset_id/$network/images";
+#    mkdir $imageDir;
+
+    peakPageContent = ""
+    peakPageContent = peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, level, d_peaks)
+
+    peakPageName = dataset_id + "-" + datatype + "-peak.html";
+    file = open(outputdir + "/" + dataset_id + "/" + datatype + "/" + peakPageName, "w") 
+    file.write(peakPageContent)
+    file.close()
 
 #    # gene part
 
@@ -261,11 +273,11 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
     filecontent = filecontent + "<table class=\"sortable\" >\n"
     filecontent = filecontent + "<thead>\n"
     filecontent = filecontent + "<tr>\n"
-    filecontent = filecontent + "<th><i class=\"fa fa-sort\"></i> Sample ID</th>\n"
-    filecontent = filecontent + "<th><i class=\"fa fa-sort\"></i> Fastq file</th>\n"
-    filecontent = filecontent + "<th><i class=\"fa fa-sort\"></i> Read number</th>\n"
-    filecontent = filecontent + "<th><i class=\"fa fa-sort\"></i> Average read length</th>\n"
-    filecontent = filecontent + "<th><i class=\"fa fa-sort\"></i> GC rate</th>\n"
+    filecontent = filecontent + "<th>Sample ID</th>\n"
+    filecontent = filecontent + "<th>Fastq file</th>\n"
+    filecontent = filecontent + "<th>Read number</th>\n"
+#    filecontent = filecontent + "<th>Average read length</th>\n"
+    filecontent = filecontent + "<th>GC rate</th>\n"
 
 #    for dataset(@{$$rh_dsLists{'Transcriptome'}}){
 #        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> $dataset score</th>\n"
@@ -302,16 +314,20 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
     filecontent = filecontent + "</thead>\n"
     filecontent = filecontent + "<tbody>\n"
 
+
     for sample_id in d_samples.keys():
 
-        (read_count, avg_read_length, gc_rate) = statistics.fastq_stats(d_samples[sample_id]["path"])
+        (read_count, gc_rate) = statistics.fastq_stats(d_samples[sample_id]["path"])
 
         filecontent = filecontent + "<tr>\n"
-        filecontent = filecontent + "<td><a href=\"" + prefix + dataset_id + "/" + datatype + "/samples/" + dataset_id + "-" + datatype + "-sample-" + sample_id + ".html#sample\">" + sample_id + "</a></td>\n"
-        filecontent = filecontent + "<td>" + d_samples[sample_id]["path"] + "</a></td>\n"
-        filecontent = filecontent + "<td>" + str(read_count) + "</a></td>\n"
-        filecontent = filecontent + "<td>" + str(avg_read_length) + "</a></td>\n"
-        filecontent = filecontent + "<td>" + str(round(gc_rate, 1)) + "</a></td>\n"
+#        filecontent = filecontent + "<td><a href=\"" + prefix + dataset_id + "/" + datatype + "/samples/" + dataset_id + "-" + datatype + "-sample-" + sample_id + ".html#sample\">" + sample_id + "</a></td>\n"
+        filecontent = filecontent + "<td><a href=\"" + prefix + "../../fastq/" + sample_id + "/" + sample_id + "_fastq_fastqc/" + sample_id + "_fastqc.html\">" + sample_id + "</a></td>\n"
+#        filecontent = filecontent + "<td><a href=\"" + prefix + "../../fastq/" + sample_id + "/" + sample_id + ".fastq\">" + d_samples[sample_id]["path"] + "</td>\n"
+        filecontent = filecontent + "<td>" + d_samples[sample_id]["path"] + "</td>\n"
+        filecontent = filecontent + "<td>" + str(read_count) + "</td>\n"
+#        filecontent = filecontent + "<td>" + str(avg_read_length) + "</a></td>\n"
+        filecontent = filecontent + "<td>" + str(round(gc_rate, 1)) + "</td>\n"
+        filecontent = filecontent + "</tr>\n"
 
 #        score;
 #        for dataset(@{$$rh_dsLists{'Transcriptome'}}){
@@ -358,7 +374,7 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
 #            filecontent = filecontent + "<td>$enrichRatio</td>\n"
 #            filecontent = filecontent + "<td>$occ</td>\n"
 #        }
-        filecontent = filecontent + "</tr>\n"
+
 
 #    }
     filecontent = filecontent + "</tbody>\n"
@@ -1152,14 +1168,17 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
 
 ### GENES ##
 
-##=pod
+#=pod
 
-##=head2 geneListPage()
+#=head2 geneListPage()
 
-##Creates gene pages and tables.
+#Creates gene pages and tables.
 
-##=cut
+#=cut
 
+def peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, level, d_peaks):
+
+    
 #sub geneListPage {
 #    outputdir = shift;
 #    filecontent = shift;
@@ -1178,27 +1197,30 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
 ##    dataset = $$rh_dsLists{'Transcriptome'}[0];
 ##    my @geneList = sort{abs($$rh_noa{$b}{'Correlations'}{$dataset}) <=> abs($$rh_noa{$a}{'Correlations'}{$dataset})} keys %$rh_noa;
 
-#    tab = "gene";
+    tab = "peak";
 
-#    $filecontent = header($filecontent, $projName, $dataset_id, $level,
-#                          $network,     $tab,       $menu,
-#                          $resHeading,  $rh_GO);
+    filecontent = header("", project_name, dataset_id, datatype, menu, tab, level)
 
-#    $filecontent = geneListBox($filecontent, $dataset_id,
-#                               $network, $rh_dsLists, \@geneList,
-#                               $rh_noa, undef, undef, $level);
+#    if($network eq "itg"){
+#        metasubnetImage ($outputdir, $graphVizPath, $dataset_id, $network, $$rh_dsLists{'Transcriptome'}, $rh_subnets_nwa, $rh_subnetsOrMetas_nwa);
 
-#    foreach geneID (@geneList) {
-#        genePage($outputdir,      $projName, $dataset_id,           $network,    $geneID, $rh_noa,
-#                 $rh_subnets_nwa, $rh_subnetsOrMetas_nwa, $rh_dsLists, $menu,   $resHeading,
-#                 $rh_GO,          $level);
+#        $filecontent = metasubnetBox($filecontent, $dataset_id, $network, $level);
+#        $filecontent = metasubnetListBox($filecontent, $dataset_id, $network, $rh_subnetsOrMetas_nwa, $rh_noa, $level);
 #    }
+#    else {
 
-#    $filecontent = footer($filecontent);
+    TFs = d_peaks.keys()
 
-#    return $filecontent;
-#}
+    for TF in TFs: 
+        filecontent = peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF)
+        filecontent = filecontent + "<img class=\"caption\" title=\"\" src=\"../../../../results/peaks/" + TF + "/multi_peaks_vs_tfbs.png\" alt=\"\"/>" ### adapt level param !
 
+#    }
+    filecontent = footer(filecontent)
+
+    return filecontent
+
+    
 ##=pod
 
 ##=head2 geneListBox()
@@ -1206,6 +1228,153 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
 ##Creates the table listing specified genes and their information.
 
 ##=cut
+
+def peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF):
+#    filecontent = shift;
+#    dataset_id = shift;
+#    network = shift;
+#    rh_dsLists = shift;
+#    rh_subnets_nwa = shift;
+#    rh_subnetsOrMetas_nwa = shift;
+#    rh_noa = shift;
+#    level = shift;
+#    goID = shift; ## defined if subnetlist from go page
+
+
+    prefix = '../' * level
+
+#    my @a_snws = keys %$rh_subnetsOrMetas_nwa;
+
+    filecontent = filecontent + "<div class=\"box\">\n"
+    filecontent = filecontent + "<h2>" + TF + " peak collections (" + str(len(d_peaks[TF])) + ")</h2>\n"
+
+    filecontent = filecontent + "<table class=\"sortable\" >\n"
+    filecontent = filecontent + "<thead>\n"
+    filecontent = filecontent + "<tr>\n"
+    filecontent = filecontent + "<th>Peak file</th>\n"
+    filecontent = filecontent + "<th>Site number</th>\n"
+    filecontent = filecontent + "<th>Covered sites</th>\n"
+    filecontent = filecontent + "<th>Missed sites</th>\n"
+    filecontent = filecontent + "<th>Site coverage</th>\n"
+    filecontent = filecontent + "<th>Peak number</th>\n"
+    filecontent = filecontent + "<th>Covered peaks</th>\n"
+    filecontent = filecontent + "<th>Missed peaks</th>\n"
+    filecontent = filecontent + "<th>Peak coverage</th>\n"
+
+
+#    for dataset(@{$$rh_dsLists{'Transcriptome'}}){
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> $dataset score</th>\n"
+#    }
+#    
+#    if(exists $$rh_subnets_nwa{$a_snws[0]}{'Merged_snw_best_score'}){
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Merged snw best score</th>\n"
+#    }
+
+#    if(defined $$rh_subnets_nwa{$a_snws[0]}{'Seed_occurrence'}){
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Seed occurrence</th>\n"
+#    }
+#    filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Size</th>\n"
+
+#    if(defined $$rh_subnets_nwa{$a_snws[0]}{'Highlighted_genes'}){
+#        my @a_genes = keys %$rh_noa;
+#        my @a_high  = keys %{$$rh_noa{$a_genes[0]}{'Highlights'}};
+#        head    = "Highlighted genes";
+#        if(scalar(@a_high) == 1){
+#            $head = $a_high[0];
+#            $head =~ s/_/ /g;
+#        }
+
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> $head</th>\n"
+#    }
+
+#    if(defined $goID){
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Hypergeometric test</th>\n"
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Bonferroni corrected p-value</th>\n"
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Enrichment ratio</th>\n"
+#        filecontent = filecontent + "<th><i class=\"icon-sort\"></i> Occurrences in subnetwork</th>\n"
+#    }
+    filecontent = filecontent + "</tr>\n"
+    filecontent = filecontent + "</thead>\n"
+    filecontent = filecontent + "<tbody>\n"
+
+#    f = open('results/reports/synthesis.txt')
+#    try:
+
+
+    with open("results/peaks/" + TF + "/multi_peaks_vs_tfbs.txt") as f:
+        for line in f:
+            data = line.split()
+            filecontent = filecontent + "<tr>\n"
+#            filecontent = filecontent + "<td><a href=\"" + prefix + dataset_id + "/" + datatype + "/peaks/" + dataset_id + "-" + datatype + "-peak-" + data[-1] + ".html#peak\">" + data[-1] + "</a></td>\n"
+            filecontent = filecontent + "<td><a href=\"" + prefix + "../../" + data[-1] + "#peak\">" + data[-1] + "</a></td>\n"
+            filecontent = filecontent + "<td>" + data[4] + "</td>\n"
+            filecontent = filecontent + "<td>" + data[5] + "</td>\n"
+            filecontent = filecontent + "<td>" + data[6] + "</td>\n"
+            filecontent = filecontent + "<td>" + str(round(float(data[7]), 2)) + "</td>\n"
+            filecontent = filecontent + "<td>" + data[0] + "</td>\n"
+            filecontent = filecontent + "<td>" + data[1] + "</td>\n"
+            filecontent = filecontent + "<td>" + data[2] + "</td>\n"
+            filecontent = filecontent + "<td>" + str(round(float(data[3]), 2)) + "</td>\n"
+
+#    # My Code
+#    finally:
+#        f.close()
+
+
+#        score;
+#        for dataset(@{$$rh_dsLists{'Transcriptome'}}){
+
+#            $score = $$rh_subnets_nwa{$subnetID}{'Scores'}{$dataset};
+#            if(defined $score){
+#                $score = sprintf("%.3f", $score);
+#            }
+#            else{
+#                $score = "-";
+#            }
+
+#            filecontent = filecontent + "<td>$score</td>\n"
+#        }
+
+#        if(defined $$rh_subnets_nwa{$subnetID}{'Merged_snw_best_score'}){
+#            $score = $$rh_subnets_nwa{$subnetID}{'Merged_snw_best_score'};
+#            if(defined $score){
+#                $score = sprintf("%.3f", $score);
+#            }
+#            else{
+#                $score = "-";
+#            }
+#            filecontent = filecontent + "<td>$score</td>\n"
+#        }
+
+#        if(defined $$rh_subnets_nwa{$subnetID}{'Seed_occurrence'}){
+#            filecontent = filecontent + "<td>$$rh_subnets_nwa{$subnetID}{'Seed_occurrence'}</td>\n"
+#        }
+#        size = scalar(keys(%{$$rh_subnets_nwa{$subnetID}{'Nodes'}}));
+#        filecontent = filecontent + "<td>$size</td>\n"
+
+#        if(defined $$rh_subnets_nwa{$subnetID}{'Highlighted_genes'}){
+#            filecontent = filecontent + "<td>$$rh_subnets_nwa{$subnetID}{'Highlighted_genes'}</td>\n"
+#        }
+
+#        if(defined $goID){
+#            hyper = $$rh_subnetsOrMetas_nwa{$subnetID}{'GO_terms'}{$goID}{'hyper'};
+#            corrpval = $$rh_subnetsOrMetas_nwa{$subnetID}{'GO_terms'}{$goID}{'corrected_pval'};
+#            enrichRatio = $$rh_subnetsOrMetas_nwa{$subnetID}{'GO_terms'}{$goID}{'Enrichment_ratio'};
+#            occ = $$rh_subnetsOrMetas_nwa{$subnetID}{'GO_terms'}{$goID}{'occurrences'};
+#            filecontent = filecontent + "<td>$hyper</td>\n"
+#            filecontent = filecontent + "<td>$corrpval</td>\n"
+#            filecontent = filecontent + "<td>$enrichRatio</td>\n"
+#            filecontent = filecontent + "<td>$occ</td>\n"
+#        }
+    filecontent = filecontent + "</tr>\n"
+
+#    }
+    filecontent = filecontent + "</tbody>\n"
+    filecontent = filecontent + "</table>\n"
+
+    filecontent = filecontent + "</div>\n"
+
+    return filecontent
 
 #sub geneListBox {
 #    filecontent = shift;
@@ -2020,9 +2189,13 @@ def header(filecontent, project_name, dataset_id, datatype, menu, tab, level):
 
 #    filecontent = filecontent + "<link rel=\"icon\" type=\"image/png\" href=\"/home/rioualen/HTML-KickStart-master/css/sub-icon.png\" />\n"            ## !! abs path, to be parametrized
 
+#    filecontent = filecontent + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js\"></script>\n"
+#    filecontent = filecontent + "<script src=\"" + os.environ['HOME'] + "/HTML-KickStart-master/js/kickstart.js\"></script>\n"                                      ## !! abs path, to be parametrized
+#    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"" + os.environ['HOME'] + "/HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
+
     filecontent = filecontent + "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js\"></script>\n"
-    filecontent = filecontent + "<script src=\"/home/rioualen/HTML-KickStart-master/js/kickstart.js\"></script>\n"                                      ## !! abs path, to be parametrized
-    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"/home/rioualen/HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
+    filecontent = filecontent + "<script src=\"" + prefix + "../../HTML-KickStart-master/js/kickstart.js\"></script>\n"                                      ## !! abs path, to be parametrized
+    filecontent = filecontent + "<link rel=\"stylesheet\" href=\"" + prefix + "../../HTML-KickStart-master/css/SnakeChunks.css\" media=\"all\" />\n"         ## !! abs path, to be parametrized
 
     filecontent = filecontent + "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n"
 
@@ -2083,10 +2256,10 @@ def menuBar(filecontent, dataset_id, datatype, menu, tab, level):
 #    print(menu)
 
     filecontent = filecontent + "<div id=\"menu\">\n"
-    filecontent = filecontent + "<h1><a href=\"" + prefix + "index.html\"><i class=\"fa fa-home\"></i></a> " + dataset_id + "</h1>        \n"
+    filecontent = filecontent + "<h1><a href=\"" + prefix + "index.html\"></a> " + dataset_id + "</h1>        \n"
 
     filecontent = filecontent + "<ul class=\"menu\">\n"
-    filecontent = filecontent + "<li class=" + homeclass + "><a href=\"" + prefix + dataset_id + "/" + dataset_id + "-home.html\"><i class=\"fa fa-home\"></i> Dataset</a></li>\n"
+    filecontent = filecontent + "<li class=" + homeclass + "><a href=\"" + prefix + dataset_id + "/" + dataset_id + "-home.html\"> Dataset</a></li>\n"
 #    if($menu eq "itg"){
 #        filecontent = filecontent + "<li class=$intclass><a href=\"$prefix$dataset_id/int/$dataset_id-int-subnet.html#subnet\">Interactome</a></li>\n"
 #        filecontent = filecontent + "<li class=$regclass><a href=\"$prefix$dataset_id/reg/$dataset_id-reg-subnet.html#subnet\">Regulome</a></li>\n"
@@ -2096,7 +2269,7 @@ def menuBar(filecontent, dataset_id, datatype, menu, tab, level):
 #    print(menu)
     filecontent = filecontent + "<li class=" + chipclass + "><a href=\"" + prefix + dataset_id + "/" + "chip" + "/" + dataset_id + "-" + "chip" + "-sample.html#sample\">ChIP-seq</a></li>\n"
 #    }
-    filecontent = filecontent + "<li class=" + dlclass + "><a href=\"" + prefix + dataset_id + "/" + dataset_id + "-download.html\"><i class=\"fa fa-download\"></i> Download</a></li>\n"
+#    filecontent = filecontent + "<li class=" + dlclass + "><a href=\"" + prefix + dataset_id + "/" + dataset_id + "-download.html\"> Download</a></li>\n"
     filecontent = filecontent + "</ul>\n"
 
     if (level > 1):
@@ -2119,7 +2292,7 @@ def tabsBar(filecontent, dataset_id, datatype, tab, prefix):
 
 #    my ($subtab, $genetab, $gotab);
     if (tab == "peak"):
-        sampletab = "\"" + prefix + dataset_id + + "/" + datatype + "/" + dataset_id + "-" + datatype + "-sample.html#sample\""
+        sampletab = "\"" + prefix + dataset_id + "/" + datatype + "/" + dataset_id + "-" + datatype + "-sample.html#sample\""
         peaktab = "\"#peak\""
     elif (tab == "sample"):
         sampletab = "\"#sample\"";
