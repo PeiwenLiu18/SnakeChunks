@@ -1,0 +1,11 @@
+---
+name: homer
+channels:
+#  - icobo
+  - conda-forge
+  - defaults
+  - r
+  - bioconda
+dependencies:
+  - homer
+...
