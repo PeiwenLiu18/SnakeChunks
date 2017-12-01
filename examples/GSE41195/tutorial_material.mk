@@ -25,7 +25,7 @@ export LANG=C
 create_dir:
 	@echo "Creating $(ANALYSIS_DIR) directory" && \
 	mkdir -p $(ANALYSIS_DIR) && \
-	mv $(HOME)/SnakeChunks-4.0 $(ANALYSIS_DIR)/SnakeChunks
+	mv $(HOME)/SnakeChunks $(ANALYSIS_DIR)/SnakeChunks # to be changed when v4.1 is available
 
 
 
