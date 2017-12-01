@@ -47,5 +47,6 @@ rule bedtools_window:
     benchmark: "{regions}_window_benchmark.txt"
     params: window = config["bedtools"]["window"],\
         qsub = config["qsub"] + " -e {regions}_window_qsub.err -o {regions}_window_qsub.out"
+    conda:  "../envs/bedtools.yaml"
     shell:"""bedtools window -a {input.bed} -b {input.gff3} -w {params.window} > {output}"""
 

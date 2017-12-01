@@ -33,5 +33,6 @@ rule bedtools_closest:
 	log: "{regions}_closest.log"
 	benchmark: "{regions}_closest_benchmark.txt"
 	params: qsub = config["qsub"] + " -e {regions}_closest_qsub.err -o {regions}_closest_qsub.out"
+	conda: "../envs/bedtools.yaml"
 	shell:"""bedtools closest -a {input.bed} -b {input.gff3} > {output}"""
 

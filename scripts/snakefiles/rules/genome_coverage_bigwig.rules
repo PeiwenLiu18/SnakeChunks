@@ -25,3 +25,4 @@ rule genome_coverage_bigwig:
     benchmark:  "{reads}_bam2bigwig_benchmark.txt"
     shell: "bamCoverage -b {input.bam} -o {output} 2> {log}" 
 
+
