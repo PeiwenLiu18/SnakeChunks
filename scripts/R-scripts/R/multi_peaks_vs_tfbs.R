@@ -9,6 +9,7 @@
 #' First version: 2017-09
 #' @param peakFiles a vector contianing a list of files. Each file is supposed to contain a set of genomic regions, in bed format.   
 #' @param sites path to a bed-formatted file containing the reference TFBSs. Passed to 
+#' @param main="Mutual coverage plot" main title for the plot. 
 #' @param peakSetLabels a vector of the same size as peakFiles indicating a label for each peak set. 
 #' @param verbose=FALSE if true, print messages during the execution
 #' @param drawPlots=FALSE if true, draw diagnostic plots
@@ -32,10 +33,12 @@
 #' setwd(mainDir)
 #' 
 #' ## File containing the reference TF binding sites
-#' TFBSFile <- file.path(mainDir, "RegulonDB", "Nac_unique_sites.bed")
+#' TF <- "OmpR"
+#' bedFile <- paste(sep="",TF, "_unique_sites.bed")
+#' TFBSFile <- file.path(mainDir, "RegulonDB", bedFile)
 #' 
 #' ## Define the directory containing the peaks
-#' peakDir <- file.path(mainDir, "results", "peaks", "Nac_vs_WT")
+#' peakDir <- file.path(mainDir, "results", "peaks", paste(sep="", TF, "_vs_WT"))
 #' 
 #' ## Identify all the peaks in this directory (recursive search in all subfolders)
 #' peakFiles <- list.files(path=peakDir, pattern=c(".*sickle_bowtie2.*\\.bed$"), recursive=TRUE, full.names = TRUE)
@@ -43,7 +46,7 @@
 #' 
 #' ## Compare peaks and TFBSs
 #' multiPeakVsRegDB <- MultiPeaksVsTFBS(
-#'   peakFiles, 
+#'   peakFiles, main=TF,
 #'   peakSetLabels = basename(sub(peakFiles, pattern="\\.bed$", replacement = "")), 
 #'   TFBSFile, verbose=TRUE, 
 #'   drawPlots=TRUE)
@@ -52,6 +55,7 @@
 MultiPeaksVsTFBS <- function(peakFiles,
                              TFBSFile,
                              PNGFile,
+                             main="Mutual coverage plot",
                              peakSetLabels=NULL,
                              verbose = FALSE,
                              drawPlots = FALSE,
@@ -117,7 +121,7 @@ MultiPeaksVsTFBS <- function(peakFiles,
     y <- 100*result$peaksVsTFBStable$peakCoverage
     png(PNGFile)
     plot(x, y,
-         main = "Mutual coverage plot",
+         main = main,
          xlim = c(0,100), 
          ylim = c(0, max(y) * 2), 
          xlab = "% TFBS",
