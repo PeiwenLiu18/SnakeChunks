@@ -135,12 +135,12 @@ include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "index_fasta.rules")
 include: os.path.join(RULES, "macs2.rules")
 include: os.path.join(RULES, "macs14.rules")
-include: os.path.join(RULES, "mosaics.rules")
+#include: os.path.join(RULES, "mosaics.rules")
 #include: os.path.join(RULES, "peak_motifs.rules")
-include: os.path.join(RULES, "spp.rules")
+#include: os.path.join(RULES, "spp.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "subread_align.rules")
-include: os.path.join(RULES, "swembl.rules")
+#include: os.path.join(RULES, "swembl.rules")
 
 
 #================================================================#
