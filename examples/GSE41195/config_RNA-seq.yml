@@ -31,7 +31,12 @@
     diffexpr: "RNA-seq/results/diffexpr"
     reports: "RNA-seq/results/reports"
 
-  trimming: "cutadapt"
+  mapping_wf:
+    workdir: "."
+    snakefile: "metadata/mapping.wf"
+    configfile: "metadata/RNA-seq.wf"
+
+#  trimming: "cutadapt"
   mapping: "tophat"
   read_counts: "featureCounts"
   diffexpr: "edgeR DESeq2"
