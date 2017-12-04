@@ -182,7 +182,7 @@ DIFFEXPR_TOOLS = config["diffexpr"].split()
 # Counting features
 #----------------------------------------------------------------#
 
-COUNTING_TOOLS = config["tools"]["read_counts"].split()
+COUNTING_TOOLS = config["read_counts"].split()
 FEATURE_COUNTS_PER_SAMPLE   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{read_counts}.txt", samples=SAMPLE_IDS, prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
 ALL_FEATURE_COUNTS          = expand(DEG_DIR + "/{prefix}_{read_counts}_all.txt", prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
 
