@@ -34,7 +34,7 @@
   mapping_wf:
     workdir: "."
     snakefile: "mapping.wf"
-    configfile: "metadata/config_RNA-seq.wf"
+    configfile: "metadata/config_RNA-seq.yml"
 
   trimming: "cutadapt"
   mapping: "bowtie2"
