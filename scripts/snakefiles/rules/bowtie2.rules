@@ -89,7 +89,7 @@ rule bowtie2:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-    bowtie2 -x {input.index} -1 " + input.reads[0] + " -2 " + input.reads[1] + " -S {params.sam} --phred33 -N {params.max_mismatches} --threads {params.threads} 2> {log}
+    bowtie2 -x {input.index} -1 {input.reads[0]} -2 {input.reads[1]} -S {params.sam} --phred33 -N {params.max_mismatches} --threads {params.threads} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
     bowtie2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 -N {params.max_mismatches} 2> {log}
