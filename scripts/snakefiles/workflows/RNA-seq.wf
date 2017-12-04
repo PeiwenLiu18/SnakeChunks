@@ -152,10 +152,10 @@ if TRIMMING_TOOLS:
 else:
     PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
 
-if not (("tools" in config.keys()) and ("diffexpr" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['diffexpr'] should be specified in the config file.")
+if not ("diffexpr" in config.keys()):
+    sys.exit("The parameter config['diffexpr'] should be specified in the config file.")
 
-DIFFEXPR_TOOLS = config["tools"]["diffexpr"].split()
+DIFFEXPR_TOOLS = config["diffexpr"].split()
 
 ##----------------------------------------------------------------#
 ## Alignment
