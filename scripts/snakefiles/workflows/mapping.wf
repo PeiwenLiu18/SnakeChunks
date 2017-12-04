@@ -43,11 +43,11 @@ import re
 import pandas as pd
 from pathlib import Path
 
-wd = os.getcwd()
+#wd = os.getcwd()
 
-GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
+#GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
-include: os.path.join(GENEREG_LIB, "scripts/python_lib/util.py")
+include: os.path.join(config["dir"]["snakechunks"], "scripts/python_lib/util.py")
 
 
 #================================================================#
