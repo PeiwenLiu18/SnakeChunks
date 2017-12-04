@@ -13,66 +13,50 @@
     gtf_file: Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf
 
   metadata:
-    samples: "metadata/samples_ChIP-seq.tab"                            # required. has to contain at least sample ids
-    design: "metadata/design_ChIP-seq.tab"                              # required. has to contain at least ids of pairs of samples to be compared
-    configfile: "metadata/config_ChIP-seq.yml"                          # required for flowcharts generation; maybe this should be revised
-    seq_type: "se"                                                                                  # required
-    input_format: "fastq.gz"
+    samples: "metadata/samples_ChIP-seq.tab"                            # Required. Has to contain at least an "ID" column. 
+    design: "metadata/design_ChIP-seq.tab"                              # Required. Has to contain at least ids of pairs of samples to be compared
+    configfile: "metadata/config_ChIP-seq.yml"                          # Required for flowcharts generation; maybe this should be revised
+    seq_type: "se"                                                      # Required
+    input_format: "fastq.gz"                                            # Optional. If not provided, will be "fastq".
 
   dir:
     reads_source: ""
     fastq: "ChIP-seq/fastq"
-    genome: "genome"                                                                                # required. where to store genomes
-    results: "ChIP-seq/results"                                                                     # required. dir for all result files that are produced by the pipeline
-    snakechunks: "SnakeChunks"                                                              # required. location of the snakemake library
+    genome: "genome"                                                    # Required. Directory containing the genome of references, annotations, and genoms indexes.
+    results: "ChIP-seq/results"                                         # Required. Directory containing all result files that are produced by the pipeline
+    snakechunks: "SnakeChunks"                                          # Required. Location of the SnakeChunks library
 
-    samples: "ChIP-seq/results/samples"                                                                      # optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
-    peaks: "ChIP-seq/results/peaks"                                                                          # optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
-    reports: "ChIP-seq/results/reports"                                                                      # optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    samples: "ChIP-seq/results/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
+    peaks: "ChIP-seq/results/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
+    reports: "ChIP-seq/results/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
 
-#  tools:
-  trimming: "cutadapt"
-  mapping: "bowtie2" # subread-align" # bwa bowtie
-  peakcalling: "homer macs2" # mosaics spp"
-  annotation: "intersect window"
+  trimming: ""
+  mapping: "bowtie2"
+  peakcalling: "homer macs2"
+  annotation: "intersect"
 
-
-  fastqc: 
-    other_options: ""                                                           # optional (def. empty string)
-
-#  cutadapt:
-#    qual_threshold: "30"                                                             # ... 
-#    length-threshold: "25"                             # to be added
-
+  cutadapt:
+    qual_threshold: "20"                                                # Optional (def. 20)
+    length-threshold: "20"                                              # Optional (def. 20)
 
   homer: 
-    style: "factor"                                                             # optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
-    F: "2"                                                                      # optional (def. 4)
-    L: "2"                                                                      # optional (def. 4)
-    P: "0.01"                                                                   # optional (def. 0.0001)
-    fdr: "0.01"                                                                 # optional (def. 0.001)
+    style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
+    F: "2"                                                              # Optional (def. 4)
+    L: "2"                                                              # Optional (def. 4)
+    P: "0.01"                                                           # Optional (def. 0.0001)
+    fdr: "0.01"                                                         # Optional (def. 0.001)
 
   macs2: 
-    qval: "0.001"                                                       # Default 0.05
-    keep_dup: "all"                                                     # Default 1
-    mfold_min: "2"                                                      # Default 5
-    mfold_max: "50"                                                     # Default 50
-    other_options: "--nomodel"                                     # optional can include --call-summits, --broad...
-
-
-#  mosaics:
-#    FDR: "0.05"
-#    frag_len: "400"
-#    bin_size: "200"
-#    type: "narrow"
-
-#  spp: 
-#    fdr: "0.05"                                                                 # optional (def. 0.01)
+    qval: "0.001"                                                       # Optional (def. 0.05)
+    keep_dup: "all"                                                     # Optional (def. 1)
+    mfold_min: "2"                                                      # Optional (def. 5)
+    mfold_max: "50"                                                     # Optional (def. 50)
+    other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
 #  peak-motifs: 
-#    tasks: "all"                                                                                                    # optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
+#    tasks: "all"                                                                                                    # Optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
 #    max_seq_len: "0"                                                                                                # default ? curr not used
-#    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # required. name format db_file
+#    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # Required. name format db_file
 #    disco: "oligos,positions,dyads"                                                                                 # default ? oligos|dyads|positions|local_words|merged_words|meme|chipmunk
 
 
