@@ -227,7 +227,7 @@ rule all:
 #            MAPPING,
             MAPPING_QC,
 #            SORTED_BAM,
-            BAM_STATS,
+#            BAM_STATS,
 #            SORTED_BAM_BAI,
 #            GENOME_INDEX,
             ALL_COVERAGE,

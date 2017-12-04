@@ -47,9 +47,9 @@
 ## These are the parameters that are used by rules & programs. 
 ##
 ## If nothing is mentionned  below, all prgrams will use their default parameters. 
-  tophat:
-    max_mismatches: 1                                                   # Default 2
-    threads: 1                                                          # Default 1
+#  tophat:
+#    max_mismatches: 1                                                   # Default 2
+#    threads: 1                                                          # Default 1
 
   subread-featureCounts:
     attr_type: "gene_id"                                                # Default 'gene_id'
