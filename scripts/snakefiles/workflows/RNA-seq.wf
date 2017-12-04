@@ -142,10 +142,10 @@ if not ("trimming" in config.keys()):
 
 TRIMMING_TOOLS = config["trimming"].split()
 
-if not (("tools" in config.keys()) and ("mapping" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['mapping'] should be specified in the config file.")
+if not ("mapping" in config.keys()):
+    sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
-MAPPING_TOOLS = config["tools"]["mapping"].split()
+MAPPING_TOOLS = config["mapping"].split()
 
 if TRIMMING_TOOLS:
     PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
