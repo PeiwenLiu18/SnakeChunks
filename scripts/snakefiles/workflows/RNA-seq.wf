@@ -217,7 +217,7 @@ rule all:
 	input: 
             mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
 #            MAPPING,
-            SORTED_BAM,
+#            SORTED_BAM,
 #            SORTED_BAM_BAI,
 #            BAM_STATS,
 #            ALL_COVERAGE,
