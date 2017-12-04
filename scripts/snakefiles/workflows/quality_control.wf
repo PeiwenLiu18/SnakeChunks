@@ -151,7 +151,7 @@ if (len(TRIMMING_TOOLS) != 0):
 
     if (SEQ_TYPE == "se"):
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
     #----------------------------------------------------------------#
@@ -165,7 +165,7 @@ if (len(TRIMMING_TOOLS) != 0):
 
         STRANDS     = config["metadata"]["strands"].split()
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
     else:
