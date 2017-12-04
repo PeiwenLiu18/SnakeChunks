@@ -100,9 +100,9 @@ then
     mv {params.temp_output_pe_2} {output.reverse} 
 elif [ seq_type == "se" ]
 then
-    shell("trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}")
-    shell("mv {params.temp_output_se} {output.fastq}")
-    shell("touch {output.forward} {output.reverse}")
+    trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}
+    mv {params.temp_output_se} {output.fastq}
+    touch {output.forward} {output.reverse}
 fi
 """
 
