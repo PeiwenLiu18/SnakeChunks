@@ -123,7 +123,7 @@ include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "tophat.rules")
 
 subworkflow mapping_wf:
-    workdir: config["mapping_wf"]["directory"]
+    workdir: config["mapping_wf"]["workdir"]
     snakefile: config["mapping_wf"]["snakefile"]
     configfile: config["mapping_wf"]["configfile"]
 
