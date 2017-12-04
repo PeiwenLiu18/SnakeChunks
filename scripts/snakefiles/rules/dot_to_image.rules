@@ -16,4 +16,5 @@ rule dot_to_image:
             + " -o {graph}_dot_to_{ext}_qsub.out"
     log: "{graph}_dot_to_{ext}.log"
     benchmark: "{graph}_dot_to_{ext}_benchmark.txt"
+    conda: "../envs/graphviz.yaml"
     shell: "dot -T{wildcards.ext} -o {output} {input} &> {log}"
