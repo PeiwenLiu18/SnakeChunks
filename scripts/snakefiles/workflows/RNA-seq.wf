@@ -137,10 +137,10 @@ subworkflow mapping_wf:
 # Workflow design (TODO)
 #----------------------------------------------------------------#
 
-if not (("tools" in config.keys()) and ("trimming" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-TRIMMING_TOOLS = config["tools"]["trimming"].split()
+TRIMMING_TOOLS = config["trimming"].split()
 
 if not (("tools" in config.keys()) and ("mapping" in config["tools"].keys())):
     sys.exit("The parameter config['tools']['mapping'] should be specified in the config file.")
