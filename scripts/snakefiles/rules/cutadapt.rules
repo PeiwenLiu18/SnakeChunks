@@ -94,12 +94,12 @@ rule cutadapt:
 #            shell("mv {params.temp_output_se} {output.fastq}")
 #            shell("touch {output.forward} {output.reverse}")
     shell:"""
-if [ {params.seq_type} == "pe" ]
+if [ "{params.seq_type}" == "pe" ]
 then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log};
     mv {params.temp_output_pe_1} {output.forward} ;
     mv {params.temp_output_pe_2} {output.reverse} 
-elif [ {params.seq_type} == "se" ]
+elif [ "{params.seq_type}" == "se" ]
 then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}
     mv {params.temp_output_se} {output.fastq}
