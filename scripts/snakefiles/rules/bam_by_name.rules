@@ -20,4 +20,5 @@ rule bam_by_name:
     benchmark: "{aligned_reads}_sorted_name_benchmark.txt"
     params: prefix = "{aligned_reads}_sorted_name", \
             qsub = config["qsub"] + " -e {aligned_reads}_sorted_name_qsub.err -o {aligned_reads}_sorted_name_qsub.out"
+    conda: "../envs/samtools.yaml"
     shell: "samtools sort -n {input} -o {output} 2> {log}"
