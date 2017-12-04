@@ -32,7 +32,7 @@
     reports: "RNA-seq/results/reports"
 
   mapping_wf:
-    workdir: "../../../../"
+#    workdir: "../../../../"
     snakefile: "SnakeChunks/scripts/snakefiles/workflows/mapping.wf"
     configfile: "metadata/config_RNA-seq.yml"
 
