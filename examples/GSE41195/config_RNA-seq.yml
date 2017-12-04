@@ -36,8 +36,8 @@
     snakefile: "metadata/mapping.wf"
     configfile: "metadata/RNA-seq.wf"
 
-#  trimming: "cutadapt"
-  mapping: "tophat"
+  trimming: "cutadapt"
+  mapping: "bowtie2"
   read_counts: "featureCounts"
   diffexpr: "edgeR DESeq2"
 
