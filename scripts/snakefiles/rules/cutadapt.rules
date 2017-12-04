@@ -99,6 +99,7 @@ then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log}
     mv {params.temp_output_pe_1} {output.forward} 
     mv {params.temp_output_pe_2} {output.reverse} 
+    touch {output.fastq} 
 elif [[ "{params.seq_type}" == "se" ]]
 then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}
