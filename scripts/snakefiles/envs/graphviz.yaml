@@ -7,4 +7,5 @@ channels:
   - bioconda
 dependencies:
   - graphviz
+  - snakemake
 ...
