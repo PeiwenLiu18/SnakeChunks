@@ -33,7 +33,7 @@
 
   mapping_wf:
     workdir: "."
-    snakefile: "metadata/mapping.wf"
+    snakefile: "SnakeChunks/scripts/snakefiles/workflows/mapping.wf"
     configfile: "metadata/RNA-seq.wf"
 
   trimming: "cutadapt"
