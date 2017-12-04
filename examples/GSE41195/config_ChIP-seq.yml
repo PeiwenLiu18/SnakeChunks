@@ -33,7 +33,7 @@
 #  tools:
   trimming: "cutadapt"
   mapping: "bowtie2" # subread-align" # bwa bowtie
-  peakcalling: "homer" # mosaics spp"
+  peakcalling: "homer macs2" # mosaics spp"
   annotation: "intersect window"
 
 
@@ -52,11 +52,20 @@
     P: "0.01"                                                                   # optional (def. 0.0001)
     fdr: "0.01"                                                                 # optional (def. 0.001)
 
-  mosaics:
-    FDR: "0.05"
-    frag_len: "400"
-    bin_size: "200"
-    type: "narrow"
+  macs2: 
+    qval: "0.001"                                                       # Default 0.05
+    keep_dup: "all"                                                     # Default 1
+    mfold_min: "2"                                                      # Default 5
+    mfold_max: "50"                                                     # Default 50
+    other_options: "--nomodel"                                     # optional can include --call-summits, --broad...
+
+
+#  mosaics:
+#    FDR: "0.05"
+#    frag_len: "400"
+#    bin_size: "200"
+#    type: "narrow"
+
 #  spp: 
 #    fdr: "0.05"                                                                 # optional (def. 0.01)
 
