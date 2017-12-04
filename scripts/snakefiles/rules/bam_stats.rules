@@ -21,4 +21,5 @@ rule bam_stats:
             + " -o {reads}_bam_stats_qsub.out"
     log: "{reads}_bam_stats.log"
     benchmark: "{reads}_bam_stats_benchmark.txt"
+    conda: "../envs/samtools.yaml"
     shell: "(samtools flagstat {input} > {output}) &> {log}"
