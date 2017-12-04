@@ -127,7 +127,7 @@ subworkflow mapping_wf:
     snakefile: config["mapping_wf"]["snakefile"]
     configfile: config["mapping_wf"]["configfile"]
 
-SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
+#SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 
 #================================================================#
 #                         Workflow                               #
