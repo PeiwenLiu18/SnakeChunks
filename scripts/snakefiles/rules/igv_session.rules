@@ -20,7 +20,7 @@ genome_dir = config["dir"]["genome"]
 
 #def igv_inputs(wildcards):
 
-include workflow.snakefile
+include: workflow.snakefile
 
 #os.path.isfile
 
