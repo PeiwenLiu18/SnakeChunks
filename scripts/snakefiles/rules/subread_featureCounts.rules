@@ -69,13 +69,17 @@ rule subread_featureCounts:
     log: "{reads}_featureCounts.log"
     benchmark: "{reads}_featureCounts_benchmark.json"
     conda: "../envs/subread.yaml"
-    run:
-        shell("featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}")
-        R("""
-            counts <- read.table("{output.featureCounts_output}", header=TRUE)
-            new <- counts[,-which(names(counts) %in% c("Chr", "Start", "End", "Strand", "Length"))]
-            write.table(new, file = "{output.twocol_output}", sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
-        """)
+    shell:"""
+        featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
+        awk '{print $1,$7}' {output.featureCounts_output} > {output.twocol_output}
+"""
+#    run:
+#        shell("featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}")
+#        R("""
+#            counts <- read.table("{output.featureCounts_output}", header=TRUE)
+#            new <- counts[,-which(names(counts) %in% c("Chr", "Start", "End", "Strand", "Length"))]
+#            write.table(new, file = "{output.twocol_output}", sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
+#        """)
 
 
 ## TODO integrate old settings:
