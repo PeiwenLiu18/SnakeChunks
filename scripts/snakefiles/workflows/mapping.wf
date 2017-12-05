@@ -47,7 +47,7 @@ from pathlib import Path
 
 #GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
-include: os.path.join(config["dir"]["snakechunks"], "scripts/python_lib/util.py")
+include: os.path.join("SnakeChunks/scripts/python_lib/util.py")
 
 
 #================================================================#
@@ -62,11 +62,6 @@ GENOME_GTF = os.path.join(GENOME_DIR, config["genome"]["gtf_file"])
 
 # Samples
 SAMPLE_IDS = read_table(config["metadata"]["samples"])['ID']
-
-## Design
-#DESIGN = read_table(config["metadata"]["design"])
-#TREATMENT = DESIGN['treatment']
-#CONTROL = DESIGN['control']
 
 ## Data & results dir
 if not (("dir" in config.keys()) and ("reads_source" in config["dir"].keys())):
