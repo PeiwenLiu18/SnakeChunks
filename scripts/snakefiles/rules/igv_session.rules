@@ -25,23 +25,23 @@ genome_dir = config["dir"]["genome"]
 #print(workflow.snakefile)
 #print(TRIMMING_TOOLS)
 
-#if not ("trimming" in config.keys()):
-#    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-#TRIMMING_TOOLS = config["trimming"].split()
+TRIMMING_TOOLS = config["trimming"].split()
 
-#if not ("mapping" in config.keys()):
-#    sys.exit("The parameter config['mapping'] should be specified in the config file.")
+if not ("mapping" in config.keys()):
+    sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
-#MAPPING_TOOLS = config["mapping"].split()
+MAPPING_TOOLS = config["mapping"].split()
 
-#if TRIMMING_TOOLS:
-#    PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
-#else:
-#    PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
+if TRIMMING_TOOLS:
+    PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
+else:
+    PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
 
-#if not ("peakcalling" in config.keys()):
-#    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
+if not ("peakcalling" in config.keys()):
+    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
 
 PEAKCALLING_TOOLS = config["peakcalling"].split()
 
@@ -58,10 +58,10 @@ rule igv_session:
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
         genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
-        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{preprocess}}_{{peakcaller}}.bed", zip,), peakcaller=PEAKCALLING_TOOLS)
+        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
     output:  
         #"{dir}/igv_session.xml"
-        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.xml"
+        session = "{dir}/{treatment}_vs_{control}_igv.xml"
     params:
         genome_version = config["genome"]["version"]
 #        samples_ids = read_table(config["metadata"]["samples"])["ID"],

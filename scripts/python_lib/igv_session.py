@@ -37,7 +37,6 @@ if __name__ == '__main__':
 
 
 def igv_session(filename, genome, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
-
     cwd = os.getcwd()
 
     file = open(filename, "w+")
