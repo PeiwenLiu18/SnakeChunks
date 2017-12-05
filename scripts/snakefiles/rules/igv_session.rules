@@ -20,7 +20,24 @@ genome_dir = config["dir"]["genome"]
 
 #def igv_inputs(wildcards):
 
-include: workflow.snakefile
+#include: workflow.snakefile
+
+
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+
+TRIMMING_TOOLS = config["trimming"].split()
+
+if not ("mapping" in config.keys()):
+    sys.exit("The parameter config['mapping'] should be specified in the config file.")
+
+MAPPING_TOOLS = config["mapping"].split()
+
+if TRIMMING_TOOLS:
+    PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
+else:
+    PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
+
 
 #os.path.isfile
 
