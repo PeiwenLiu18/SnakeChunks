@@ -158,6 +158,74 @@ if not ("diffexpr" in config.keys()):
 DIFFEXPR_TOOLS = config["diffexpr"].split()
 
 #----------------------------------------------------------------#
+# FastQC
+#----------------------------------------------------------------#
+
+#input_format = "fastq"
+#if ("input_format" in config["metadata"].keys())):
+#    input_format =  config["metadata"]["input_format"]
+
+
+#----------------------------------------------------------------#
+# Single-end
+#----------------------------------------------------------------#
+
+if (SEQ_TYPE == "se"):
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq_fastqc/{samples}_fastqc.html", samples=SAMPLE_IDS)
+
+#----------------------------------------------------------------#
+# Paired-ends
+#----------------------------------------------------------------#
+
+elif (SEQ_TYPE == "pe"):
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq_fastqc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
+
+
+else:
+    sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
+
+QC = RAW_QC
+
+#----------------------------------------------------------------#
+# Trimming
+#----------------------------------------------------------------#
+
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+
+TRIMMING_TOOLS = config["trimming"].split()
+
+if (len(TRIMMING_TOOLS) != 0):
+
+    #----------------------------------------------------------------#
+    # Single-end
+    #----------------------------------------------------------------#
+
+    if (SEQ_TYPE == "se"):
+
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+
+    #----------------------------------------------------------------#
+    # Paired-ends
+    #----------------------------------------------------------------#
+
+    elif (SEQ_TYPE == "pe"):
+
+        if not (("metadata" in config.keys()) and ("strands" in config["metadata"].keys())):
+            sys.exit("The strands suffixes (parameter config['metadata']['strands']) should be specified in the config file for a paired ends analysis.")
+
+        STRANDS     = config["metadata"]["strands"].split()
+
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+
+    else:
+        sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
+
+    QC = RAW_QC + TRIM_QC
+
+#----------------------------------------------------------------#
 # Alignment
 #----------------------------------------------------------------#
 
