@@ -47,7 +47,7 @@ from pathlib import Path
 
 #GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
-include: os.path.join("SnakeChunks/scripts/python_lib/util.py")
+include: os.path.join("../../../../SnakeChunks/scripts/python_lib/util.py")
 
 
 #================================================================#
