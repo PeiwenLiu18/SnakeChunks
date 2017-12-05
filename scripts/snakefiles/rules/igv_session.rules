@@ -58,7 +58,7 @@ rule igv_session:
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
         genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
-        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, dir=wildcards.dir, treatment=wildcards.treatment, control=wildcards.control), peakcaller=PEAKCALLING_TOOLS, prefix=wildcards.preprocess)
+        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{preprocess}}_{{peakcaller}}.bed", zip,), peakcaller=PEAKCALLING_TOOLS)
     output:  
         #"{dir}/igv_session.xml"
         session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.xml"
