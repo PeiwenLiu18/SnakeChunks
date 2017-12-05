@@ -22,8 +22,8 @@ rule RegulonDB_download:
     params: qsub = config["qsub"] + " -e {regions}_getfasta_qsub.err -o {regions}_getfasta_qsub.out"
     log: "{dir}/index.log"
     benchmark: "{dir}/index_benchmark.tab"
-#    conda: "../envs/bedtools.yaml"
-    shell:"""bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} 2> {log}"""
-
+#    conda: ""
+    shell:"""
 wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getTFBS?tfObject={wildcards.TF} -O {output.tfbs}
 wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getPSSM?tfObject={wildcards.TF} -O {output.pssm}
+"""
