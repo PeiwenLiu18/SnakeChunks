@@ -264,6 +264,7 @@ rule all:
 #            GENE_LIST,
 #            PEAK_MOTIFS,
 #            HTML_REPORT,
+            IGV_SESSION,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
