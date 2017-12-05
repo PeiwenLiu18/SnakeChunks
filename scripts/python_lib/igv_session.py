@@ -32,9 +32,6 @@ gff3 = snakemake.input["genome_gff3"]
 gtf = snakemake.input["genome_gtf"]
 peaks = snakemake.input["peaks"]
 
-if __name__ == '__main__':
-    igv_session(filename, genome, gff3, gtf, peaks)
-
 
 def igv_session(filename, genome, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
     cwd = os.getcwd()
@@ -110,5 +107,8 @@ def igv_session(filename, genome, gtf="", gff3="", peaks="", coverage="", transc
     file.write('</Session>\n')
 
     file.close()
+
+if __name__ == '__main__':
+    igv_session(filename, genome, gff3, gtf, peaks)
 
 
