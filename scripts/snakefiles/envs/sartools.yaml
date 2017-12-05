@@ -1,0 +1,11 @@
+---
+name: r-sartools
+channels:
+  - conda-forge
+  - defaults
+  - r
+  - bioconda
+dependencies:
+  - r-sartools
+  - r
+...
