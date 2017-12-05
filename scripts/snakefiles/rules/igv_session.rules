@@ -22,33 +22,34 @@ genome_dir = config["dir"]["genome"]
 
 #include: workflow.snakefile
 
+print(workflow.snakefile)
 
-if not ("trimming" in config.keys()):
-    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+#if not ("trimming" in config.keys()):
+#    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-TRIMMING_TOOLS = config["trimming"].split()
+#TRIMMING_TOOLS = config["trimming"].split()
 
-if not ("mapping" in config.keys()):
-    sys.exit("The parameter config['mapping'] should be specified in the config file.")
+#if not ("mapping" in config.keys()):
+#    sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
-MAPPING_TOOLS = config["mapping"].split()
+#MAPPING_TOOLS = config["mapping"].split()
 
-if TRIMMING_TOOLS:
-    PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
-else:
-    PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
+#if TRIMMING_TOOLS:
+#    PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
+#else:
+#    PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
 
-if not ("peakcalling" in config.keys()):
-    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
+#if not ("peakcalling" in config.keys()):
+#    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
 
-PEAKCALLING_TOOLS = config["peakcalling"].split()
+#PEAKCALLING_TOOLS = config["peakcalling"].split()
 
 #os.path.isfile
 
-GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
-PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
+#GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
+#PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
-print(PEAKS)
+#print(PEAKS)
 
 rule igv_session:
     input: 
