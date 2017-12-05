@@ -91,6 +91,19 @@ if not ("diffexpr" in config["dir"].keys()):
 else:
     DEG_DIR = config["dir"]["diffexpr"]
 
+# Get seq_type
+if not "seq_type" in config["metadata"].keys():
+    sys.exit("Sequencing type (single or paired ends) must be defined in the config file.")
+
+SEQ_TYPE = config["metadata"]["seq_type"]
+
+if (SEQ_TYPE == "pe"):
+    if not (("metadata" in config.keys()) and ("strands" in config["metadata"].keys())):
+        sys.exit("The strands suffixes (parameter config['metadata']['strands']) should be specified in the config file for a paired ends analysis.")
+
+    STRANDS     = config["metadata"]["strands"].split()
+
+
 #================================================================#
 #               Snakemake includes
 #================================================================#
@@ -156,6 +169,8 @@ if not ("diffexpr" in config.keys()):
     sys.exit("The parameter config['diffexpr'] should be specified in the config file.")
 
 DIFFEXPR_TOOLS = config["diffexpr"].split()
+
+
 
 #----------------------------------------------------------------#
 # FastQC
