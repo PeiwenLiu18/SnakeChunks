@@ -18,14 +18,25 @@
 genome_dir = config["dir"]["genome"]
 
 
+#def igv_inputs(wildcards):
+
+#include workflow.snakefile
+
+#os.path.isfile
+
+#GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
+#PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
+
+
 rule igv_session:
-#    input: 
-    output:  "{dir}/igv_session.xml"
-    params:
+    input: 
+#        igv_inputs,
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
-        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]),
-	genome_version = config["genome"]["version"]
+        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"])
+    output:  "{dir}/igv_session.xml"
+    params:
+        genome_version = config["genome"]["version"]
 #        samples_ids = read_table(config["metadata"]["samples"])["ID"],
 #        samples_dir = config["dir"]["fastq"],
 #        trim_tools = config["tools"]["trimming"],
@@ -34,7 +45,8 @@ rule igv_session:
 #        project_name = config["title"]
     log: "{dir}/index.log"
     benchmark: "{dir}/index_benchmark.tab"
-    script:
-        "../../python_lib/igv_session.py"
+#    script:
+#        "../../python_lib/igv_session.py"
+    shell: "touch {output}"
 
 
