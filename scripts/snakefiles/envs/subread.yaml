@@ -2,4 +2,6 @@
 name: subread
 channels:
   -bioconda
+dependencies:
+  - subread
 ...

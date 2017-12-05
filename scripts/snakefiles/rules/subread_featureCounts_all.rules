@@ -86,6 +86,7 @@ rule subread_featureCounts_all:
             + " -o " + diffexpr_dir + "/{preprocess}_featureCounts_qsub.out"
     log: diffexpr_dir + "/{preprocess}_featureCounts.log"
     benchmark: diffexpr_dir + "/{preprocess}_featureCounts_benchmark.json"
+    conda: "../envs/subread.yaml"
     run:
         shell("featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}")
         R("""
