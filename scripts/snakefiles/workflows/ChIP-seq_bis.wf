@@ -239,7 +239,7 @@ HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
 
 #        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.html"
 
-IGV_SESSION       = expand(expand(REPORTS_DIR = "/{treat}_vs_{control}_{{prefix}}_igv.xml", zip, treat=TREATMENT, control=CONTROL), prefix=PREFIX)
+IGV_SESSION       = expand(expand(REPORTS_DIR + "/{treat}_vs_{control}_{{prefix}}_igv.xml", zip, treat=TREATMENT, control=CONTROL), prefix=PREFIX)
 
 FORMAT_PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_formatted.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
