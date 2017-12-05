@@ -31,7 +31,7 @@
     peaks: "ChIP-seq/results/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
     reports: "ChIP-seq/results/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
 
-  trimming: ""
+  trimming: "cutadapt"
   mapping: "bowtie2"
   peakcalling: "homer macs2"
   annotation: "intersect"
