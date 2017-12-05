@@ -18,8 +18,6 @@
 genome_dir = config["dir"]["genome"]
 
 
-#def igv_inputs(wildcards):
-
 #include: workflow.snakefile
 
 #print(workflow.snakefile)
@@ -45,6 +43,13 @@ if not ("peakcalling" in config.keys()):
 
 PEAKCALLING_TOOLS = config["peakcalling"].split()
 
+
+def igv_inputs(wildcards):
+        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, dir=wildcards.dir, treatment=wildcards.treament, control=wildcards.control), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
+        return peaks
+
+#        peaks = expand("{fastq_dir}/{samples}/{prefix}_{strand}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+
 #os.path.isfile
 
 #GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -54,11 +59,11 @@ PEAKCALLING_TOOLS = config["peakcalling"].split()
 
 rule igv_session:
     input: 
-#        igv_inputs,
+        igv_inputs,
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
         genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
-        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
+#        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
     output:  
         #"{dir}/igv_session.xml"
         session = "{dir}/{treatment}_vs_{control}_igv.xml"
