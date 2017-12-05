@@ -18,6 +18,7 @@
     configfile: "metadata/config_ChIP-seq.yml"                          # Required for flowcharts generation; maybe this should be revised
     seq_type: "se"                                                      # Required
     input_format: "fastq.gz"                                            # Optional. If not provided, will be "fastq".
+    TF: "FNR"                                                           # List of transcription factors of interest. Required for RegulonDB comparison. 
 
   dir:
     reads_source: ""
