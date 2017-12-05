@@ -47,7 +47,6 @@ peaks_dir = config["dir"]["peaks"]
 
 
 def igv_inputs(wildcards):
-        peaks = expand(expand("{peaks_dir}/{treatment}_vs_{control}/{{peakcaller}}/{treatment}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, dir=wildcards.dir, treatment=wildcards.treatment, control=wildcards.control), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
         return peaks
 
 #        peaks = expand("{fastq_dir}/{samples}/{prefix}_{strand}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
