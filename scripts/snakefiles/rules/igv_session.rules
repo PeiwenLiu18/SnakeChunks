@@ -38,6 +38,10 @@ if TRIMMING_TOOLS:
 else:
     PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
 
+if not ("peakcalling" in config.keys()):
+    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
+
+PEAKCALLING_TOOLS = config["peakcalling"].split()
 
 #os.path.isfile
 
