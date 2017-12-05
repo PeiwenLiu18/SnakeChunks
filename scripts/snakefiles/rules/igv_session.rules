@@ -20,9 +20,10 @@ genome_dir = config["dir"]["genome"]
 
 #def igv_inputs(wildcards):
 
-#include: workflow.snakefile
+include: workflow.snakefile
 
 print(workflow.snakefile)
+print(PREFIX)
 
 #if not ("trimming" in config.keys()):
 #    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
