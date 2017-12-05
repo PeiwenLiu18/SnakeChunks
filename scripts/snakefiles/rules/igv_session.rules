@@ -59,8 +59,9 @@ rule igv_session:
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
         genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
         peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, dir=wildcards.dir, treatment=wildcards.treatment, control=wildcards.control), peakcaller=PEAKCALLING_TOOLS, prefix=wildcards.preprocess)
-    output:  "{dir}/igv_session.xml"
-        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.html"
+    output:  
+        #"{dir}/igv_session.xml"
+        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.xml"
     params:
         genome_version = config["genome"]["version"]
 #        samples_ids = read_table(config["metadata"]["samples"])["ID"],
