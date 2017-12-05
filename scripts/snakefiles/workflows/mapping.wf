@@ -203,8 +203,8 @@ GRAPHICS = expand(REPORTS_DIR + "/flowcharts/mapping_{graph}.{ext}", graph=["dag
 
 
 
-HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
-
+#HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
+MULTIQC_REPORT = REPORTS_DIR + "/multiqc_report.html"
 
 #igv_session(xml_file, genome=GENOME_FASTA, gff3=GENOME_GFF3, gtf=GENOME_GTF, peaks=PEAKS, coverage=GENOME_COV_GZ)
 
