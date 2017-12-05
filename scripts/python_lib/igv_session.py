@@ -33,7 +33,7 @@ gff3 = snakemake.input["genome_gff3"]
 gtf = snakemake.input["genome_gtf"]
 peaks = snakemake.input["peaks"]
 
-print(peaks)
+print("peaks=", peaks)
 
 
 def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
