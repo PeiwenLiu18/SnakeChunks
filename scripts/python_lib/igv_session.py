@@ -33,6 +33,8 @@ gff3 = snakemake.input["genome_gff3"]
 gtf = snakemake.input["genome_gtf"]
 peaks = snakemake.input["peaks"]
 
+print(peaks)
+
 
 def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
     cwd = os.getcwd()
@@ -46,24 +48,24 @@ def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", cov
     file.write('<Resources>\n')
     if peaks:
         for i in peaks:
-            file.write('  <Resource path="../../' + i + '"/>\n')
+            file.write('  <Resource path="../../../' + i + '"/>\n')
     if coverage:
         for i in coverage:
-            file.write('  <Resource path="../../' + i + '"/>\n')
+            file.write('  <Resource path="../../../' + i + '"/>\n')
     if gtf:
-        file.write('  <Resource path="../../' + gtf + '"/>\n')
+        file.write('  <Resource path="../../../' + gtf + '"/>\n')
     if gff3:
-        file.write('  <Resource path="../../' + gff3 + '"/>\n')
+        file.write('  <Resource path="../../../' + gff3 + '"/>\n')
     file.write('</Resources>\n')
 
     ## Genome annotation panel
     file.write('<Panel name="GeneAnnotPanel" height="60">\n')
     if gff3:
-        file.write('  <Track id="../../' + gff3 + '" name="gff3 ' + genome_version + '"  color="153,0,51" fontSize="12" >\n')
+        file.write('  <Track id="../../../' + gff3 + '" name="gff3 ' + genome_version + '"  color="153,0,51" fontSize="12" >\n')
         file.write('    <DataRange/>\n')
         file.write('  </Track>\n')
     if gtf:
-        file.write('  <Track id="../../' + gtf + '" name="gtf ' + genome_version + '"  color="153,0,51" fontSize="12" >\n')
+        file.write('  <Track id="../../../' + gtf + '" name="gtf ' + genome_version + '"  color="153,0,51" fontSize="12" >\n')
         file.write('    <DataRange/>\n')
         file.write('  </Track>\n')
     file.write('</Panel>\n')
@@ -79,7 +81,7 @@ def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", cov
 #            cov = tab.iloc[:,3]
 #            max = int(np.percentile(cov, 99))
 
-            file.write('  <Track height="50" autoscale="true" id="../../' + bdg + '" name="' + name + '" color="51,153,0" fontSize="12">\n')
+            file.write('  <Track height="50" autoscale="true" id="../../../' + bdg + '" name="' + name + '" color="51,153,0" fontSize="12">\n')
             file.write('    <DataRange minimum="0" maximum="200"/>\n')
             file.write('  </Track>\n')
         file.write('</Panel>\n')
@@ -94,7 +96,7 @@ def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", cov
             sam_name = bedfile.split(sep="/")[-1]
             sam_name = bedfile.split(sep="_")[0]
 
-            file.write('  <Track id="../../' + bedfile + '" name="' + pc_name + " " + sam_name + '" color="0,0,178" fontSize="12">\n')
+            file.write('  <Track id="../../../' + bedfile + '" name="' + pc_name + " " + sam_name + '" color="0,0,178" fontSize="12">\n')
             file.write(    '<DataRange/>\n')
             file.write('  </Track>\n')
         file.write('</Panel>\n')
