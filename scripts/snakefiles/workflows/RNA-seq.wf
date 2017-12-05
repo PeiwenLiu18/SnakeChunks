@@ -122,10 +122,13 @@ include: os.path.join(RULES, "subread_featureCounts_all.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "tophat.rules")
 
+print(workflow.snakefile)
+print(workflow.configfile)
+
 subworkflow mapping_wf:
     workdir: "../../../.."
     snakefile: config["mapping_wf"]["snakefile"]
-    configfile: config["mapping_wf"]["configfile"]
+    configfile: workflow.configfile #config["mapping_wf"]["configfile"]
 
 #SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 
