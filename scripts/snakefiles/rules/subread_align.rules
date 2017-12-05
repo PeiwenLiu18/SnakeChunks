@@ -93,6 +93,7 @@ rule subread_align:
           + " -o " + sample_dir + "/{samples}/{prefix}_subread-align_qsub.out"
     log: sample_dir + "/{samples}/{prefix}_subread-align.log"
     benchmark: sample_dir + "/{samples}/{prefix}_subread-align_benchmark.json"
+    conda: "../envs/subread.yaml"
     run:
         if (seq_type == "pe"):
             shell("subread-align -i {input.index} -r " + input.reads[0] + " -R " + input.reads[1] + " -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {output.bam} 2> {log}")
