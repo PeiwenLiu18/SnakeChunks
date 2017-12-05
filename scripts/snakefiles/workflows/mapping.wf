@@ -47,8 +47,9 @@ wd = os.getcwd()
 
 GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
-include: os.path.join("/root/mydisk/FNR_analysis/SnakeChunks/scripts/python_lib/util.py")
-
+# Python includes
+PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
+include: os.path.join(PYTHON, "util.py")
 
 #================================================================#
 #           Variables & directories
