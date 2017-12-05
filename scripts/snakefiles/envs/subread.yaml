@@ -1,7 +1,10 @@
 ---
 name: subread
 channels:
-  -bioconda
+  - conda-forge
+  - defaults
+  - r
+  - bioconda
 dependencies:
   - subread
 ...
