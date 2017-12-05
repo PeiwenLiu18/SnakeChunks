@@ -31,4 +31,5 @@ rule bedgraph_to_tdf:
     benchmark: "{coverage}_bedgraph_to_tdf_benchmark.txt"
     params: genome=genome_file, \
             qsub = config["qsub"] + " -e {coverage}_bedgraph_to_tdf_qsub.err -o {coverage}_bedgraph_to_tdf_qsub.out"
+    conda: "../envs/igvtools.yaml"
     shell: "igvtools totdf {input} {output} {params.genome} 2> {log}"
