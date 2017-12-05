@@ -1,0 +1,29 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+if not "TF" in config["metadata"].keys():
+    sys.exit("Parameters config['metadata']['TF'] must be defined in the config file to perform the RegulonDB download.")
+
+# Rule
+rule RegulonDB_download:
+    """Get TFBS and PSSM from RegulonDB webservice for a given TF or list of TFs.
+        
+    Required parameters:
+        config["qsub"]
+        config["metadata"]["TF"] 
+
+    Author: Claire Rioualen
+    """
+#    input: 
+    output: 
+        tfbs="{dir}/{TF}/{TF}_sites.fa",
+        pssm= "{dir}/{TF}/{TF}_matrix.tf"
+    params: qsub = config["qsub"] + " -e {regions}_getfasta_qsub.err -o {regions}_getfasta_qsub.out"
+    log: "{dir}/index.log"
+    benchmark: "{dir}/index_benchmark.tab"
+#    conda: "../envs/bedtools.yaml"
+    shell:"""bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} 2> {log}"""
+
+wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getTFBS?tfObject={wildcards.TF} -O {output.tfbs}
+wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getPSSM?tfObject={wildcards.TF} -O {output.pssm}
