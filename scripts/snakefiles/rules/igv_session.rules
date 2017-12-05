@@ -61,7 +61,7 @@ def igv_inputs(wildcards):
 
 rule igv_session:
     input: 
-        igv_inputs,
+        peaks = igv_inputs,
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
         genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
