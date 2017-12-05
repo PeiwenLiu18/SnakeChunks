@@ -43,7 +43,7 @@ print(TRIMMING_TOOLS)
 #if not ("peakcalling" in config.keys()):
 #    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
 
-#PEAKCALLING_TOOLS = config["peakcalling"].split()
+PEAKCALLING_TOOLS = config["peakcalling"].split()
 
 #os.path.isfile
 
@@ -57,8 +57,10 @@ rule igv_session:
 #        igv_inputs,
         genome_fasta = os.path.join(genome_dir, config["genome"]["fasta_file"]),
         genome_gff3 = os.path.join(genome_dir, config["genome"]["gff3_file"]),
-        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"])
+        genome_gtf = os.path.join(genome_dir, config["genome"]["gtf_file"]), 
+        peaks = expand(expand("{dir}/{treatment}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, dir=wildcards.dir, treatment=wildcards.treatment, control=wildcards.control), peakcaller=PEAKCALLING_TOOLS, prefix=wildcards.preprocess)
     output:  "{dir}/igv_session.xml"
+        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.html"
     params:
         genome_version = config["genome"]["version"]
 #        samples_ids = read_table(config["metadata"]["samples"])["ID"],
@@ -69,8 +71,8 @@ rule igv_session:
 #        project_name = config["title"]
     log: "{dir}/index.log"
     benchmark: "{dir}/index_benchmark.tab"
-#    script:
-#        "../../python_lib/igv_session.py"
-    shell: "touch {output}"
+    script:
+        "../../python_lib/igv_session.py"
+
 
 
