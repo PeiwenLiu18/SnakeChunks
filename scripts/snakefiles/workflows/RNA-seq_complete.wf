@@ -71,6 +71,11 @@ GENOME_GTF = os.path.join(GENOME_DIR, config["genome"]["gtf_file"])
 
 
 # Data & results dir
+if not ("fastq" in config["dir"].keys()):
+    sys.exit("The parameter config['dir']['fastq'] should be specified in the config file.")
+else:
+    FASTQ_DIR = config["dir"]["fastq"]
+
 if not ("results" in config["dir"].keys()):
     sys.exit("The parameter config['dir']['results'] should be specified in the config file.")
 else:
