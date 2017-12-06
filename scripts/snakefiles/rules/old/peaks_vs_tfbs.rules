@@ -1,0 +1,101 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+
+if not "peaks" in config["dir"].keys():
+    sys.exit("The peaks dir must be defined in the config file")
+
+
+
+tfs = read_table(config["metadata"]["design"])['treatment']
+control = read_table(config["metadata"]["design"])['control']
+
+comp = [tf + "_vs_" + ctrl for tf,ctrl in zip(tfs,control)]
+
+peaks_dir = config["dir"]["peaks"]
+trim_tools = config["tools"]["trimming"]
+map_tools = config["tools"]["mapping"]
+pc_tools = config["tools"]["peakcalling"].split()
+
+peaks = []
+for tf in tfs:
+    for pc in pc_tools:
+        path = peaks_dir + "/" + tf + "_vs_" + control + "/" + pc + "/" + tf + "_vs_" + control + "_" + trim_tools + "_" + map_tools + "_" + pc + ".bed"
+        peaks.append(path)
+
+tfbs = []
+for tf in tfs:
+    path = "RegulonDB/" + tf + "_unique_sites.bed"
+    tfbs.append(path)
+
+
+# Rule
+rule peaks_vs_tfbs:
+    """
+    This rule computes comparisons between a bedfile containing ChIP-seq peaks and a bedfile containing TFBS, 
+    using the Bioconductor library GenomicRanges (https://bioconductor.org/packages/release/bioc/html/GenomicRanges.html)
+
+    Required parameters: 
+        config["qsub"]
+
+    Authors: Claire Rioualen, Jacques van Helden
+    """
+    input: 
+#        peaks = "{dir_peaks}/{peaks}.bed",
+        peaks = peaks,
+        tfbs = tfbs
+    output: 
+#        multi_synthesis = config["dir"]["peaks"] + "/{treatment}_vs_{control}/multi_peaks_vs_tfbs.txt",
+#        multi_graph = config["dir"]["peaks"] + "/{treatment}_vs_{control}/multi_peaks_vs_tfbs.png"
+        multi_synthesis = "{dir_peaks}/{tf}/multi_peaks_vs_tfbs.txt",
+        multi_graph = "{dir_peaks}/{tf}/multi_peaks_vs_tfbs.png"#,
+#        done = "synthesis.done"
+    params:
+        dir = config["dir"]["peaks"],
+        tf = tfs,
+        pc = pc_tools
+    log: "{dir_peaks}/{tf}/multi_peaks_vs_tfbs.log"
+    benchmark: "{dir_peaks}/{tf}/multi_peaks_vs_tfbs_benchmark.txt"
+    params: 
+        qsub = config["qsub"] + " -e {dir_peaks}/{tf}/multi_peaks_vs_tfbs_qsub.err -o {dir_peaks}/{tf}/multi_peaks_vs_tfbs_qsub.out"
+    run:
+        R("""
+#sink("{log}")
+library(GenomicRanges)
+
+## TEMPORARY: these two functions were borrowed from the roken package, still to be published
+source("~/SnakeChunks/scripts/R-scripts/R/bed_to_granges.R")
+source("~/SnakeChunks/scripts/R-scripts/R/bed_import.R")
+source("~/SnakeChunks/scripts/R-scripts/R/peaks_vs_tfbs.R")
+source("~/SnakeChunks/scripts/R-scripts/R/multi_peaks_vs_tfbs.R")
+
+#mainDir <- "/data/analyses/Galagan_GSE93506"
+#setwd(mainDir)
+
+tfs = c("Nac", "NtrC", "OmpR")
+pcs = c("macs2", "spp", "homer", "swembl")
+
+
+for (TF in tfs) {{
+    peakFiles <- c()
+    for (peakCaller in pcs) {{
+        peakFile <- file.path("results", "peaks", paste(TF, "_vs_WT", sep=""), peakCaller, paste(TF, "_vs_WT_sickle_bowtie2_", peakCaller, ".bed", sep=""))
+        TFBSFile <- file.path("RegulonDB", paste(TF, "_unique_sites.bed", sep=""))
+        peakFiles <- c(peakFiles, peakFile)
+        ## Compare peaks and TFBSs
+        peakVsRegDB <- PeaksVsTFBS(peakFile, TFBSFile, drawPlots=TRUE)
+    }}
+#    peakFiles <- list.files(file.path(mainDir, "results/peaks/", peakCaller, "/", paste(TF, "_vs_WT_sickle_bowtie2_", peakCaller, ".bed", sep="")), pattern=c(".*\\\\.bed$"), recursive=TRUE, full.names = TRUE)
+#    peakFiles <- c(peakFiles,file.path(mainDir, "results" , "peaks", peakCaller, paste(TF, "_vs_WT_sickle_bowtie2_", peakCaller, ".bed", sep="")) )
+    multiPeakVsRegDB <- MultiPeaksVsTFBS(peakFiles, peakSetLabels = basename(sub(peakFiles, pattern="\\\\.bed$", replacement = "")), TFBSFile, PNGFile=paste("{wildcards.dir_peaks}", TF, "multi_peaks_vs_tfbs.png", sep="/"), verbose=TRUE, drawPlots=TRUE)
+    write.table(multiPeakVsRegDB$peaksVsTFBStable, file=paste("{wildcards.dir_peaks}", TF, "multi_peaks_vs_tfbs.txt", sep="/"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+
+}}
+
+
+#sink()
+
+""")
+
+        shell("touch synthesis.done")
