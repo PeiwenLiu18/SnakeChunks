@@ -105,8 +105,8 @@ rule sartools_DESeq2:
     log: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2.log"
     benchmark: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_benchmark.json"
     conda: "../envs/sartools.yaml"
-    shell:
-        "Rscript {params.rscript} &> {log}"
+    script:
+        "{params.rscript} &> {log}"
 
 #run:
 #        R("""

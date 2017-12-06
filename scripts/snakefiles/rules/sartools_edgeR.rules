@@ -96,8 +96,8 @@ rule sartools_edgeR:
     log: "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR.log"
     benchmark: "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_benchmark.json"
     conda: "../envs/sartools.yaml"
-    shell:
-        "Rscript {params.rscript} &> {log}"
+    script:
+        "{params.rscript} &> {log}"
 #    run:
 #        R("""
 
