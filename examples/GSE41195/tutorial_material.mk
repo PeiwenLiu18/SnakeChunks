@@ -28,10 +28,7 @@ create_dir:
 	mv $(HOME)/SnakeChunks $(ANALYSIS_DIR)/SnakeChunks # to be changed when v4.1 is available
 
 
-
 ### Download genome & annotations 
-
-
 download_genome_data:
 	mkdir -p $(ANALYSIS_DIR)/genome && \
 	wget -nc ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/dna/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa.gz -P $(ANALYSIS_DIR)/genome && \
@@ -40,7 +37,6 @@ download_genome_data:
 	gunzip $(ANALYSIS_DIR)/genome/*.gz
 
 ### Download raw data 
-
 download_chipseq_data:
 	cd $(ANALYSIS_DIR) && \
 	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010224 $(ANALYSIS_DIR)/ChIP-seq/fastq/GSM1010220 && \
