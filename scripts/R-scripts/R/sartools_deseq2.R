@@ -7,7 +7,11 @@ library(SARTools)
 
 baseDir <- getwd()
 
-targetFile <- snakemake@params[["targetFile"]]
+test <- snakemake@input[[1]]
+
+print(test)
+
+#targetFile <- snakemake@params[["targetFile"]]
 #setwd(paste(snakemake@wildcards[["diffexpr_dir"]], "/", snakemake@wildcards[["test"]], "_vs_", snakemake@wildcards[["ref"]], sep=""))
 #new.loc <- paste("DESeq2/", targetFile, sep="")
 #file.copy(targetFile, new.loc)
