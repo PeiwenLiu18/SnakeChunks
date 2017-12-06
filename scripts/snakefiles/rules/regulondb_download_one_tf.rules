@@ -15,15 +15,13 @@ rule RegulonDB_download_one_TF:
 
     Author: Claire Rioualen
     """
-#    input: 
+    input: 
+        all_tfbs="{dir}/BindingSiteSet.bed"
     output: 
-        tfbs="{dir}/{TF}/{TF}_sites.fa",
-        pssm= "{dir}/{TF}/{TF}_matrix.tf"
-    params: qsub = config["qsub"] + " -e {dir}/{TF}/{TF}_qsub.err -o {dir}/{TF}/{TF}_qsub.out"
-    log: "{dir}/{TF}/{TF}_index.log"
-    benchmark: "{dir}/{TF}/{TF}_benchmark.tab"
-#    conda: ""
+        selected_tfbs="{dir}/{TF}/{TF}_BS.bed"
+    params: qsub = config["qsub"] + " -e {dir}/{TF}/{TF}_BS_qsub.err -o {dir}/{TF}/{TF}_BS_qsub.out"
+    log: "{dir}/{TF}/{TF}_BS.log"
+    benchmark: "{dir}/{TF}/{TF}_BS_benchmark.tab"
     shell:"""
-wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getTFBS?tfObject={wildcards.TF} -O {output.tfbs}
-wget -nc http://regulondb.ccg.unam.mx/webresources/tools/getPSSM?tfObject={wildcards.TF} -O {output.pssm}
+    awk '$4 == "{wildcards.TF}"' {input.all_tfbs} > {output.selected_tfbs}
 """
