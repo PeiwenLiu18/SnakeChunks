@@ -138,6 +138,8 @@ include: os.path.join(RULES, "macs2.rules")
 include: os.path.join(RULES, "macs14.rules")
 #include: os.path.join(RULES, "mosaics.rules")
 #include: os.path.join(RULES, "peak_motifs.rules")
+include: os.path.join(RULES, "regulondb_download.rules")
+include: os.path.join(RULES, "regulondb_download_one_tf.rules")
 #include: os.path.join(RULES, "spp.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "subread_align.rules")
@@ -217,6 +219,8 @@ GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}
 
 PEAK_MOTIFS     = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/peak-motifs/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_peak-motifs_synthesis.html", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
+REGULONDB_SITES = config["dir"]["regulondb"] + "/BindingSiteSet.bed"
+
 # ----------------------------------------------------------------
 # Flowcharts
 # ----------------------------------------------------------------
@@ -252,7 +256,8 @@ rule all:
 	Run analyses.
 	"""
 	input: \
-#            MAPPING,
+           REGULONDB_SITES,
+##            MAPPING,
 #            MAPPING_QC,
 ##            SORTED_BAM,
 #            BAM_STATS,
