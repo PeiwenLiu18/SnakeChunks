@@ -82,7 +82,7 @@ rule sartools_DESeq2:
         report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
     params:
-        rscript = "SnakeChunks/script/R-scripts/R/sartools_deseq2.R",
+        rscript = "../../R-scripts/R/sartools_deseq2.R",
         wd = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
         targetFile = "{preprocess,.*}SARTools_targetfile.txt",
         rawDir = "",
