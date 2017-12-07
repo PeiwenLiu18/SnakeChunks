@@ -23,5 +23,5 @@ rule RegulonDB_download:
 #    conda: ""
     shell:"""
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/BindingSiteSet.txt -O {output.all_tfbs_txt} &> {log}
-    awk '($1 !~ "#") && !(($4 == 0) && ($5 == 0)) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$4"\t"$5"\t"$2"\t.\t"$6}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
+    awk '($1 !~ "#") && !(($4 == 0) && ($5 == 0)) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$4-1"\t"$5"\t"$2"\t.\t"$6}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
 """
