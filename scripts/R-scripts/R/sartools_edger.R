@@ -33,67 +33,106 @@ edger <- function(){
     normalizationMethod <- snakemake@params[["normalizationMethod"]]
     workDir <- snakemake@params[["wd"]]
 
-    print("\n\nTEST1\n\n")
-    # checking parameters
-    checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
-          rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
-          condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
-          cpmCutoff=cpmCutoff,gene.selection=gene.selection,
-          normalizationMethod=normalizationMethod,colors=colors)
 
-    print("\n\nTEST2\n\n")
-    print(projectName)
-    print(targetFile)
+# checking parameters
+checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
+                      rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
+                      condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
+                      cpmCutoff=cpmCutoff,gene.selection=gene.selection,
+                      normalizationMethod=normalizationMethod,colors=colors)
 
-    # loading target file
-    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
+# loading target file
+target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
 
-    # loading counts
-    counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
+# loading counts
+counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
 
-    # description plots
-    majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
+# description plots
+majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
 
-    print("\n\nTEST3\n\n")
+# edgeR analysis
+out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
+                       batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
+                       pAdjustMethod=pAdjustMethod)
 
-    # edgeR analysis
-    out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
-           batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
-           pAdjustMethod=pAdjustMethod)
+# MDS + clustering
+exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
 
-    print("\n\nTEST4\n\n")
+# summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
+summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
 
-    # MDS + clustering
-    exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
+# save image of the R session
+save.image(file=paste0(projectName, ".RData"))
 
-    # summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
-    summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
-
-    # save image of the R session
-    save.image(file=paste0(projectName, ".RData"))
-
-    print("\n\nTEST5\n\n")
-    # generating HTML report
-    writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
-      majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
-      targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
-      condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
-      gene.selection=gene.selection, normalizationMethod=normalizationMethod)
-
-    # get list of gene_ids of up/down genes
-    #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.up.txt$")[1], sep=""))[,1])
-    #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.down.txt$")[1], sep=""))[,1])
-
-    print("\n\nTEST6\n\n")
-    up <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".up.txt", sep="")[1])[,1])
-    down <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".down.txt", sep="")[1])[,1])
+# generating HTML report
+writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
+                  majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
+                  targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
+                  condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
+                  gene.selection=gene.selection, normalizationMethod=normalizationMethod)
 
 
-    setwd(baseDir)
+#    print("\n\nTEST1\n\n")
+#    # checking parameters
+#    checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
+#          rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
+#          condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
+#          cpmCutoff=cpmCutoff,gene.selection=gene.selection,
+#          normalizationMethod=normalizationMethod,colors=colors)
 
-    gene_list <- c(up[2:length(up)], down[2:length(down)])
-    print(gene_list)
-    write.table(gene_list, file=snakemake@output[["gene_list"]], row.names=F, col.names=F, quote=F)
+#    print("\n\nTEST2\n\n")
+#    print(projectName)
+#    print(targetFile)
+
+#    # loading target file
+#    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
+
+#    # loading counts
+#    counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
+
+#    # description plots
+#    majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
+
+#    print("\n\nTEST3\n\n")
+
+#    # edgeR analysis
+#    out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
+#           batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
+#           pAdjustMethod=pAdjustMethod)
+
+#    print("\n\nTEST4\n\n")
+
+#    # MDS + clustering
+#    exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
+
+#    # summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
+#    summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
+
+#    # save image of the R session
+#    save.image(file=paste0(projectName, ".RData"))
+
+#    print("\n\nTEST5\n\n")
+#    # generating HTML report
+#    writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
+#      majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
+#      targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
+#      condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
+#      gene.selection=gene.selection, normalizationMethod=normalizationMethod)
+
+#    # get list of gene_ids of up/down genes
+#    #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.up.txt$")[1], sep=""))[,1])
+#    #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.down.txt$")[1], sep=""))[,1])
+
+#    print("\n\nTEST6\n\n")
+#    up <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".up.txt", sep="")[1])[,1])
+#    down <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".down.txt", sep="")[1])[,1])
+
+
+#    setwd(baseDir)
+
+#    gene_list <- c(up[2:length(up)], down[2:length(down)])
+#    print(gene_list)
+#    write.table(gene_list, file=snakemake@output[["gene_list"]], row.names=F, col.names=F, quote=F)
 }
 
 edger()
