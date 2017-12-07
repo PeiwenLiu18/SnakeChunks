@@ -71,7 +71,7 @@ rule subread_featureCounts:
     conda: "../envs/subread.yaml"
     shell:"""
         featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
-        mv {output.featureCounts_output} {output.twocol_output}
+        cp {output.featureCounts_output} {output.twocol_output}
 #        featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
 #        awk '{{print $1,$7}}' {output.featureCounts_output} > {output.twocol_output}
 """
