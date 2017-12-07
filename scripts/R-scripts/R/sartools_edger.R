@@ -1,7 +1,7 @@
 
 edger <- function(){
 
-    rm(list=ls())
+
 
     library(SARTools)
 
