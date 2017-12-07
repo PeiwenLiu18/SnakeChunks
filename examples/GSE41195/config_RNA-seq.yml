@@ -62,7 +62,7 @@
     varInt: "group"
     condRef: "WT"
     batch: NULL
-    alpha: "0.05"
+    alpha: 0.05
     pAdjustMethod: "BH"
     cpmCutoff: "1"
     gene_selection: "pairwise"
@@ -76,7 +76,7 @@
     fitType: "parametric"                                               # "parametric" (default) or "local"
     cooksCutoff: TRUE
     independentFiltering: TRUE
-    alpha: "0.05"
+    alpha: 0.05
     pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
     typeTrans: "VST"                                                    # "VST" or "rlog"
     locfunc: "median"                                                   # "median" (default) or "shorth" to estimate the size factors
