@@ -51,7 +51,7 @@ deseq2 <- function(){
            typeTrans=typeTrans,locfunc=locfunc,colors=colors)
 
     # loading target file
-    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
+    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=NULL)
 
     # loading counts
     counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
