@@ -58,7 +58,7 @@
 
 
   edgeR:
-    featuresToRemove: "NULL"
+    featuresToRemove: NULL
     varInt: "group"
     condRef: "WT"
     batch: NULL
@@ -72,7 +72,7 @@
     featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
     varInt: "group"
     condRef: "WT"
-    batch: "NULL"
+    batch: NULL
     fitType: "parametric"                                               # "parametric" (default) or "local"
     cooksCutoff: "TRUE"
     independentFiltering: "TRUE"

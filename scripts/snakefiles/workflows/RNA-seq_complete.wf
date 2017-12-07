@@ -312,7 +312,7 @@ rule all:
 #            BAM_STATS,
 #            ALL_COVERAGE,
 #            FEATURE_COUNTS_PER_SAMPLE,
-            ALL_FEATURE_COUNTS,
+#            ALL_FEATURE_COUNTS,
             SARTOOLS_TARGETFILE,
             DEG,
 #            INFER_TRANSCRIPTS,
