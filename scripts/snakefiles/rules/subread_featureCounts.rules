@@ -70,7 +70,7 @@ rule subread_featureCounts:
     benchmark: "{reads}_featureCounts_benchmark.json"
     conda: "../envs/subread.yaml"
     shell:"""
-#        featureCounts -a {input.gtf} -o {output.twocol_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
+        featureCounts -a {input.gtf} -o {output.twocol_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
 #        featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
 #        awk '{{print $1,$7}}' {output.featureCounts_output} > {output.twocol_output}
 """
