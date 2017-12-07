@@ -26,9 +26,9 @@ edger <- function(){
     varInt <- snakemake@params[["varInt"]]
     condRef <- snakemake@params[["condRef"]]
     batch <- snakemake@params[["batch"]]
-    alpha <- {params.alpha}
+    alpha <- snakemake@params[["alpha"]]
     pAdjustMethod <- snakemake@params[["pAdjustMethod"]]
-    cpmCutoff <- {params.cpmCutoff}
+    cpmCutoff <- snakemake@params[["cpmCutoff"]]
     gene.selection <- snakemake@params[["gene_selection"]]
     normalizationMethod <- snakemake@params[["normalizationMethod"]]
     workDir <- snakemake@params[["wd"]]
