@@ -61,6 +61,8 @@ edger <- function(){
            batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
            pAdjustMethod=pAdjustMethod)
 
+    print("\n\nTEST4\n\n")
+
     # MDS + clustering
     exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
 
