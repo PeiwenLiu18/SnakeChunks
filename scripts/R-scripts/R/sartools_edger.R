@@ -78,7 +78,7 @@ edger <- function(){
       majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
       targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
       condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
-      gene.selection=gene.selection, normalizationMethod=normalizationMethod, cpmCutoff=cpmCutoff)
+      gene.selection=gene.selection, normalizationMethod=normalizationMethod)
 
     # get list of gene_ids of up/down genes
     #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.up.txt$")[1], sep=""))[,1])
