@@ -64,7 +64,7 @@
     batch: NULL
     alpha: 0.05
     pAdjustMethod: "BH"
-    cpmCutoff: "1"
+    cpmCutoff: 1
     gene_selection: "pairwise"
     normalizationMethod: "TMM"
 
