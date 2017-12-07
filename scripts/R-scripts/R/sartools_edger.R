@@ -33,19 +33,20 @@ edger <- function(){
     normalizationMethod <- snakemake@params[["normalizationMethod"]]
     workDir <- snakemake@params[["wd"]]
 
+    print("\n\nTEST1\n\")
     # checking parameters
     checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
           rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
-          condRef=condRef,batch=NULL,alpha=alpha,pAdjustMethod=pAdjustMethod,
+          condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
           cpmCutoff=cpmCutoff,gene.selection=gene.selection,
           normalizationMethod=normalizationMethod,colors=colors)
 
-
+    print("\n\nTEST2\n\")
     print(projectName)
     print(targetFile)
 
     # loading target file
-    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=NULL)
+    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
 
     # loading counts
     counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
@@ -53,9 +54,11 @@ edger <- function(){
     # description plots
     majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
 
+    print("\n\nTEST3\n\")
+
     # edgeR analysis
     out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
-           batch=NULL, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
+           batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
            pAdjustMethod=pAdjustMethod)
 
     # MDS + clustering
@@ -71,7 +74,7 @@ edger <- function(){
     writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
       majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
       targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
-      condRef=condRef, batch=NULL, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
+      condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
       gene.selection=gene.selection, normalizationMethod=normalizationMethod)
 
     # get list of gene_ids of up/down genes
