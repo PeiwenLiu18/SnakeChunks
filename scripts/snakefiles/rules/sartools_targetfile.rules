@@ -23,7 +23,7 @@ diffexpr_dir = config["dir"]["diffexpr"]
 
 # Define input files
 def targetfiles_inputs(wildcards):
-    count_files =  expand(sample_dir + "/{samples}/{samples}_{preprocess}.txt", samples=sample_ids, preprocess=wildcards.preprocess)
+    count_files =  expand(sample_dir + "/{samples}/{samples}_{preprocess}.tab", samples=sample_ids, preprocess=wildcards.preprocess)
     return count_files
 
 # Rule
