@@ -33,7 +33,7 @@ edger <- function(){
     normalizationMethod <- snakemake@params[["normalizationMethod"]]
     workDir <- snakemake@params[["wd"]]
 
-    print("\n\nTEST1\n\")
+    print("\n\nTEST1\n\n")
     # checking parameters
     checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
           rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
@@ -41,7 +41,7 @@ edger <- function(){
           cpmCutoff=cpmCutoff,gene.selection=gene.selection,
           normalizationMethod=normalizationMethod,colors=colors)
 
-    print("\n\nTEST2\n\")
+    print("\n\nTEST2\n\n")
     print(projectName)
     print(targetFile)
 
@@ -54,7 +54,7 @@ edger <- function(){
     # description plots
     majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
 
-    print("\n\nTEST3\n\")
+    print("\n\nTEST3\n\n")
 
     # edgeR analysis
     out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
