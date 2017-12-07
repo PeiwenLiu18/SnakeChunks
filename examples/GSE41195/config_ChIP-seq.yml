@@ -30,6 +30,7 @@
     samples: "ChIP-seq/results/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
     peaks: "ChIP-seq/results/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
     reports: "ChIP-seq/results/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    regulondb: "data/RegulonDB"
 
   trimming: "cutadapt"
   mapping: "bowtie2"
