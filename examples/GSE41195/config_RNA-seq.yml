@@ -74,8 +74,8 @@
     condRef: "WT"
     batch: NULL
     fitType: "parametric"                                               # "parametric" (default) or "local"
-    cooksCutoff: "TRUE"
-    independentFiltering: "TRUE"
+    cooksCutoff: TRUE
+    independentFiltering: TRUE
     alpha: "0.05"
     pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
     typeTrans: "VST"                                                    # "VST" or "rlog"
