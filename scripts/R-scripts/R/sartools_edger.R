@@ -72,6 +72,7 @@ edger <- function(){
     # save image of the R session
     save.image(file=paste0(projectName, ".RData"))
 
+    print("\n\nTEST5\n\n")
     # generating HTML report
     writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
       majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
@@ -83,6 +84,7 @@ edger <- function(){
     #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.up.txt$")[1], sep=""))[,1])
     #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.down.txt$")[1], sep=""))[,1])
 
+    print("\n\nTEST6\n\n")
     up <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".up.txt", sep="")[1])[,1])
     down <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".down.txt", sep="")[1])[,1])
 
