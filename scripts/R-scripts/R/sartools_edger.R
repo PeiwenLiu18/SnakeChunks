@@ -33,43 +33,105 @@ edger <- function(){
     workDir <- snakemake@params[["wd"]]
 
 
-# checking parameters
-checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
-                      rawDir=".",featuresToRemove=featuresToRemove,varInt=varInt,
-                      condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
-                      cpmCutoff=cpmCutoff,gene.selection=gene.selection,
-                      normalizationMethod=normalizationMethod,colors=colors)
+    # checking parameters
+    checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
+          rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
+          condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
+          cpmCutoff=cpmCutoff,gene.selection=gene.selection,
+          normalizationMethod=normalizationMethod,colors=colors)
 
-# loading target file
-target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
 
-# loading counts
-counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
+    print(projectName)
+    print(targetFile)
 
-# description plots
-majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
+    # loading target file
+    target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
 
-# edgeR analysis
-out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
-                       batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
-                       pAdjustMethod=pAdjustMethod)
+    # loading counts
+    counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
 
-# MDS + clustering
-exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
+    # description plots
+    majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
 
-# summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
-summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
+    # edgeR analysis
+    out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
+           batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
+           pAdjustMethod=pAdjustMethod)
 
-# save image of the R session
-save.image(file=paste0(projectName, ".RData"))
+    # MDS + clustering
+    exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
 
-# generating HTML report
+    # summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
+    summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
+
+    # save image of the R session
+    save.image(file=paste0(projectName, ".RData"))
+
+    # generating HTML report
+#    writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
+#      majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
+#      targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
+#      condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
+#      gene.selection=gene.selection, normalizationMethod=normalizationMethod)
 writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
                   majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
                   targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
                   condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
                   gene.selection=gene.selection, normalizationMethod=normalizationMethod,
                   cpmCutoff=cpmCutoff)
+
+    # get list of gene_ids of up/down genes
+    #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.up.txt$")[1], sep=""))[,1])
+    #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "snakemake@wildcards[["test}vssnakemake@wildcards[["ref}.down.txt$")[1], sep=""))[,1])
+
+    up <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".up.txt", sep="")[1])[,1])
+    down <- as.vector(read.table(paste("tables/", snakemake@wildcards[["test"]], "vs", snakemake@wildcards[["ref"]], ".down.txt", sep="")[1])[,1])
+
+
+    setwd(baseDir)
+
+    gene_list <- c(up[2:length(up)], down[2:length(down)])
+    print(gene_list)
+    write.table(gene_list, file=snakemake@output[["gene_list"]], row.names=F, col.names=F, quote=F)
+
+
+## checking parameters
+#checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
+#                      rawDir=".",featuresToRemove=featuresToRemove,varInt=varInt,
+#                      condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
+#                      cpmCutoff=cpmCutoff,gene.selection=gene.selection,
+#                      normalizationMethod=normalizationMethod,colors=colors)
+
+## loading target file
+#target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
+
+## loading counts
+#counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
+
+## description plots
+#majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
+
+## edgeR analysis
+#out.edgeR <- run.edgeR(counts=counts, target=target, varInt=varInt, condRef=condRef,
+#                       batch=batch, cpmCutoff=cpmCutoff, normalizationMethod=normalizationMethod,
+#                       pAdjustMethod=pAdjustMethod)
+
+## MDS + clustering
+#exploreCounts(object=out.edgeR$dge, group=target[,varInt], gene.selection=gene.selection, col=colors)
+
+## summary of the analysis (boxplots, dispersions, export table, nDiffTotal, histograms, MA plot)
+#summaryResults <- summarizeResults.edgeR(out.edgeR, group=target[,varInt], counts=counts, alpha=alpha, col=colors)
+
+## save image of the R session
+#save.image(file=paste0(projectName, ".RData"))
+
+## generating HTML report
+#writeReport.edgeR(target=target, counts=counts, out.edgeR=out.edgeR, summaryResults=summaryResults,
+#                  majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
+#                  targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
+#                  condRef=condRef, batch=batch, alpha=alpha, pAdjustMethod=pAdjustMethod, colors=colors,
+#                  gene.selection=gene.selection, normalizationMethod=normalizationMethod,
+#                  cpmCutoff=cpmCutoff)
 
 
 }
