@@ -70,7 +70,7 @@ rule sartools_edgeR:
     Contributors: Claire Rioualen
     """
     input: 
-        targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"
+        targetFile = "RNA-seq/results/diffexpr/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"
     output: 
         report = "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_report.html",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_gene_list.tab"
