@@ -20,7 +20,7 @@ edger <- function(){
     projectName <- snakemake@params[["projectName"]]
     author <- snakemake@params[["author"]]
 
-    rawDir <- snakemake@params[["rawDir"]]
+    rawDir <- "." #snakemake@params[["rawDir"]]
     featuresToRemove <- snakemake@params[["featuresToRemove"]]
     varInt <- snakemake@params[["varInt"]]
     condRef <- snakemake@params[["condRef"]]
