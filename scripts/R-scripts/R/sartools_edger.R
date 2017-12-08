@@ -2,7 +2,6 @@
 edger <- function(){
 
     library(SARTools)
-    sessionInfo()
 
     baseDir <- getwd()
 
