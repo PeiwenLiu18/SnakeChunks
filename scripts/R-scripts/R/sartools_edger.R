@@ -20,14 +20,14 @@ edger <- function(){
     projectName <- snakemake@params[["projectName"]]
     author <- snakemake@params[["author"]]
 
-    rawDir <- "." #snakemake@params[["rawDir"]]
+    rawDir <- snakemake@params[["rawDir"]]
     featuresToRemove <- snakemake@params[["featuresToRemove"]]
     varInt <- snakemake@params[["varInt"]]
     condRef <- snakemake@params[["condRef"]]
     batch <- snakemake@params[["batch"]]
     alpha <- snakemake@params[["alpha"]]
     pAdjustMethod <- snakemake@params[["pAdjustMethod"]]
-    cpmCutoff <- 1 #snakemake@params[["cpmCutoff"]]
+    cpmCutoff <- snakemake@params[["cpmCutoff"]]
     gene.selection <- snakemake@params[["gene_selection"]]
     normalizationMethod <- snakemake@params[["normalizationMethod"]]
     workDir <- snakemake@params[["wd"]]
@@ -35,7 +35,7 @@ edger <- function(){
 
 # checking parameters
 checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
-                      rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
+                      rawDir=".",featuresToRemove=featuresToRemove,varInt=varInt,
                       condRef=condRef,batch=batch,alpha=alpha,pAdjustMethod=pAdjustMethod,
                       cpmCutoff=cpmCutoff,gene.selection=gene.selection,
                       normalizationMethod=normalizationMethod,colors=colors)
