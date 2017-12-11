@@ -55,7 +55,7 @@ rm(list=ls())                                        # remove all the objects fr
     workDir <- snakemake@params[["wd"]]
 
 
-
+    targetFile <- snakemake@params[["targetFile"]]
 ################################################################################
 ###                             running script                               ###
 ################################################################################
