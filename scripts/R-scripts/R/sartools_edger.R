@@ -40,6 +40,7 @@ edger <- function(){
           cpmCutoff=cpmCutoff,gene.selection=gene.selection,
           normalizationMethod=normalizationMethod,colors=colors)
 
+    setwd(baseDir)
     dir <- getwd()
     print(dir)
     print(projectName)
