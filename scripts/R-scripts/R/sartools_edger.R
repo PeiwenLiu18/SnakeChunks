@@ -32,6 +32,7 @@ edger <- function(){
     workDir <- snakemake@params[["wd"]]
 
 
+
     # checking parameters
     checkParameters.edgeR(projectName=projectName,author=author,targetFile=targetFile,
           rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
@@ -39,7 +40,7 @@ edger <- function(){
           cpmCutoff=cpmCutoff,gene.selection=gene.selection,
           normalizationMethod=normalizationMethod,colors=colors)
 
-
+    getwd()
     print(projectName)
     print(targetFile)
 
