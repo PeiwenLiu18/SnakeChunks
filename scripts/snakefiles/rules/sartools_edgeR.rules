@@ -76,7 +76,7 @@ rule sartools_edgeR:
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_gene_list.tab"
     params:
         rscript = "../../R-scripts/R/sartools_edger.R",
-        wd = "RNA-seq/results/diffexpr/{test}_vs_{ref}/edgeR", #"{diffexpr_dir}/{test}_vs_{ref}/edgeR",
+        wd = "{diffexpr_dir}/{test}_vs_{ref}/edgeR", # "RNA-seq/results/diffexpr/{test}_vs_{ref}/edgeR", #
         targetFile = "{preprocess,.*}SARTools_targetfile.txt",
         rawDir = "../../{diffexpr_dir}", 
         projectName = "{test}_vs_{ref}_{preprocess,.*}edgeR",
