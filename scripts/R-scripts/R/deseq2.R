@@ -2,18 +2,35 @@
 #counts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
 #coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
 
+
 dir.main <- '~/FNR_analysis/'
 setwd(dir.main)
+dir.counts <- 'RNA-seq/results/diffexpr'
+
+## Parameter values
+parameters <- list()
+parameters[["alpha"]] <- 0.05
+parameters[["sample.ids"]] <- ""
+parameters[["sample_table"]] <- file.path(dir.main, "metadata", "samples_RNA-seq.tab")
+parameters[["count_file"]] <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+
+
+## The real script starts here
 
 library("DESeq2")
 
-dir.counts <- 'RNA-seq/results/diffexpr'
 
-count.file <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+counts <- read.table(parameters[["count_file"]], header=TRUE, row.names=1, comment.char = "#")
+dim(counts)
+View(counts)
+coldata <- read.table(parameters[["sample_table"]], header=TRUE, row.names = 1)
 
-counts <- read.table(count.file, header=TRUE, row.names="gene")
+# parameters[["sample.ids"]] <- sub(pattern = "RNA.seq.results.samples.", replacement = "", names(counts))
+# parameters[["sample.ids"]] <- sub(pattern = "\\..*", replacement  = "", x = parameters[["sample.ids"]], perl=TRUE)
 
-coldata <- read.table("samples_RNA-seq.tab", header=TRUE, row.names="sample")
+## TO CHECK: is the order of the samples the same as column names in the coutns: check with feature count rule
+colnames(counts) <- rownames(coldata)
+
 
 dds <- DESeqDataSetFromMatrix(countData=counts, colData=coldata, design=~condition)
 
