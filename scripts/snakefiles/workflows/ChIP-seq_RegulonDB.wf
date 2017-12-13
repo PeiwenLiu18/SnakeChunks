@@ -279,7 +279,7 @@ rule all:
             FORMAT_PEAKS,
             GET_FASTA,
 #            GENOMIC_FEAT,
-#            GENE_LIST,
+            GENE_LIST,
 #            PEAK_MOTIFS,
 #            HTML_REPORT,
             IGV_SESSION,
