@@ -1,5 +1,4 @@
 #! /usr/bin/python
-# -*- coding: utf8 -*-
 """Peak Motifs - developed by Jocelyn Brayet <jocelyn.brayet@curie.fr>
 Copyright (C) 2015  Institut Curie.
 
@@ -101,6 +100,11 @@ optional arguments:
 			transcription factor of interest.
   -server <SERVER>, --server <SERVER>
 			RSAT server
+  -output <OUMODE>, --output <OUTPUT>
+			Output mode requested to the Web service. Supported: "server", "client", "both"
+  -prefix <PREFIX>, --prefix <PREFIX>
+                        Prefix to the output archive (the extension .zip will automaticalybe added).
+                        Default: peak-motifs_results.zip
 
 Version 0.1 - 30/01/2015 - Adapted from Jocelyn Brayet, France Genomique team
 
@@ -125,62 +129,9 @@ from suds.client import Client
 ###########################################################'
 ## Define log options for suds
 
-# Import log package
-#import logging
 
-# Import log package
-#import logging
-# création de l'objet logger qui va nous servir à écrire dans les logs
-#logger = logging.getLogger()
-# on met le niveau du logger à DEBUG, comme ça il écrit tout
-#logger.setLevel(logging.DEBUG)
-# Configure log of suds clients to DEBUG for verbose output concerning Client request
-#logging.getLogger('suds.client').setLevel(logging.ERROR)
-#logging.getLogger('suds.transport').setLevel(logging.ERROR)
-#logging.getLogger('suds.xsd.schema').setLevel(logging.ERROR)
-#logging.getLogger('suds.wsdl').setLevel(logging.ERROR)
+########################## FUNCTION DEFINITION ############'
 
-
-# création d'un second handler qui va rediriger chaque écriture de log
-# sur la console
-#steam_handler = logging.StreamHandler()
-#steam_handler.setLevel(logging.DEBUG)
-#logger.addHandler(steam_handler)
-
-#logger.info('Hello')
-
-#print(client.factory.create('peak_motifs'))
-
-#	  (PeakMotifsRequest){
-#		 output = None -> ok
-#		 verbosity = None
-#		 test = None -> ok
-#		 tmp_test_infile = None
-#		 control = None
-#		 tmp_control_infile = None
-#		 max_seq_length = None
-#		 max_motif_number = None
-#		 motif_db = None
-#		 ref_motif = None
-#		 top_peaks = None
-#		 min_length = None
-#		 max_length = None
-#		 markov = None
-#		 min_markov = None
-#		 max_markov = None
-#		 noov = None
-#		 class_int = None
-#		 str = None
-#		 graph_title = None
-#		 image_format = None
-#		 disco = None
-#		 source = None
-#		 task = None
-#	  }
-# }
-
-
-################################ functions ############################################################
 ## Define a function to make a service perform the desired request using provided arguments
 def call_run_service(service, args):
 	"""
@@ -256,6 +207,8 @@ if __name__ == '__main__':
 	########### peak motifs arguments ####################
 	parser = argparse.ArgumentParser(description='Client to download peak-motifs results from RSAT server.', epilog='Version '+peakMotifsVersion)
 	
+	parser.add_argument('-server', '--server', metavar='<SERVEUR>', type=str, nargs=1, help='RSAT server', required=True)
+
 	parser.add_argument('-test', '--test_file', metavar='<TEST_FILE>', type=argparse.FileType('r'), nargs=1, help='Input test peak sequence in fasta format.', required=True)
 	parser.add_argument('-control', '--control_file', metavar='<CONTROL_FILE>', type=argparse.FileType('r'), nargs=1, help='Input control peak sequence in fasta format.', required=False)
 	parser.add_argument('-max_seq_length', '--maxSeqLength', metavar='<MAX_SEQ_LENGTH>', type=int, nargs=1, help='Maximal sequence length.', required=False)
@@ -274,12 +227,14 @@ if __name__ == '__main__':
 	parser.add_argument('-disco', '--discoAlgorithm', metavar='<DISCO_ALGORITHM>', type=str, nargs='*', help='Specify the software tool(s) that will be used for motif discovery (oligos|dyads|positions|local_words|merged_words). Several algorithms can be specified either by using a comma-separated list of algorithms: -disco oligos,dyads', required=False)
 	parser.add_argument('-source', '--sourceFile', metavar='<SOURCE_FILE>', type=str, nargs=1, help='Enter the source of the fasta sequence file. Supported source: galaxy', required=False)
 	parser.add_argument('-verb', '--verbosity', metavar='<VERBOSITY>', type=int, nargs=1, help='Verbosity.', required=False)
-	parser.add_argument('-motif_db', '--motif_db', metavar='<MOTIF_DB>', type=str, nargs=1, help='Motif database(s) against which discovered motifs will be compared.', required=False)
 	parser.add_argument('-ref_motif', '--ref_motif', metavar='<REF_MOTIF>', type=argparse.FileType('r'), nargs=1, help='User-provided reference motif(s).', required=False)
+	parser.add_argument('-motif_db', '--motif_db', metavar='<MOTIF_DB>', type=str, nargs=1, help='Motif database(s) against which discovered motifs will be compared.', required=False)
+	parser.add_argument('-output', '--output', metavar='<OUTPUT>', type=str, nargs=1, help='Output mode for the RSAT Web services server. Supported: "server", "client", "both".', required=False)
+	parser.add_argument('-prefix', '--prefix', metavar='<PREFIX>', type=str, nargs=1, help='Prefix for the result archive (can include an existing path). Default: peak-motifs_result.zip. ', required=False)
 
+        
 	################################ galaxy arguments ############################################################
 	#parser.add_argument('-outGalaxy', '--outGalaxy', metavar='<OUT_GALAXY>', type=str, nargs=1, required=True)
-	parser.add_argument('-server', '--server', metavar='<SERVEUR>', type=str, nargs=1, help='RSAT server', required=True)
 	###########################################################'
 
 	args = parser.parse_args()
@@ -315,6 +270,8 @@ if __name__ == '__main__':
 	imageFormatValue = testNone(args.imageFormat)
 	discoAlgorithmValue = testNone(args.discoAlgorithm)
 	motifDbValue =  testNone(args.motif_db)
+	outputValue =  testNone(args.output)
+	prefixValue =  testNone(args.prefix)
 	sourceFileValue = testNone(args.sourceFile)
 	verbosityValue = testNone(args.verbosity)
 	#outGalaxyValue = testNone(args.outGalaxy)
@@ -368,10 +325,9 @@ if __name__ == '__main__':
 		'disco' : discoAlgorithmValue,
 		'source' : sourceFileValue,
 		'motif_db' : motifDbValue,
+		'output' : outputValue,
 		'ref_motif' : refMotifValue,
 		'verbosity' : verbosityValue
-		#'motif_db' : 'test'
-		#'output' : 'blablabla'
 	
 	}
 
@@ -415,6 +371,7 @@ if __name__ == '__main__':
 	"""
 
 	nameFile = "peak-motifs_results.zip"
+        nameFile = prefixValue + '.zip'
 	urlResult=buildZipUrl(result.server)
 	print(urlResult)
 
