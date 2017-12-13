@@ -314,7 +314,7 @@ if __name__ == '__main__':
 	graphTitleValue = testNone(args.graphTitle)
 	imageFormatValue = testNone(args.imageFormat)
 	discoAlgorithmValue = testNone(args.discoAlgorithm)
-        motifDbValue =  testNone(args.motif_db)
+	motifDbValue =  testNone(args.motif_db)
 	sourceFileValue = testNone(args.sourceFile)
 	verbosityValue = testNone(args.verbosity)
 	#outGalaxyValue = testNone(args.outGalaxy)
