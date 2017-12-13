@@ -52,7 +52,7 @@ rule peak_motifs:
 export PEAKSEQ={input}
 
 python {params.python_script} \
-   -test ${PEAKSEQ} \
+   -test ${{PEAKSEQ}} \
    -graph_title {params.title} \
    -disco dyads \
    -motif_db regulonDB \
