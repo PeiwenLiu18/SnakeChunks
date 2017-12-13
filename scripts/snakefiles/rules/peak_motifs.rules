@@ -8,6 +8,9 @@ if not "peak-motifs" in config.keys():
 #if not "motif_db" in config["peak-motifs"].keys():
 #    sys.exit("The parameter peak-motif:motif_db must be defined in the config file")
 
+if not "python" in config["peak-motifs"].keys():
+    config["peak-motifs"]["python"] = "python2"
+
 if not "motif_db" in config["peak-motifs"].keys():
     config["peak-motifs"]["motif_db"] = ""
 
@@ -34,8 +37,11 @@ rule peak_motifs:
     Contributors: Claire Rioualen, Lucie Khamvongsa
     """
     input: "{caller_dir}/{peaks}.fasta"
-    output: "{caller_dir}/peak-motifs/{peaks}_peak-motifs_synthesis.html"
+    output: 
+#        zip = "{caller_dir}/peak-motifs/{peaks}_peak-motifs.zip",
+        html = "{caller_dir}/peak-motifs/{peaks}_peak-motifs/peak-motifs_synthesis.html"
     params:
+        python = config["peak-motifs"]["python"],
         python_script = "SnakeChunks/scripts/python_lib/peak-motifs_soap.py",
         title = config["title"],
         bed_ctrl = "{caller_dir}/{peaks}.bed", \
@@ -43,31 +49,25 @@ rule peak_motifs:
         disco = config["peak-motifs"]["disco"], \
         motif_db = config["peak-motifs"]["motif_db"], \
         outdir = "{caller_dir}/peak-motifs", \
-        prefix="{peaks}_peak-motifs", \
+#        prefix="{peaks}_peak-motifs", \
+        prefix = "{caller_dir}/peak-motifs/{peaks}_peak-motifs",
         qsub = config["qsub"] + " -e {peaks}_qsub.err" \
                   + " -o {peaks}_qsub.out" 
     log: "{caller_dir}/{peaks}_peak-motifs.log"
     benchmark: "{caller_dir}/{peaks}_peak-motifs_bench.json"
     conda: "../envs/peakmotifs.yaml"
     shell:"""
-export PEAKSEQ={input}
-
-python {params.python_script} \
-   -test ${{PEAKSEQ}} \
+{params.python} {params.python_script} \
+   -test {input} \
    -graph_title "{params.title}" \
    -disco dyads \
    -motif_db regulonDB \
+   -output both -prefix {params.prefix} \
    -server fungi
+
+unzip -qq -d `dirname {params.prefix}` {params.prefix}.zip
+rm -rf {params.prefix} && mv -f {wildcards.caller_dir}/peak-motifs/peak-motifs_ws_*/ {params.prefix}
 """
-
-#export PEAKSEQ=ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2.fasta
-
-#python $RSAT/public_html//web_services/clients/python/peak-motifs_soap.py \
-#   -test ${PEAKSEQ} \
-#   -graph_title "FNR ChIP-seq;  Machin et al 201X" \
-#   -disco dyads \
-#   -motif_db regulonDB \
-#   -server fungi
 
 
 
