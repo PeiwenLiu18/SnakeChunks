@@ -82,9 +82,10 @@ rule sartools_DESeq2:
         report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
     params:
+        rscript = "../../R-scripts/R/sartools_deseq2.R",
         wd = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
         targetFile = "{preprocess,.*}SARTools_targetfile.txt",
-        rawDir = "",
+        rawDir = "../../../../..",
         projectName = "{test}_vs_{ref}_{preprocess,.*}DESeq2",
         author = config["author"],
         featuresToRemove = config["DESeq2"]["featuresToRemove"],
@@ -103,99 +104,103 @@ rule sartools_DESeq2:
           + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.out"
     log: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2.log"
     benchmark: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_benchmark.json"
-    run:
-        R("""
+    conda: "../envs/sartools.yaml"
+    script:
+        "{params.rscript}"
 
-        rm(list=ls())
+#run:
+#        R("""
 
-        sink("{log}")
+#        rm(list=ls())
 
-        library(SARTools)
+#        sink("{log}")
 
-        baseDir <- getwd()
+#        library(SARTools)
 
-        targetFile <- "{params.targetFile}"
-        setwd("{wildcards.diffexpr_dir}/{wildcards.test}_vs_{wildcards.ref}")
-        new.loc <- paste("DESeq2/", targetFile, sep="")
-        file.copy(targetFile, new.loc)
+#        baseDir <- getwd()
 
-        setwd("DESeq2")
+#        targetFile <- "{params.targetFile}"
+#        setwd("{wildcards.diffexpr_dir}/{wildcards.test}_vs_{wildcards.ref}")
+#        new.loc <- paste("DESeq2/", targetFile, sep="")
+#        file.copy(targetFile, new.loc)
 
-        colors <- c("green", "red", "blue", "pink")
+#        setwd("DESeq2")
 
-        # setting params
+#        colors <- c("green", "red", "blue", "pink")
 
-        projectName <- "{params.projectName}"
-        author <- "{params.author}"
+#        # setting params
 
-        rawDir <- "{params.rawDir}"
-        featuresToRemove <- "{params.featuresToRemove}"
-        varInt <- "{params.varInt}"
-        condRef <- "{params.condRef}"
-        batch <- {params.batch}
-        fitType <- "{params.fitType}"
-        cooksCutoff <- {params.cooksCutoff}
-        independentFiltering <- {params.independentFiltering}
-        typeTrans <- "{params.typeTrans}"
-        locfunc <- "{params.locfunc}"
-        alpha <- {params.alpha}
-        pAdjustMethod <- "{params.pAdjustMethod}"
-        workDir <- "{params.wd}"
+#        projectName <- "{params.projectName}"
+#        author <- "{params.author}"
 
-        # checking parameters
-        checkParameters.DESeq2(projectName=projectName,author=author,targetFile=targetFile,
-                               rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
-                               condRef=condRef,batch=batch,fitType=fitType,cooksCutoff=cooksCutoff,
-                               independentFiltering=independentFiltering,alpha=alpha,pAdjustMethod=pAdjustMethod,
-                               typeTrans=typeTrans,locfunc=locfunc,colors=colors)
+#        rawDir <- "{params.rawDir}"
+#        featuresToRemove <- "{params.featuresToRemove}"
+#        varInt <- "{params.varInt}"
+#        condRef <- "{params.condRef}"
+#        batch <- {params.batch}
+#        fitType <- "{params.fitType}"
+#        cooksCutoff <- {params.cooksCutoff}
+#        independentFiltering <- {params.independentFiltering}
+#        typeTrans <- "{params.typeTrans}"
+#        locfunc <- "{params.locfunc}"
+#        alpha <- {params.alpha}
+#        pAdjustMethod <- "{params.pAdjustMethod}"
+#        workDir <- "{params.wd}"
 
-        # loading target file
-        target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
+#        # checking parameters
+#        checkParameters.DESeq2(projectName=projectName,author=author,targetFile=targetFile,
+#                               rawDir=rawDir,featuresToRemove=featuresToRemove,varInt=varInt,
+#                               condRef=condRef,batch=batch,fitType=fitType,cooksCutoff=cooksCutoff,
+#                               independentFiltering=independentFiltering,alpha=alpha,pAdjustMethod=pAdjustMethod,
+#                               typeTrans=typeTrans,locfunc=locfunc,colors=colors)
 
-        # loading counts
-        counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
+#        # loading target file
+#        target <- loadTargetFile(targetFile=targetFile, varInt=varInt, condRef=condRef, batch=batch)
 
-        # description plots
-        majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
+#        # loading counts
+#        counts <- loadCountData(target=target, rawDir=rawDir, featuresToRemove=featuresToRemove)
 
-        # analysis with DESeq2
-        out.DESeq2 <- run.DESeq2(counts=counts, target=target, varInt=varInt, batch=batch,
-                                 locfunc=locfunc, fitType=fitType, pAdjustMethod=pAdjustMethod,
-                                 cooksCutoff=cooksCutoff, independentFiltering=independentFiltering, alpha=alpha)
+#        # description plots
+#        majSequences <- descriptionPlots(counts=counts, group=target[,varInt], col=colors)
 
-        # PCA + clustering
-        exploreCounts(object=out.DESeq2$dds, group=target[,varInt], typeTrans=typeTrans, col=colors)
+#        # analysis with DESeq2
+#        out.DESeq2 <- run.DESeq2(counts=counts, target=target, varInt=varInt, batch=batch,
+#                                 locfunc=locfunc, fitType=fitType, pAdjustMethod=pAdjustMethod,
+#                                 cooksCutoff=cooksCutoff, independentFiltering=independentFiltering, alpha=alpha)
 
-        # summary of the analysis (boxplots, dispersions, diag size factors, export table, nDiffTotal, histograms, MA plot)
-        summaryResults <- summarizeResults.DESeq2(out.DESeq2, group=target[,varInt], col=colors,
-                                                  independentFiltering=independentFiltering,
-                                                  cooksCutoff=cooksCutoff, alpha=alpha)
+#        # PCA + clustering
+#        exploreCounts(object=out.DESeq2$dds, group=target[,varInt], typeTrans=typeTrans, col=colors)
 
-        # save image of the R session
-        save.image(file=paste0(projectName, ".RData"))
+#        # summary of the analysis (boxplots, dispersions, diag size factors, export table, nDiffTotal, histograms, MA plot)
+#        summaryResults <- summarizeResults.DESeq2(out.DESeq2, group=target[,varInt], col=colors,
+#                                                  independentFiltering=independentFiltering,
+#                                                  cooksCutoff=cooksCutoff, alpha=alpha)
 
-        # generating HTML report
-        writeReport.DESeq2(target=target, counts=counts, out.DESeq2=out.DESeq2, summaryResults=summaryResults,
-                           majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
-                           targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
-                           condRef=condRef, batch=batch, fitType=fitType, cooksCutoff=cooksCutoff,
-                           independentFiltering=independentFiltering, alpha=alpha, pAdjustMethod=pAdjustMethod,
-                           typeTrans=typeTrans, locfunc=locfunc, colors=colors)
+#        # save image of the R session
+#        save.image(file=paste0(projectName, ".RData"))
 
-        # get list of gene_ids of up/down genes
-        #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "up.txt$")[1], sep=""))[,1])
-        #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "down.txt$")[1], sep=""))[,1])
+#        # generating HTML report
+#        writeReport.DESeq2(target=target, counts=counts, out.DESeq2=out.DESeq2, summaryResults=summaryResults,
+#                           majSequences=majSequences, workDir=workDir, projectName=projectName, author=author,
+#                           targetFile=targetFile, rawDir=rawDir, featuresToRemove=featuresToRemove, varInt=varInt,
+#                           condRef=condRef, batch=batch, fitType=fitType, cooksCutoff=cooksCutoff,
+#                           independentFiltering=independentFiltering, alpha=alpha, pAdjustMethod=pAdjustMethod,
+#                           typeTrans=typeTrans, locfunc=locfunc, colors=colors)
 
-        up <- as.vector(read.table(paste("tables/", "{wildcards.test}", "vs", "{wildcards.ref}", ".up.txt", sep="")[1])[,1])
-        down <- as.vector(read.table(paste("tables/", "{wildcards.test}", "vs", "{wildcards.ref}", ".down.txt", sep="")[1])[,1])
+#        # get list of gene_ids of up/down genes
+#        #up <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "up.txt$")[1], sep=""))[,1])
+#        #down <- as.vector(read.table(paste("tables/", list.files(path = "tables", pattern = "down.txt$")[1], sep=""))[,1])
 
-        setwd(baseDir)
+#        up <- as.vector(read.table(paste("tables/", "{wildcards.test}", "vs", "{wildcards.ref}", ".up.txt", sep="")[1])[,1])
+#        down <- as.vector(read.table(paste("tables/", "{wildcards.test}", "vs", "{wildcards.ref}", ".down.txt", sep="")[1])[,1])
+
+#        setwd(baseDir)
 
 
-        gene_list <- c(up[2:length(up)], down[2:length(down)])
-        print(gene_list)
-        write.table(gene_list, file="{output.gene_list}", row.names=F, col.names=F, quote=F)
+#        gene_list <- c(up[2:length(up)], down[2:length(down)])
+#        print(gene_list)
+#        write.table(gene_list, file="{output.gene_list}", row.names=F, col.names=F, quote=F)
 
-        sink()
-        """)
+#        sink()
+#        """)
 

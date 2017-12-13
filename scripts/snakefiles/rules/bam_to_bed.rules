@@ -19,4 +19,5 @@ rule bam_to_bed:
             + " -o {reads}_bam_to_bed_qsub.out"
     log: "{reads}_bam_to_bed.log"
     benchmark: "{reads}_bam_to_bed_benchmark.txt"
+    conda: "../envs/bedtools.yaml"
     shell:"bedtools bamtobed -i {input} > {output} 2> {log}"

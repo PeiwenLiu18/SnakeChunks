@@ -32,6 +32,7 @@ rule bedtools_intersect:
 	log: "{regions}_intersect.log"
 	benchmark: "{regions}_intersect_benchmark.txt"
 	params: qsub = config["qsub"] + " -e {regions}_intersect_qsub.err -o {regions}_intersect_qsub.out"
+	conda:  "../envs/bedtools.yaml"
 	shell:"""
 bedtools intersect -a {input.bed} -b {input.gff3} > {output} 2> {log}
 """

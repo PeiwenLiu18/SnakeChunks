@@ -37,6 +37,7 @@ rule bowtie2_index:
           + " -o " + bowtie2_dir + "index_qsub.out"
     log: bowtie2_dir + "/index.log"
     benchmark: bowtie2_dir + "/index_benchmark.txt"
+    conda:  "../envs/bowtie2.yaml"
     shell: """
 mkdir -p {params.dir}
 cp {input} {params.dir}

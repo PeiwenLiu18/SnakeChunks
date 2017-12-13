@@ -19,6 +19,7 @@ rule get_chrom_sizes:
           + " -o {genome}_chromsize_qsub.out"
     log: "{genome}_chromsize.log"
     benchmark: "{genome}_chromsize_benchmark.txt"
+    conda: "../envs/samtools.yaml"
     shell:"""
 (samtools faidx {input}
 cut -f1,2 {input}.fai > {output}) 2> {log}

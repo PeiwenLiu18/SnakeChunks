@@ -49,6 +49,7 @@ rule spp:
           + " -o " + dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp_qsub.out"
     log: dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp.log"
     benchmark: dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp_benchmark.json"
+    conda: "../envs/bedtools.yaml"
     run:
         R("""sink("{log}")
 

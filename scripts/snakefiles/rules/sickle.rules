@@ -78,3 +78,5 @@ rule sickle:
         elif (seq_type == "se"):
             shell("sickle se --fastq-file {input} --qual-type {params.qual_type} -q {params.qual_threshold} -l {params.length_threshold} --output-file {output.single} &> {log}")
             shell("touch {output.forward} {output.reverse}")
+
+

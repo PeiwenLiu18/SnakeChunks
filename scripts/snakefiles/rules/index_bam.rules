@@ -20,4 +20,5 @@ rule index_bam:
             + " -o {reads}_sorted_pos.bam.bai_qsub.err"
     log: "{reads}.bam.bai.log"
     benchmark: "{reads}_sorted_pos.bam.bai_benchmark.log"
+    conda: "../envs/samtools.yaml"
     shell:"samtools index {input} 2> {log}"

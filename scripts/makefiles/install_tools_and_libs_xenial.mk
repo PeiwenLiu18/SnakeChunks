@@ -428,6 +428,7 @@ visualization: java igv igv_tools
 
 ## to be used only in non-graphical environment (eg IFB cloud VMs)
 desktop_and_x2go: 
+	add_repos
 	sudo apt-get install -y x2goserver
 	sudo apt-get install -y --no-install-recommends ubuntu-mate-core ubuntu-mate-desktop
 	sudo apt-get install -y mate-desktop-environment-extra

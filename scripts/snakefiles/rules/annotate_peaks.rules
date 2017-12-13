@@ -40,13 +40,16 @@ rule annotate_peaks:
     benchmark: "{regions}_gene_list_benchmark.txt"
     params: 
         qsub = config["qsub"] + " -e {regions}_gene_list_qsub.err -o {regions}_gene_list_qsub.out"
-    run:
-        shell("annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}")
-        R("""
-tab <- read.table("{output}", sep="\t", header=T)
-gene_list <- unique(sort(tab[,"Nearest.PromoterID"]))
-write.table(gene_list, file="{output}", row.names=F, col.names=F, quote=F)
-""")
+    conda: "../envs/homer.yaml"
+    shell:
+        "annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}"
+#    run:
+#        shell("annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}")
+#        R("""
+#tab <- read.table("{output}", sep="\t", header=T)
+#gene_list <- unique(sort(tab[,"Nearest.PromoterID"]))
+#write.table(gene_list, file="{output}", row.names=F, col.names=F, quote=F)
+#""")
 
 
 

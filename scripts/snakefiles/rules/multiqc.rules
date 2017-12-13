@@ -1,0 +1,23 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+# Rule
+rule multiqc:
+    """
+        Generates a report with the MultiQC tool. 
+        More: www.multiqc.info
+        
+    Required parameters:
+        config["qsub"]
+
+    Author: Claire Rioualen
+    """
+#    input: 
+    output: "{dir}/multiqc_report.html"
+    params: qsub = config["qsub"] + " -e {regions}_getfasta_qsub.err -o {regions}_getfasta_qsub.out"
+    log: "{dir}/index.log"
+    benchmark: "{dir}/index_benchmark.tab"
+    conda: "../envs/multiqc.yaml"
+    shell:"""multiqc . -o {wildcards.dir} 2> {log}"""
+

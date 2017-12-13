@@ -64,7 +64,7 @@ RULES = os.path.join(GENEREG_LIB, "scripts/snakefiles/rules")
 include: os.path.join(RULES, "dot_graph.rules")
 include: os.path.join(RULES, "dot_to_image.rules")
 include: os.path.join(RULES, "fastqc.rules")
-include: os.path.join(RULES, "gzip.rules")
+#include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "sickle.rules")
 include: os.path.join(RULES, "cutadapt.rules")
 include: os.path.join(RULES, "bbduk.rules")
@@ -109,6 +109,11 @@ if (SEQ_TYPE == "pe"):
 # FastQC
 #----------------------------------------------------------------#
 
+#input_format = "fastq"
+#if ("input_format" in config["metadata"].keys())):
+#    input_format =  config["metadata"]["input_format"]
+
+
 #----------------------------------------------------------------#
 # Single-end
 #----------------------------------------------------------------#
@@ -133,10 +138,10 @@ QC = RAW_QC
 # Trimming
 #----------------------------------------------------------------#
 
-if not (("tools" in config.keys()) and ("trimming" in config["tools"].keys())):
+if not ("trimming" in config.keys()):
     sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-TRIMMING_TOOLS = config["tools"]["trimming"].split()
+TRIMMING_TOOLS = config["trimming"].split()
 
 if (len(TRIMMING_TOOLS) != 0):
 
@@ -146,7 +151,7 @@ if (len(TRIMMING_TOOLS) != 0):
 
     if (SEQ_TYPE == "se"):
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
     #----------------------------------------------------------------#
@@ -160,7 +165,7 @@ if (len(TRIMMING_TOOLS) != 0):
 
         STRANDS     = config["metadata"]["strands"].split()
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
     else:
@@ -172,7 +177,7 @@ if (len(TRIMMING_TOOLS) != 0):
 # Reporting
 #----------------------------------------------------------------#
 
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "svg"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png"])
 
 #================================================================#
 #                        Rule all                                #
@@ -183,7 +188,7 @@ rule all:
 	Run the workflow.
 	"""
 	input: \
-            QC, \
-            GRAPHICS
+            QC#, \
+            #GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
