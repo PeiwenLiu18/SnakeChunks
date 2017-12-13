@@ -280,7 +280,7 @@ rule all:
             GET_FASTA,
 #            GENOMIC_FEAT,
             GENE_LIST,
-#            PEAK_MOTIFS,
+            PEAK_MOTIFS,
 #            HTML_REPORT,
             IGV_SESSION,
             GRAPHICS
