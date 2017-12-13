@@ -1,14 +1,21 @@
 
-#cts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
+#counts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
 #coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
 
+dir.main <- '~/FNR_analysis/'
+setwd(dir.main)
 
 library("DESeq2")
 
-cts <- read.table("cutadapt_bowtie2_featureCounts_all.txt", header=TRUE, row.names="gene")
+dir.counts <- 'RNA-seq/results/diffexpr'
+
+count.file <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+
+counts <- read.table(count.file, header=TRUE, row.names="gene")
+
 coldata <- read.table("samples_RNA-seq.tab", header=TRUE, row.names="sample")
 
-dds <- DESeqDataSetFromMatrix(countData=cts, colData=coldata, design=~condition)
+dds <- DESeqDataSetFromMatrix(countData=counts, colData=coldata, design=~condition)
 
 # remove uninformative columns
 dds <- dds[ rowSums(counts(dds)) > 1, ]
