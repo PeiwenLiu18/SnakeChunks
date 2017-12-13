@@ -6,5 +6,6 @@ channels:
   - r
   - bioconda
 dependencies:
-  - suds-jurko 
+  - suds-jurko
+  - urllib3
 ...
