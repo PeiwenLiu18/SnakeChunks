@@ -54,7 +54,7 @@ export PEAKSEQ={input}
 
 python {params.python_script} \
    -test ${{PEAKSEQ}} \
-   -graph_title {params.title} \
+   -graph_title "{params.title}" \
    -disco dyads \
    -motif_db regulonDB \
    -server fungi
