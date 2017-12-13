@@ -66,7 +66,8 @@ rule peak_motifs:
    -server fungi
 
 unzip -qq -d `dirname {params.prefix}` {params.prefix}.zip
-rm -rf {params.prefix} && mv -f {wildcards.caller_dir}/peak-motifs/peak-motifs_ws_*/ {params.prefix}
+
+rm -rf {params.prefix} && mv -f {wildcards.caller_dir}/peak-motifs/peak-motifs_ws_*/ {params.prefix} && rm {params.prefix}.zip
 """
 
 
