@@ -36,7 +36,7 @@ rule peak_motifs:
     input: "{caller_dir}/{peaks}.fasta"
     output: "{caller_dir}/peak-motifs/{peaks}_peak-motifs_synthesis.html"
     params:
-        python_script = "../../python_lib/peak-motifs_soap.py",
+        python_script = "SnakeChunks/scripts/python_lib/peak-motifs_soap.py",
         title = config["title"],
         bed_ctrl = "{caller_dir}/{peaks}.bed", \
         tasks = config["peak-motifs"]["tasks"], \
