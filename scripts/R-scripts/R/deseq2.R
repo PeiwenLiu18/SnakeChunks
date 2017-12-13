@@ -1,8 +1,7 @@
-# colData and countData must have the same sample order, but this is ensured
-# by the way we create the count matrix
+
 #cts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
 #coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
-#print(cts)
+
 
 library("DESeq2")
 
@@ -22,7 +21,7 @@ res <- results(dds, contrast=contrast)
 res <- lfcShrink(dds, contrast=contrast, res=res) 
 # sort by p-value
 res <- res[order(res$padj),]
-# TODO explore IHW usage
+
 
 
 # store results
