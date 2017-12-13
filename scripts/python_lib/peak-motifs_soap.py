@@ -231,6 +231,7 @@ if __name__ == '__main__':
 	parser.add_argument('-motif_db', '--motif_db', metavar='<MOTIF_DB>', type=str, nargs=1, help='Motif database(s) against which discovered motifs will be compared.', required=False)
 	parser.add_argument('-output', '--output', metavar='<OUTPUT>', type=str, nargs=1, help='Output mode for the RSAT Web services server. Supported: "server", "client", "both".', required=False)
 	parser.add_argument('-prefix', '--prefix', metavar='<PREFIX>', type=str, nargs=1, help='Prefix for the result archive (can include an existing path). Default: peak-motifs_result.zip. ', required=False)
+	parser.add_argument('-decompress', '--decompress',  action='store_true', help='Decompress the zip archive returned by peak-motifs. ')
 
         
 	################################ galaxy arguments ############################################################
@@ -375,10 +376,8 @@ if __name__ == '__main__':
 	urlResult=buildZipUrl(result.server)
 	print(urlResult)
 
-	#ogFile.write("\n"+urlResult)
-
 	###########################################################'
-	## Wait RSAT server
+	## Wait for RSAT server
 	while urllib.urlopen(urlResult).getcode() != 200:
 	#logFile.write(str(urllib.urlopen(urlResult).getcode())+"\n")
 		time.sleep(5)
@@ -400,23 +399,24 @@ if __name__ == '__main__':
 	###########################################################'
 	## Decompress results
 	#try:
-	zfile = zipfile.ZipFile(nameFile, 'r')
-	#except IOError:
-	#logFile.write("No zip file")
-	#Logger.error("No zip file")
-
-	tempflag = 0
-	folderName =""
-
-	for i in zfile.namelist():  ## On parcourt l'ensemble des fichiers de l'archive
-	
-		#logFile.write(i+"\n")
-		###############################
+        if args.decompress:
+                zfile = zipfile.ZipFile(nameFile, 'r')
+                #except IOError:
+                #logFile.write("No zip file")
+                #Logger.error("No zip file")
+                
+                tempflag = 0
+                folderName =""
+                
+                for i in zfile.namelist():  ## On parcourt l'ensemble des fichiers de l'archive
+                
+                        #logFile.write(i+"\n")
+                        ###############################
 			if tempflag ==0:
 				folderName = i
 		
 			tempflag = 1
-		###############################
+                        ###############################
 		
 			if i.endswith('/'):   ## S'il s'agit d'un repertoire, on se contente de creer le dossier 
 				os.makedirs(i)
@@ -425,34 +425,8 @@ if __name__ == '__main__':
 				fp = open(i, "wb")	  ## creation en local du nouveau fichier 
 				fp.write(data)		  ## ajout des donnees du fichier compresse dans le fichier local 
 				fp.close() 
-	zfile.close()
+                zfile.close()
 
-	#logFile.write("\n"+folderName+"\n")
-	#logFile.write("\n"+outGalaxyValue+"\n")
-
-
-
-
-	#os.popen("cp "+folderName+"peak-motifs_synthesis.html "+outGalaxyValue)
-	
-	#os.popen("sed -i \"1iHHEELLLOOO\" "+outGalaxyValue)
-	#os.popen("sed -i \"1i<style type=\'text/css\'></style>\" "+outGalaxyValue)
-
-	###########################################################'
-	##Create results folder name
-	#outGalaxyValueDir = outGalaxyValue.replace(".dat","_files")
-	
-	#logFile.write("\noutGalaxyValueDir : " +outGalaxyValueDir)
-
-	#logFile.close()
-
-	# Create results folder
-	#os.popen("mkdir "+outGalaxyValueDir)
-
-	# Copy results files in results folder
-	#os.popen("cp -R "+folderName+"data " + outGalaxyValueDir+"/data")
-	#os.popen("cp -R "+folderName+"reports " + outGalaxyValueDir+"/reports")
-	#os.popen("cp -R "+folderName+"results " + outGalaxyValueDir+"/results")
 
 
 
