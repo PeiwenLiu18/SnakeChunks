@@ -314,7 +314,7 @@ rule all:
 #            FEATURE_COUNTS_PER_SAMPLE,
             ALL_FEATURE_COUNTS,
             SARTOOLS_TARGETFILE,
-            DEG,
+#            DEG,
 #            INFER_TRANSCRIPTS,
             GRAPHICS
 	params: qsub=config["qsub"]
