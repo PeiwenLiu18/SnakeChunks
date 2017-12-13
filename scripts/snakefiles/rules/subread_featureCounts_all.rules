@@ -89,7 +89,7 @@ rule subread_featureCounts_all:
     conda: "../envs/subread.yaml"
     shell:"""
         featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
-        awk '{{print $1,$7}}' {output.featureCounts_output} > {output.twocol_output}
+        awk '($1 !~ "#") {{print $1,$7,$8,$9,$10}}' {output.featureCounts_output} > {output.twocol_output}
 """
 #    run:
 #        shell("featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}")
@@ -99,5 +99,12 @@ rule subread_featureCounts_all:
 #            write.table(new, file = "{output.twocol_output}", sep="\t", col.names=TRUE, row.names=FALSE, quote=FALSE)
 #        """)
 
+#featureCounts -a genome/Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.1.21.gtf  \
+#-o test.txt RNA-seq/results/samples/GSM1010244/GSM1010244_cutadapt_bowtie2_sorted_pos.bam \
+#RNA-seq/results/samples/GSM1010245/GSM1010245_cutadapt_bowtie2_sorted_pos.bam \
+#RNA-seq/results/samples/GSM1010246/GSM1010246_cutadapt_bowtie2_sorted_pos.bam \
+#RNA-seq/results/samples/GSM1010247/GSM1010247_cutadapt_bowtie2_sorted_pos.bam 
+# 
+#-g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
 
 
