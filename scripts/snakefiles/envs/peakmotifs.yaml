@@ -7,5 +7,6 @@ channels:
   - bioconda
 dependencies:
   - suds-jurko
+  - email_validator
   - urllib3
 ...
