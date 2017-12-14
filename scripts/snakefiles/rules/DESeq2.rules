@@ -54,7 +54,7 @@ rule DESeq2:
         sample_ids = read_table(config["metadata"]["samples"])['ID'],
         pAdjustMethod = config["DESeq2"]["pAdjustMethod"],
         alpha = config["DESeq2"]["alpha"],
-        rawsum_filter = config["DESeq2"]["rawSum"],
+        rawsum_filter = config["DESeq2"]["rawsum_filter"],
         qsub = config["qsub"] \
           + " -e " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.err" \
           + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.out"
