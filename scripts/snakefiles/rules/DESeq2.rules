@@ -1,104 +1,59 @@
+import sys
+import os
+
 # Set parameters
 if not "qsub" in config.keys():
     sys.exit("The parameter qsub must be defined in the config file")
 
-if not "samples" in config["dir"].keys():
-    sys.exit("The sample dir must be defined in the config file")
-
 if not "diffexpr" in config["dir"].keys():
     sys.exit("The diffexpr dir must be defined in the config file")
 
-if not "author" in config.keys():
-    sys.exit("The parameter qsub must be defined in the config file")
 
 if not "DESeq2" in config.keys():
     config["DESeq2"] = {}
 
-if not "featuresToRemove" in config["DESeq2"].keys():
-    config["DESeq2"]["featuresToRemove"] = "NULL"
-
-if not "varInt" in config["DESeq2"].keys():
-    config["DESeq2"]["varInt"] = "group"
-
-if not "condRef" in config["DESeq2"].keys():
-    config["DESeq2"]["condRef"] = "WT"
-
-if not "batch" in config["DESeq2"].keys():
-    config["DESeq2"]["batch"] = "NULL"
+if not "pAdjustMethod" in config["DESeq2"].keys():
+    config["DESeq2"]["pAdjustMethod"] = "BH"
 
 if not "alpha" in config["DESeq2"].keys():
     config["DESeq2"]["alpha"] = 0.05
 
-if not "pAdjustMethod" in config["DESeq2"].keys():
-    config["DESeq2"]["pAdjustMethod"] = "BH"
-
-if not "fitType" in config["DESeq2"].keys():
-    config["DESeq2"]["fitType"] = "parametric"
-
-if not "cooksCutoff" in config["DESeq2"].keys():
-    config["DESeq2"]["cooksCutoff"] = "TRUE"
-
-if not "independentFiltering" in config["DESeq2"].keys():
-    config["DESeq2"]["independentFiltering"] = "TRUE"
-
-if not "typeTrans" in config["DESeq2"].keys():
-    config["DESeq2"]["typeTrans"] = "VST"
-
-if not "locfunc" in config["DESeq2"].keys():
-    config["DESeq2"]["locfunc"] = "median"
+if not "rowsum_filter" in config["DESeq2"].keys():
+    config["DESeq2"]["rowsum_filter"] = 10
 
 # Rule
-rule sartools_DESeq2:
+rule DESeq2:
     """
     This rule is designed to perform differential expression analysis of RNA-seq data
-    with DESeq2, using the R package SARTools (https://github.com/PF2-pasteur-fr/SARTools/). 
-
-    It requires replicated data to run properly.
+    with DESeq2. It requires replicated data to run properly.
 
     Required parameters:
         config["qsub"]
-        config["author"]
-        config["dir"]["samples"]
         config["dir"]["diffexpr"]
+        config["metadata"]["samples"]
+        config["metadata"]["design"]
 
     Optional parameters:
-        config["DESeq2"]["featuresToRemove"]
-        config["DESeq2"]["varInt"]
-        config["DESeq2"]["condRef"]
-        config["DESeq2"]["batch"]
-        config["DESeq2"]["alpha"]
         config["DESeq2"]["pAdjustMethod"]
-        config["DESeq2"]["fitType"]
-        config["DESeq2"]["cooksCutoff"]
-        config["DESeq2"]["independentFiltering"]
-        config["DESeq2"]["typeTrans"]
-        config["DESeq2"]["locfunc"]
+        config["DESeq2"]["alpha"]
+        config["DESeq2"]["rowsum_filter"]
 
     Author: Claire Rioualen
     """
     input: 
-#        targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"
+        count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
     output: 
-#        report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
-        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
+        report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
+#        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
     params:
-        rscript = "../../R-scripts/R/deseq2.R",
-#        wd = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
-#        targetFile = "{preprocess,.*}SARTools_targetfile.txt",
-#        rawDir = "../../../../..",
-#        projectName = "{test}_vs_{ref}_{preprocess,.*}DESeq2",
-#        author = config["author"],
-#        featuresToRemove = config["DESeq2"]["featuresToRemove"],
-#        varInt = config["DESeq2"]["varInt"],
-#        condRef = config["DESeq2"]["condRef"],
-#        batch = config["DESeq2"]["batch"],
-#        alpha = config["DESeq2"]["alpha"],
-#        pAdjustMethod = config["DESeq2"]["pAdjustMethod"],
-#        fitType = config["DESeq2"]["fitType"],
-#        cooksCutoff = config["DESeq2"]["cooksCutoff"],
-#        independentFiltering = config["DESeq2"]["independentFiltering"],
-#        typeTrans = config["DESeq2"]["typeTrans"],
-#        locfunc = config["DESeq2"]["locfunc"],
+        rscript = "../../R-scripts/R/deseq2_test.R",
+        diffexpr_dir = config["dir"]["diffexpr"],
+        samples_tab = config["metadata"]["samples"],
+        design_tab = config["metadata"]["design"],
+        sample_ids = read_table(config["metadata"]["samples"])['ID'],
+        pAdjustMethod = config["DESeq2"]["pAdjustMethod"],
+        alpha = config["DESeq2"]["alpha"],
+        rowsum_filter = config["DESeq2"]["rowsum_filter"],
         qsub = config["qsub"] \
           + " -e " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.err" \
           + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.out"

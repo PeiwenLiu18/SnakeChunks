@@ -126,6 +126,7 @@ include: os.path.join(RULES, "bowtie2_index.rules")
 include: os.path.join(RULES, "bwa_index.rules")
 include: os.path.join(RULES, "bwa.rules")
 include: os.path.join(RULES, "cutadapt.rules")
+include: os.path.join(RULES, "DESeq2.rules")
 include: os.path.join(RULES, "dot_graph.rules")
 include: os.path.join(RULES, "dot_to_image.rules")
 include: os.path.join(RULES, "fastqc.rules")
@@ -133,11 +134,11 @@ include: os.path.join(RULES, "genome_coverage_bedgraph.rules")
 include: os.path.join(RULES, "genome_coverage_bedgraph_strands.rules")
 include: os.path.join(RULES, "get_chrom_sizes.rules")
 include: os.path.join(RULES, "index_bam.rules")
-include: os.path.join(RULES, "sartools_DESeq2.rules")
-include: os.path.join(RULES, "sartools_edgeR.rules")
-include: os.path.join(RULES, "sartools_targetfile.rules")
+#include: os.path.join(RULES, "sartools_DESeq2.rules")
+#include: os.path.join(RULES, "sartools_edgeR.rules")
+#include: os.path.join(RULES, "sartools_targetfile.rules")
 include: os.path.join(RULES, "subread_align.rules")
-include: os.path.join(RULES, "subread_featureCounts.rules")
+#include: os.path.join(RULES, "subread_featureCounts.rules")
 include: os.path.join(RULES, "subread_featureCounts_all.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "tophat.rules")
@@ -280,9 +281,11 @@ ALL_FEATURE_COUNTS          = expand(DEG_DIR + "/{prefix}_{read_counts}_all.txt"
 # DEG analysis
 #----------------------------------------------------------------#
 
-SARTOOLS_TARGETFILE = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_SARTools_targetfile.txt", test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS)
+#SARTOOLS_TARGETFILE = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_SARTools_targetfile.txt", test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS)
 DEG = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_report.html", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 #GENE_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.tab", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
+
+DESEQ2 = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_report.html", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 
 ##----------------------------------------------------------------#
 ## Transcripts search
@@ -313,7 +316,8 @@ rule all:
 #            ALL_COVERAGE,
 #            FEATURE_COUNTS_PER_SAMPLE,
             ALL_FEATURE_COUNTS,
-            SARTOOLS_TARGETFILE,
+#            SARTOOLS_TARGETFILE,
+            DESEQ2,
 #            DEG,
 #            INFER_TRANSCRIPTS,
             GRAPHICS
