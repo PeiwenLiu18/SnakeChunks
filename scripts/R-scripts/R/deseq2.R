@@ -3,6 +3,7 @@
 #coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
 
 ## QUESTIONS for Claire
+## - Il faut lire le fichier VolcanoPlots.R avec la commande R source()
 ## - Tab-separated value extension: tsv or tab ? Now people use "tsv"
 ## - a design file can contain several comparisons between two conditions -> one separate folder per comparison ?
 ## - design file: is there a reason for specifying the reference in the first column and the test in the second one ? This is somewhat confusing since in the output we have test_vs_ref
@@ -119,9 +120,38 @@ for (i in 1:nrow(design)) {
   file.prefix <- file.path(dir.output, paste(sep="_", test.condition, "vs", ref.condition))
   
   ## Draw an MA plot
-  pdf(paste(sep="_", file.prefix, "ma_plot.pdf"))
+  pdf(paste(sep="", file.prefix, "_ma_plot.pdf"), width = 7, height = 7)
   plotMA(res.sorted)
   silence <- dev.off()
+  
+  ## Volcano plot
+  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
+  VolcanoPlot(multitest.table = res.frame, 
+              main=paste(sep="", test.condition, " vs ", ref.condition),
+              alpha = parameters[["alpha"]],
+              effect.size.col = "log2FoldChange",
+              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1)
+  silence <- dev.off()
+  
+  ## P-value histogram (unadjusted p-values)
+  pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 7, height = 5)
+  hist(res.frame$pvalue, main="P-value histogram", 
+       breaks=seq(from=0, to=1, by=0.05),
+       col="#BBDDFF", xlab="Nominal p-value", ylab="Number of genes", las=1)
+  ## Estimate the number of genes under null hypothesis
+  m <- nrow(res.frame) ## Number of genes
+  m0 <- min(2*sum(res.frame$pvalue >= 0.5), m)
+  m1 <- m - m0
+  abline(h=m0/20, lty="dashed")
+  legend("topright", legend = c(
+    paste("m = ", m),
+    paste("m0 = ", m0),
+    paste("m1 = ", m1),
+    paste("DEG = ", sum(DEG.genes)),
+    paste("Sn = ", signif(digits=2, sum(DEG.genes) / m1))
+  ))
+  silence <- dev.off()
+  
   
   
   ## Print a result table with all genes
