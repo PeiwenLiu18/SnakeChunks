@@ -44,7 +44,7 @@ rule DESeq2:
         count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
     output: 
         gene_table = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_all_genes.tsv",
-        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_DEG_BH_alpha0.05_genes.txt"
+        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_gene_list.txt"
     params:
         rscript = "../../R-scripts/R/deseq2.R",
         outdir = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",

@@ -179,8 +179,9 @@ silence <- dev.off()
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
-  
+#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
+              file=paste(sep="", file.prefix, "_deseq2_gene_list.txt")) ## snakemake@output[["gene_list"]]
+
   list.files(dir.output)
   # system(paste("open", dir.output)) ## to check the results; only works for Mac
 }
