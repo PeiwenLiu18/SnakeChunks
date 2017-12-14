@@ -48,7 +48,7 @@ rule DESeq2:
     params:
         rscript = "../../R-scripts/R/deseq2_test.R",
         diffexpr_dir = config["dir"]["diffexpr"],
-        samples_tab = config["metadata"]["samples"],
+        sample_tab = config["metadata"]["samples"],
         design_tab = config["metadata"]["design"],
         sample_ids = read_table(config["metadata"]["samples"])['ID'],
         pAdjustMethod = config["DESeq2"]["pAdjustMethod"],
