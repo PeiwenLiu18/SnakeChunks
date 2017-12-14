@@ -43,7 +43,7 @@ rule DESeq2:
     input: 
         count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
     output: 
-        touch("{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html")
+        report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
 #        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
     params:
         rscript = "../../R-scripts/R/deseq2_test.R",
