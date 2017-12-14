@@ -7,7 +7,7 @@
 ## > J'ai repris la structure de dossiers que j'utilisais avec SARTools (et qui est similaire à celle du ChIP-seq)
 ## - design file: is there a reason for specifying the reference in the first column and the test in the second one ? This is somewhat confusing since in the output we have test_vs_ref
 ## > I can't remember, normally columns are read using the headers so it shouldn't matter
-## - can we assume that the order of the columns in the design file is the same as rows in the sample description table ?
+## - can we assume that the order of the columns in the design file is the same as rows in the sample description table ?
 ## > You mean the columns in the count file? I think yes but I'm not 100% sure
 ## - Is there a way to pass an optional list of parameters from snakemake to R in the same way as the "..." specification for function headers ?
 ## > I don't think I understand what you mean
@@ -22,9 +22,24 @@ dir.counts <- snakemake@params[["diffexpr_dir"]] # 'RNA-seq/results/diffexpr'
 parameters <- list()
 
 ## DESeq2 parameters
-parameters[["pAdjustMethod"]] <- snakemake@params[["pAdjustMethod"]] # "BH" ## Correction for multiple testing
-parameters[["alpha"]] <- snakemake@params[["alpha"]] # 0.05 ## Threshold on adjusted p-value
-parameters[["rowsum_filter"]] <- snakemake@params[["rowsum_filter"]] # 10 ## Threshold on row sums, to filter out undetected genes
+parameters$pAdjustMethod <- snakemake@params[["pAdjustMethod"]] # "BH" ## Correction for multiple testing
+parameters$alpha <- as.numeric(snakemake@params[["alpha"]]) # 0.05 ## Threshold on adjusted p-value
+parameters$rowsum_filter <- snakemake@params[["rowsum_filter"]] # 10 ## Threshold on row sums, to filter out undetected genes
+
+if ((!is.numeric(parameters$alpha)) 
+    || (parameters$alpha < 0) 
+    || (parameters$alpha > 1)) {
+  stop(parameters$alpha, " (", class(parameters$alpha), ")  is not a valid value for alpha. Must be number between 0 and 1. ")
+}
+if ((!is.numeric(parameters$rowsum_filter)) 
+    || (parameters$rowsum_filter < 0)) {
+  stop(parameters$rowsum_filter, " (", class(parameters$rowsum_filter), ")  is not a valid value for alpha. Must be a positive number. ")
+}
+
+#message("alpha = ", parameters$alpha, "; is.numeric(alpha) = ", is.numeric(parameters$alpha), 
+#        "; as.numeric(alpha) = ", as.numeric(parameters$alpha),
+#        "; is.numeric(as.numeric(alpha)) = ", is.numeric(as.numeric(parameters$alpha)))
+
 
 ## Data and design
 parameters[["sample.ids"]] <- snakemake@params[["sample_ids"]]
@@ -88,7 +103,7 @@ for (i in 1:nrow(design)) {
   
   # remove uninformative columns ## ???? rows, genes
   ## Filter out genes with zero counts in all samples
-  dds <- dds[ rowSums(counts(dds)) > parameters[["rowsum_filter"]], ]
+  dds <- dds[ rowSums(counts(dds)) > parameters$rowsum_filter, ]
   
   # Normalization, preprocessing and differential analysis
   dds <- DESeq(dds)
@@ -96,8 +111,8 @@ for (i in 1:nrow(design)) {
   ## Extract the result
   contrast <- c("Condition", c("FNR", "WT"))
   res <- results(dds, contrast=contrast, 
-                 alpha = parameters[["alpha"]],
-                 independentFiltering=FALSE, pAdjustMethod = "BH")  ## Collect the result table
+                 alpha = parameters$alpha,
+                 independentFiltering=FALSE, pAdjustMethod = parameters$pAdjustMethod)  ## Collect the result table
   dim(res)
   
   ## CLAIRE: la fonction suivante n'existe apparemment pas dans DESeq2
@@ -116,7 +131,7 @@ for (i in 1:nrow(design)) {
   # head(res.frame)
   
   ## Select differentially expressed genes
-  DEG.genes <- res.frame$padj < parameters[["alpha"]]
+  DEG.genes <- res.frame$padj < parameters$alpha
   
   ################ Export result files ################
   message("Exporting results to directory ", dir.output)
@@ -125,7 +140,7 @@ for (i in 1:nrow(design)) {
   
   ## Draw an MA plot
   pdf(snakemake@output[["ma_plot"]], width = 7, height = 7)
-  DESeq2::plotMA(res.sorted, alpha=parameters[["alpha"]], las=1)
+  DESeq2::plotMA(res.sorted, alpha=parameters$alpha, las=1)
   grid()
   silence <- dev.off()
   
@@ -134,7 +149,7 @@ for (i in 1:nrow(design)) {
   pdf(snakemake@output[["volcano_plot"]], width = 7, height = 7)
   VolcanoPlot(multitest.table = res.frame, 
               main=paste(sep="", test.condition, " vs ", ref.condition),
-              alpha = parameters[["alpha"]],
+              alpha = parameters$alpha,
               effect.size.col = "log2FoldChange",
               control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
   silence <- dev.off()
@@ -179,13 +194,13 @@ silence <- dev.off()
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
+#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
               file=snakemake@output[["gene_pval"]])
 
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
-#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
+#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
               file=snakemake@output[["gene_list"]])
 
   list.files(dir.output)
