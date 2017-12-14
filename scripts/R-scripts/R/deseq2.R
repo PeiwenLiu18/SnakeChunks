@@ -124,22 +124,23 @@ for (i in 1:nrow(design)) {
   file.prefix <- file.path(dir.output, paste(sep="_", test.condition, "vs", ref.condition))
   
   ## Draw an MA plot
-  pdf(paste(sep="", file.prefix, "_ma_plot.pdf"), width = 7, height = 7)
+  pdf(snakemake@output[["ma_plot"]], width = 7, height = 7)
   DESeq2::plotMA(res.sorted, alpha=parameters[["alpha"]], las=1)
   grid()
   silence <- dev.off()
   
-#  ## Volcano plot
-#  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
-#  VolcanoPlot(multitest.table = res.frame, 
-#              main=paste(sep="", test.condition, " vs ", ref.condition),
-#              alpha = parameters[["alpha"]],
-#              effect.size.col = "log2FoldChange",
-#              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
-#  silence <- dev.off()
+  ## Volcano plot
+  source("VolcanoPlot.R")
+  pdf(snakemake@output[["volcano_plot"]], width = 7, height = 7)
+  VolcanoPlot(multitest.table = res.frame, 
+              main=paste(sep="", test.condition, " vs ", ref.condition),
+              alpha = parameters[["alpha"]],
+              effect.size.col = "log2FoldChange",
+              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
+  silence <- dev.off()
 
 ## P-value histogram (unadjusted p-values)
-pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 8, height = 6)
+pdf(snakemake@output[["pval_histo"]], width = 8, height = 6)
 
 hist(res.frame$pvalue, main="P-value histogram", 
      breaks=seq(from=0, to=1, by=0.05),
@@ -178,8 +179,9 @@ silence <- dev.off()
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
-  
+#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
+              file=snakemake@output[["gene_pval"]])
+
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
