@@ -279,7 +279,7 @@ ALL_FEATURE_COUNTS          = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix
 
 DIFFEXPR_TOOLS = config["diffexpr"].split()
 DEG_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
-print(DEG_LIST)
+
 #SARTOOLS_TARGETFILE = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_SARTools_targetfile.txt", test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS)
 #DEG = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_report.html", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 #GENE_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.tab", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
