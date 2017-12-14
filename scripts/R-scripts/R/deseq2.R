@@ -134,7 +134,7 @@ for (i in 1:nrow(design)) {
   silence <- dev.off()
   
   ## P-value histogram (unadjusted p-values)
-  pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 7, height = 5)
+  pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 8, height = 6)
   
   hist(res.frame$pvalue, main="P-value histogram", 
        breaks=seq(from=0, to=1, by=0.05),
