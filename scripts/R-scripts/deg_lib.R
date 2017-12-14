@@ -205,8 +205,7 @@ complete.deg.table <- function(deg.table,
     }
   }
   
-  ################################################################
-  ## Export figures
+  ################# Export figures   
   if (!is.null(dir.figures)) {
     verbose(paste("\tSaving figures in directory", dir.figures), 2)
     dir.create(dir.figures, showWarnings = FALSE, recursive = TRUE)
@@ -297,8 +296,7 @@ functional.enrichment <- function(geneset,
     envir[suffix] <- paste(sep="", envir["prefix"],suffix)
   }
   
-  ################################################################
-  ## Run over-representation analysis with GOstats
+  ############## Run over-representation analysis with GOstats 
   if (run.GOstats) {
     library("GOstats")
     
@@ -547,7 +545,6 @@ rnaseq.volcanoPlot <- function(deg.table,
 }
 
 
-################################################################
 ## Compute sample-wise statistics
 calc.stats.per.sample <- function(sample.descriptions, 
                                   count.table) {
@@ -583,8 +580,7 @@ calc.stats.per.sample <- function(sample.descriptions,
   return(stats.per.sample)
 }
 
-################################################################
-## Draw a barplot with the number of reads per sample
+########## Draw a barplot with the number of reads per sample 
 libsize.barplot <- function(stats.per.sample, 
                             main="Read library sizes (libsum per sample)",
                             plot.file=NULL, 
@@ -613,8 +609,7 @@ libsize.barplot <- function(stats.per.sample,
   }
 }
 
-################################################################
-## Draw boxplots with read counts per genes for each sample
+########## Draw boxplots with read counts per genes for each sample ################
 count.boxplot <- function(count.table, 
                           sample.desc,
                           sample.label.col=1,
@@ -642,8 +637,7 @@ count.boxplot <- function(count.table,
   }
 }
 
-################################################################
-## Draw a heatmap with the inter-sample correlation matrix.
+## Draw a heatmap with the inter-sample correlation matrix. ###########
 count.correl.heatmap <- function(count.table, 
                                  main="Correlation between raw counts",
                                  plot.file=NULL,
