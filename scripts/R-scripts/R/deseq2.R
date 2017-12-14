@@ -153,6 +153,7 @@ n.genes <- nrow(res.frame) ## Number of genes
 
 ## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
 ## based on the method defined by Storey and Tibshirani (2003).
+m <- nrow(res.frame)
 n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
 n1 <- m - n0
 abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
