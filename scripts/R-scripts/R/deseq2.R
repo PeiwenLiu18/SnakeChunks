@@ -85,27 +85,45 @@ design <- read.table(parameters[["design_file"]], header=TRUE, row.names = NULL)
 # colnames(counts) == rownames(coldata)
 colnames(counts) <- rownames(coldata)
 
-
-dds <- DESeqDataSetFromMatrix(countData=counts, colData=coldata, design = ~Condition)
-
-# remove uninformative columns ## ???? rows, genes
-## Filter out genes with zero counts in all samples
-dds <- dds[ rowSums(counts(dds)) > 1, ]
-# normalization and preprocessing
-dds <- DESeq(dds)
-
-contrast <- c("condition", c("FNR", "WT"))
-res <- results(dds, contrast=contrast)
-# shrink fold changes for lowly expressed genes
-res <- lfcShrink(dds, contrast=contrast, res=res) 
-# sort by p-value
-res <- res[order(res$padj),]
-
-
-
-# store results
-pdf("ma_plot.pdf")
-plotMA(res, ylim=c(-2,2))
-dev.off()
-
-write.table(as.data.frame(res), file="deseq2_res.tab")
+## Iterate over each line of the design file
+i <- 1
+for (i in 1:nrow(design)) {
+  ## Select samples according to the design
+  analysis <- design[i]
+  ref.condition <- design[i, 1]
+  test.condition <- design[i, 2]
+  
+  ref.samples <- row.names(coldata)[as.vector(coldata$Condition) == ref.condition]
+  test.samples <- row.names(coldata)[as.vector(coldata$Condition) == test.condition]
+  
+  message ("Analysis ", i, "/", nrow(design), 
+           "; ref condition: ", ref.condition, " (", length(ref.samples)," samples)",
+           "; test condition: ", test.condition, " (", length(test.samples)," samples)")  
+  
+  selected.samples <- c(ref.samples, test.samples)
+  dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples], design = ~Condition)
+  dds$condition <- relevel(deseq2.dds$condition, ref=cond2) 
+  
+  # remove uninformative columns ## ???? rows, genes
+  ## Filter out genes with zero counts in all samples
+  dds <- dds[ rowSums(counts(dds)) > 1, ]
+  
+  # normalization and preprocessing
+  dds <- DESeq(dds)
+  
+  contrast <- c("condition", c("FNR", "WT"))
+  res <- results(dds, contrast=contrast)
+  # shrink fold changes for lowly expressed genes
+  res <- lfcShrink(dds, contrast=contrast, res=res) 
+  # sort by p-value
+  res <- res[order(res$padj),]
+  
+  
+  
+  # store results
+  pdf("ma_plot.pdf")
+  plotMA(res, ylim=c(-2,2))
+  dev.off()
+  
+  write.table(as.data.frame(res), file="deseq2_res.tab")
+}
