@@ -43,10 +43,11 @@ rule DESeq2:
     input: 
         count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
     output: 
-        report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
-#        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
+        gene_table = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_all_genes.tsv",
+        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_DEG_BH_alpha0.05_genes.txt"
     params:
         rscript = "../../R-scripts/R/deseq2_test.R",
+        outdir = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
         diffexpr_dir = config["dir"]["diffexpr"],
         sample_tab = config["metadata"]["samples"],
         design_tab = config["metadata"]["design"],
