@@ -1,14 +1,16 @@
-
-#counts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
-#coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
-
-## QUESTIONS for Claire
+## QUESTIONS for Claire / answers following
 ## - Il faut lire le fichier VolcanoPlots.R avec la commande R source()
+## > À quel moment/quel endroit ? J'ai commenté le passage en attendant 
 ## - Tab-separated value extension: tsv or tab ? Now people use "tsv"
+## > OK
 ## - a design file can contain several comparisons between two conditions -> one separate folder per comparison ?
+## > J'ai repris la structure de dossiers que j'utilisais avec SARTools (et qui est similaire à celle du ChIP-seq)
 ## - design file: is there a reason for specifying the reference in the first column and the test in the second one ? This is somewhat confusing since in the output we have test_vs_ref
-## - can we assume that the order of the columns in the design file is the same as rows in the sample description table ?
+## > I can't remember, normally columns are read using the headers so it shouldn't matter
+## - can we assume that the order of the columns in the design file is the same as rows in the sample description table ?
+## > You mean the columns in the count file? I think yes but I'm not 100% sure
 ## - Is there a way to pass an optional list of parameters from snakemake to R in the same way as the "..." specification for function headers ?
+## > I don't think I understand what you mean
 
 dir.main <- getwd() # '~/FNR_analysis/'
 print(dir.main)
@@ -101,6 +103,7 @@ for (i in 1:nrow(design)) {
   ## CLAIRE: la fonction suivante n'existe apparemment pas dans DESeq2
   # shrink fold changes for lowly expressed genes
   # res <- lfcShrink(dds, contrast=contrast, res=res) 
+  # > Oui je crois qu'elle a disparu entre deux versions de DESeq2, mais ce n'est pas indispensable
   
   
   # sort by p-value
@@ -180,7 +183,7 @@ silence <- dev.off()
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
 #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
-              file=snakemake@output[["gene_list"]]))
+              file=snakemake@output[["gene_list"]])
 
   list.files(dir.output)
   # system(paste("open", dir.output)) ## to check the results; only works for Mac
