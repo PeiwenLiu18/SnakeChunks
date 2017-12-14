@@ -1,6 +1,3 @@
-
-from snakemake.utils import R
-
 # Set parameters
 if not "qsub" in config.keys():
     sys.exit("The parameter qsub must be defined in the config file")
@@ -10,9 +7,6 @@ if not "gtf_file" in config["genome"].keys():
 
 if not "genome" in config["dir"].keys():
     sys.exit("Genome directory must be defined in the config file")
-
-#if not "base" in config["dir"].keys():
-#    sys.exit("Dir base must be defined in the config file")
 
 if not "subread-featureCounts" in config.keys():
     config["subread-featureCounts"] = {}
