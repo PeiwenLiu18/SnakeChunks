@@ -130,7 +130,7 @@ for (i in 1:nrow(design)) {
   silence <- dev.off()
   
   ## Volcano plot
-  source("VolcanoPlot.R")
+  source("SnakeChunks/scripts/R-scripts/R/VolcanoPlot.R")
   pdf(snakemake@output[["volcano_plot"]], width = 7, height = 7)
   VolcanoPlot(multitest.table = res.frame, 
               main=paste(sep="", test.condition, " vs ", ref.condition),
