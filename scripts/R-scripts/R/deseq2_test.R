@@ -31,7 +31,7 @@ parameters[["design_file"]] <- snakemake@params[["design_tab"]] # file.path(dir.
 parameters[["count_file"]] <- snakemake@input[["count_file"]] # file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
 
 ## Output directory
-parameters[["output_dir"]] <- file.path(dir.counts, "DEG", "DESeq2")
+parameters[["output_dir"]] <- snakemake@params[["outdir"]] # file.path(dir.counts, "DEG", "DESeq2")
 
 ## Create output directory if required
 dir.output <- parameters[["output_dir"]]
@@ -158,17 +158,17 @@ for (i in 1:nrow(design)) {
   ## Print a result table with all genes
   write.table(res.frame, row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv"))
+              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv")) ## snakemake@output[["gene_table"]]
   
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
+              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
   
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt"))
+              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
   
   list.files(dir.output)
   # system(paste("open", dir.output)) ## to check the results; only works for Mac
