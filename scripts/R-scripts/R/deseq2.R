@@ -135,21 +135,32 @@ for (i in 1:nrow(design)) {
   
   ## P-value histogram (unadjusted p-values)
   pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 7, height = 5)
+  
   hist(res.frame$pvalue, main="P-value histogram", 
        breaks=seq(from=0, to=1, by=0.05),
-       col="#BBDDFF", xlab="Nominal p-value", ylab="Number of genes", las=1)
+       col="#CC6666", xlab="Nominal p-value", ylab="Number of genes", las=1)
+  
+  ## Highlight number of genes declared positive
+  hist(unlist(res.frame[!DEG.genes, "pvalue"]), 
+       breaks=seq(from=0, to=1, by=0.05), add = TRUE, col="#BBDDFF")
   ## Estimate the number of genes under null hypothesis
-  m <- nrow(res.frame) ## Number of genes
-  m0 <- min(2*sum(res.frame$pvalue >= 0.5), m)
-  m1 <- m - m0
-  abline(h=m0/20, lty="dashed")
-  legend("topright", legend = c(
-    paste("m = ", m),
-    paste("m0 = ", m0),
-    paste("m1 = ", m1),
-    paste("DEG = ", sum(DEG.genes)),
-    paste("Sn = ", signif(digits=2, sum(DEG.genes) / m1))
-  ))
+  n.genes <- nrow(res.frame) ## Number of genes
+  
+  ## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
+  ## based on the method defined by Storey and Tibshirani (2003).
+  n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
+  n1 <- m - n0
+  abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
+  legend("topright", 
+         legend = c(
+           paste("N = ", n.genes),
+           paste("n0 = ", n0),
+           paste("n1 = ", n1),
+           paste("DEG = ", sum(DEG.genes)),
+           paste("Sn = ", signif(digits=2, sum(DEG.genes) / n1))
+         ), 
+         lty=c("solid", "dashed", "solid", "solid", "solid"), 
+         lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
   silence <- dev.off()
   
   
