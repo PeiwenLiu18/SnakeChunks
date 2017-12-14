@@ -10,27 +10,28 @@
 ## - can we assume that the order of the columns in the design file is the same as rows in the sample description table ?
 ## - Is there a way to pass an optional list of parameters from snakemake to R in the same way as the "..." specification for function headers ?
 
-dir.main <- '~/FNR_analysis/'
+dir.main <- getwd() # '~/FNR_analysis/'
+print(dir.main)
 setwd(dir.main)
-dir.counts <- 'RNA-seq/results/diffexpr'
+dir.counts <- snakemake@params[["diffexpr_dir"]] # 'RNA-seq/results/diffexpr'
 
 ################ Parameter values ################
 ## (THESE SHOULD BE PASSED VIA SNAKEMAKE)
 parameters <- list()
 
 ## DESeq2 parameters
-parameters[["pAdjustMethod"]] <- "BH" ## Correction for multiple testing
-parameters[["alpha"]] <- 0.05 ## Threshold on adjusted p-value
-parameters[["rowsum_filter"]] <- 10 ## Threshold on row sums, to filter out undetected genes
+parameters[["pAdjustMethod"]] <- snakemake@params[["pAdjustMethod"]] # "BH" ## Correction for multiple testing
+parameters[["alpha"]] <- snakemake@params[["alpha"]] # 0.05 ## Threshold on adjusted p-value
+parameters[["rowsum_filter"]] <- snakemake@params[["rowsum_filter"]] # 10 ## Threshold on row sums, to filter out undetected genes
 
 ## Data and design
-parameters[["sample.ids"]] <- "" ##
-parameters[["sample_table"]] <- file.path(dir.main, "metadata", "samples_RNA-seq.tab")
-parameters[["design_file"]] <- file.path(dir.main, "metadata", "design_RNA-seq.tab")
-parameters[["count_file"]] <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+parameters[["sample.ids"]] <- snakemake@params[["sample_ids"]]
+parameters[["sample_table"]] <- snakemake@params[["sample_tab"]] # file.path(dir.main, "metadata", "samples_RNA-seq.tab")
+parameters[["design_file"]] <- snakemake@params[["design_tab"]] # file.path(dir.main, "metadata", "design_RNA-seq.tab")
+parameters[["count_file"]] <- snakemake@input[["count_file"]] # file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
 
 ## Output directory
-parameters[["output_dir"]] <- file.path(dir.counts, "DEG", "DESeq2")
+parameters[["output_dir"]] <- snakemake@params[["outdir"]] # file.path(dir.counts, "DEG", "DESeq2")
 
 ## Create output directory if required
 dir.output <- parameters[["output_dir"]]
@@ -125,61 +126,60 @@ for (i in 1:nrow(design)) {
   grid()
   silence <- dev.off()
   
-  ## Volcano plot
-  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
-  VolcanoPlot(multitest.table = res.frame, 
-              main=paste(sep="", test.condition, " vs ", ref.condition),
-              alpha = parameters[["alpha"]],
-              effect.size.col = "log2FoldChange",
-              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
-  silence <- dev.off()
-  
-  ## P-value histogram (unadjusted p-values)
-  pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 8, height = 6)
-  
-  hist(res.frame$pvalue, main="P-value histogram", 
-       breaks=seq(from=0, to=1, by=0.05),
-       col="#CC6666", xlab="Nominal p-value", ylab="Number of genes", las=1)
-  
-  ## Highlight number of genes declared positive
-  hist(unlist(res.frame[!DEG.genes, "pvalue"]), 
-       breaks=seq(from=0, to=1, by=0.05), add = TRUE, col="#BBDDFF")
-  ## Estimate the number of genes under null hypothesis
-  n.genes <- nrow(res.frame) ## Number of genes
-  
-  ## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
-  ## based on the method defined by Storey and Tibshirani (2003).
-  n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
-  n1 <- m - n0
-  abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
-  legend("topright", 
-         legend = c(
-           paste("N = ", n.genes),
-           paste("n0 = ", n0),
-           paste("n1 = ", n1),
-           paste("DEG = ", sum(DEG.genes)),
-           paste("Sn = ", signif(digits=2, sum(DEG.genes) / n1))
-         ), 
-         lty=c("solid", "dashed", "solid", "solid", "solid"), 
-         lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
-  silence <- dev.off()
-  
-  
-  
+#  ## Volcano plot
+#  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
+#  VolcanoPlot(multitest.table = res.frame, 
+#              main=paste(sep="", test.condition, " vs ", ref.condition),
+#              alpha = parameters[["alpha"]],
+#              effect.size.col = "log2FoldChange",
+#              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
+#  silence <- dev.off()
+
+## P-value histogram (unadjusted p-values)
+pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 8, height = 6)
+
+hist(res.frame$pvalue, main="P-value histogram", 
+     breaks=seq(from=0, to=1, by=0.05),
+     col="#CC6666", xlab="Nominal p-value", ylab="Number of genes", las=1)
+
+## Highlight number of genes declared positive
+hist(unlist(res.frame[!DEG.genes, "pvalue"]), 
+     breaks=seq(from=0, to=1, by=0.05), add = TRUE, col="#BBDDFF")
+## Estimate the number of genes under null hypothesis
+n.genes <- nrow(res.frame) ## Number of genes
+
+## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
+## based on the method defined by Storey and Tibshirani (2003).
+n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
+n1 <- m - n0
+abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
+legend("topright", 
+       legend = c(
+         paste("N = ", n.genes),
+         paste("n0 = ", n0),
+         paste("n1 = ", n1),
+         paste("DEG = ", sum(DEG.genes)),
+         paste("Sn = ", signif(digits=2, sum(DEG.genes) / n1))
+       ), 
+       lty=c("solid", "dashed", "solid", "solid", "solid"), 
+       lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
+silence <- dev.off()
+
+
   ## Print a result table with all genes
   write.table(res.frame, row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv"))
+              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv")) ## snakemake@output[["gene_table"]]
   
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
+              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
   
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="", file.prefix, "deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt"))
+              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
   
   list.files(dir.output)
   # system(paste("open", dir.output)) ## to check the results; only works for Mac
