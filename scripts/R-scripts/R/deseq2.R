@@ -121,7 +121,8 @@ for (i in 1:nrow(design)) {
   
   ## Draw an MA plot
   pdf(paste(sep="", file.prefix, "_ma_plot.pdf"), width = 7, height = 7)
-  plotMA(res.sorted)
+  DESeq2::plotMA(res.sorted, alpha=parameters[["alpha"]], las=1)
+  grid()
   silence <- dev.off()
   
   ## Volcano plot
@@ -130,7 +131,7 @@ for (i in 1:nrow(design)) {
               main=paste(sep="", test.condition, " vs ", ref.condition),
               alpha = parameters[["alpha"]],
               effect.size.col = "log2FoldChange",
-              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1)
+              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
   silence <- dev.off()
   
   ## P-value histogram (unadjusted p-values)
