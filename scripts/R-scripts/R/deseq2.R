@@ -13,14 +13,22 @@ dir.main <- '~/FNR_analysis/'
 setwd(dir.main)
 dir.counts <- 'RNA-seq/results/diffexpr'
 
-## Parameter values (THESE SHOULD BE PASSED VIA SNAKEMAKE)
+################ Parameter values ################
+## (THESE SHOULD BE PASSED VIA SNAKEMAKE)
 parameters <- list()
+
+## DESeq2 parameters
 parameters[["pAdjustMethod"]] <- "BH" ## Correction for multiple testing
 parameters[["alpha"]] <- 0.05 ## Threshold on adjusted p-value
+parameters[["rowsum_filter"]] <- 10 ## Threshold on row sums, to filter out undetected genes
+
+## Data and design
 parameters[["sample.ids"]] <- "" ##
 parameters[["sample_table"]] <- file.path(dir.main, "metadata", "samples_RNA-seq.tab")
 parameters[["design_file"]] <- file.path(dir.main, "metadata", "design_RNA-seq.tab")
 parameters[["count_file"]] <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+
+## Output directory
 parameters[["output_dir"]] <- file.path(dir.counts, "DEG", "DESeq2")
 
 ## Create output directory if required
@@ -76,7 +84,7 @@ for (i in 1:nrow(design)) {
   
   # remove uninformative columns ## ???? rows, genes
   ## Filter out genes with zero counts in all samples
-  dds <- dds[ rowSums(counts(dds)) > 1, ]
+  dds <- dds[ rowSums(counts(dds)) > parameters[["rowsum_filter"]], ]
   
   # Normalization, preprocessing and differential analysis
   dds <- DESeq(dds)
@@ -94,21 +102,27 @@ for (i in 1:nrow(design)) {
   
   
   # sort by p-value
-  res <- res[order(res$padj),]
-  View(data.frame(res))
+  res.sorted <- res[order(res$padj),]
+  # View(data.frame(res.sorted))
+
+  ## Build a data.frame for export
+  res.frame <- cbind("gene" = row.names(res.sorted), data.frame(res.sorted))
+  # names(res.frame)
+  # head(res.frame)
   
+  ## Select differentially expressed genes
+  DEG.genes <- res.frame$padj < parameters[["alpha"]]
+  
+  ################ Export result files ################
+  message("Exporting results to directory ", dir.output)
   ## Build prefix from conditions
   file.prefix <- file.path(dir.output, paste(sep="_", test.condition, "vs", ref.condition))
   
-  # MA plot
+  ## Draw an MA plot
   pdf(paste(sep="_", file.prefix, "ma_plot.pdf"))
-  plotMA(res)
+  plotMA(res.sorted)
   silence <- dev.off()
   
-  ## Build a data.frame for export
-  res.frame <- cbind("gene" = row.names(res), data.frame(res))
-  # names(res.frame)
-  # head(res.frame)
   
   ## Print a result table with all genes
   write.table(res.frame, row.names = FALSE, col.names=TRUE,
@@ -116,7 +130,6 @@ for (i in 1:nrow(design)) {
               file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv"))
   
   ## Print a result table with genes passing the threshold
-  DEG.genes <- res.frame$padj < parameters[["alpha"]]
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
               file=paste(sep="", file.prefix, "deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], ".tsv"))
