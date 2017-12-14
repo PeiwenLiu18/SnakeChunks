@@ -12,18 +12,6 @@ if not "diffexpr" in config["dir"].keys():
 if not "DESeq2" in config.keys():
     config["DESeq2"] = {}
 
-#if not "featuresToRemove" in config["DESeq2"].keys():
-#    config["DESeq2"]["featuresToRemove"] = "NULL"
-
-#if not "varInt" in config["DESeq2"].keys():
-#    config["DESeq2"]["varInt"] = "group"
-
-#if not "condRef" in config["DESeq2"].keys():
-#    config["DESeq2"]["condRef"] = "WT"
-
-#if not "batch" in config["DESeq2"].keys():
-#    config["DESeq2"]["batch"] = "NULL"
-
 if not "pAdjustMethod" in config["DESeq2"].keys():
     config["DESeq2"]["pAdjustMethod"] = "BH"
 
@@ -32,21 +20,6 @@ if not "alpha" in config["DESeq2"].keys():
 
 if not "rowsum_filter" in config["DESeq2"].keys():
     config["DESeq2"]["rowsum_filter"] = 10
-
-#if not "fitType" in config["DESeq2"].keys():
-#    config["DESeq2"]["fitType"] = "parametric"
-
-#if not "cooksCutoff" in config["DESeq2"].keys():
-#    config["DESeq2"]["cooksCutoff"] = "TRUE"
-
-#if not "independentFiltering" in config["DESeq2"].keys():
-#    config["DESeq2"]["independentFiltering"] = "TRUE"
-
-#if not "typeTrans" in config["DESeq2"].keys():
-#    config["DESeq2"]["typeTrans"] = "VST"
-
-#if not "locfunc" in config["DESeq2"].keys():
-#    config["DESeq2"]["locfunc"] = "median"
 
 # Rule
 rule DESeq2:
