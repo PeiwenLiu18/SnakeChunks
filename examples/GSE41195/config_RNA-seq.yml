@@ -1,4 +1,6 @@
----
+################################################################
+## MANDATORY PARAMETERS
+##
   description: ""
   author: "Claire Rioualen and Jacques van Helden"
   title: "FNR analysis protocol for RNA-seq data"
@@ -46,38 +48,28 @@
 ## These are the parameters that are used by rules & programs. 
 ##
 ## If nothing is mentionned  below, all prgrams will use their default parameters. 
-#  tophat:
-#    max_mismatches: 1                                                   # Default 2
-#    threads: 1                                                          # Default 1
-
   subread-featureCounts:
     attr_type: "gene_id"                                                # Default 'gene_id'
-    feature_type: "exon"
+    feature_type: "exon"                                                # Default "exon"
     strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
     multi_mapping: ""
 
-
-  edgeR:
-    featuresToRemove: NULL
-    varInt: "group"
-    condRef: "WT"
-    batch: NULL
-    alpha: 0.05
-    pAdjustMethod: "BH"
-    cpmCutoff: 1
-    gene_selection: "pairwise"
-    normalizationMethod: "TMM"
-
   DESeq2:
-    featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
-    varInt: "group"
-    condRef: "WT"
-    batch: NULL
-    fitType: "parametric"                                               # "parametric" (default) or "local"
-    cooksCutoff: TRUE
-    independentFiltering: TRUE
-    alpha: 0.05
-    pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
-    typeTrans: "VST"                                                    # "VST" or "rlog"
-    locfunc: "median"                                                   # "median" (default) or "shorth" to estimate the size factors
+    pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
+    alpha: 0.05                                                         # Default 0.05
+    rowsum_filter: 10                                                   # Default 10
+
+#    featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
+#    varInt: "group"
+#    condRef: "WT"
+#    batch: NULL
+#    fitType: "parametric"                                               # "parametric" (default) or "local"
+#    cooksCutoff: TRUE
+#    independentFiltering: TRUE
+#    alpha: 0.05
+#    pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
+#    typeTrans: "VST"                                                    # "VST" or "rlog"
+#    locfunc: "median"                                                   # "median" (default) or "shorth" to estimate the size factors
+
+
 
