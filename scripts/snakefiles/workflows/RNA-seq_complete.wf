@@ -317,7 +317,7 @@ rule all:
 #            FEATURE_COUNTS_PER_SAMPLE,
             ALL_FEATURE_COUNTS,
 #            SARTOOLS_TARGETFILE,
-            DESEQ2,
+#            DESEQ2,
 #            DEG,
 #            INFER_TRANSCRIPTS,
             GRAPHICS

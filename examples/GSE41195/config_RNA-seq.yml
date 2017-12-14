@@ -33,14 +33,10 @@
     diffexpr: "RNA-seq/results/diffexpr"
     reports: "RNA-seq/results/reports"
 
-  mapping_wf:
-    snakefile: "mapping.wf"
-    configfile: "metadata/config_RNA-seq.yml"
-
   trimming: "cutadapt"
   mapping: "bowtie2"
   read_counts: "featureCounts"
-  diffexpr: "edgeR DESeq2"
+  diffexpr: "DESeq2"
 
 ################################################################
 ## OPTIONAL PARAMETERS
