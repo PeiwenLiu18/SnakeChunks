@@ -14,7 +14,11 @@ parameters[["sample.ids"]] <- ""
 parameters[["sample_table"]] <- file.path(dir.main, "metadata", "samples_RNA-seq.tab")
 parameters[["design_file"]] <- file.path(dir.main, "metadata", "design_RNA-seq.tab")
 parameters[["count_file"]] <- file.path(dir.counts, "cutadapt_bowtie2_featureCounts_all.txt")
+parameters[["dir_output"]] <- file.path(dir.counts, "DEG", "DESeq2")
 
+## Create output directory if required
+dir.output <- parameters[["dir_output"]]
+dir.create(dir.output, showWarnings = FALSE, recursive = TRUE)
 
 ################################################################
 ## DESeq2 analysis
@@ -90,8 +94,8 @@ i <- 1
 for (i in 1:nrow(design)) {
   ## Select samples according to the design
   analysis <- design[i]
-  ref.condition <- design[i, 1]
-  test.condition <- design[i, 2]
+  ref.condition <- as.vector(unlist(design[i, 1]))
+  test.condition <- as.vector(unlist(design[i, 2]))
   
   ref.samples <- row.names(coldata)[as.vector(coldata$Condition) == ref.condition]
   test.samples <- row.names(coldata)[as.vector(coldata$Condition) == test.condition]
@@ -101,8 +105,8 @@ for (i in 1:nrow(design)) {
            "; test condition: ", test.condition, " (", length(test.samples)," samples)")  
   
   selected.samples <- c(ref.samples, test.samples)
-  dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples], design = ~Condition)
-  dds$condition <- relevel(deseq2.dds$condition, ref=cond2) 
+  dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples,], design = ~Condition)
+  dds$Condition <- relevel(dds$Condition, ref=ref.condition) 
   
   # remove uninformative columns ## ???? rows, genes
   ## Filter out genes with zero counts in all samples
@@ -111,19 +115,31 @@ for (i in 1:nrow(design)) {
   # normalization and preprocessing
   dds <- DESeq(dds)
   
-  contrast <- c("condition", c("FNR", "WT"))
-  res <- results(dds, contrast=contrast)
+  contrast <- c("Condition", c("FNR", "WT"))
+  res <- results(dds, contrast=contrast, 
+                 alpha = parameters[["alpha"]],
+                 independentFiltering=FALSE, pAdjustMethod = "BH")  ## Collect the result table
+  dim(res)
+  
+  ## CLAIRE: la fonction suivante n'existe apparemment pas dans DESeq2
   # shrink fold changes for lowly expressed genes
-  res <- lfcShrink(dds, contrast=contrast, res=res) 
+  # res <- lfcShrink(dds, contrast=contrast, res=res) 
+  
+  
   # sort by p-value
   res <- res[order(res$padj),]
+  View(data.frame(res))
   
   
-  
-  # store results
-  pdf("ma_plot.pdf")
-  plotMA(res, ylim=c(-2,2))
+  # MA plot
+  pdf(file.path(dir.output, "ma_plot.pdf"))
+  plotMA(res)
   dev.off()
   
+  
+  
   write.table(as.data.frame(res), file="deseq2_res.tab")
+
+  list.files(dir.output)
+  # system(paste("open", dir.output))
 }
