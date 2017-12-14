@@ -2,6 +2,9 @@
 #counts <- read.table(snakemake@input[["counts"]], header=TRUE, row.names="gene")
 #coldata <- read.table(snakemake@params[["samples"]], header=TRUE, row.names="sample")
 
+## QUESTIONS for Claire
+## - Tab-separated value extension: tsv or tab ? Now people use "tsv"
+## - a design file can contain several comparisons between two conditions -> one separate folder per comparison ?
 
 dir.main <- '~/FNR_analysis/'
 setwd(dir.main)
@@ -9,7 +12,8 @@ dir.counts <- 'RNA-seq/results/diffexpr'
 
 ## Parameter values
 parameters <- list()
-parameters[["alpha"]] <- 0.05
+parameters[["pAdjustMethod"]] <- "BH" ## Correction for multiple testing
+parameters[["alpha"]] <- 0.05 ## Threshold on adjusted p-value
 parameters[["sample.ids"]] <- ""
 parameters[["sample_table"]] <- file.path(dir.main, "metadata", "samples_RNA-seq.tab")
 parameters[["design_file"]] <- file.path(dir.main, "metadata", "design_RNA-seq.tab")
@@ -19,52 +23,6 @@ parameters[["dir_output"]] <- file.path(dir.counts, "DEG", "DESeq2")
 ## Create output directory if required
 dir.output <- parameters[["dir_output"]]
 dir.create(dir.output, showWarnings = FALSE, recursive = TRUE)
-
-################################################################
-## DESeq2 analysis
-## 
-## Detect differentially expressed genes (DEG) using the package DESeq2, 
-## and add a few custom columns (e-value, ...) to the result table. 
-deseq2.analysis <- function(dir.figures=NULL) {
-  verbose("\t\tDESeq2 analysis", 2)
-  
-  ## Path prefix to save DESeq2 result files
-  prefix["DESeq2_file"] <- paste(sep="", prefix["comparison_file"], "_", suffix.DESeq2)
-  prefix["DESeq2_figure"] <- paste(sep="", prefix["comparison_figure"], "_", suffix.DESeq2)
-  
-  ## Create a DESeqDataSet object from the count table + conditions
-  condition <- as.factor(as.vector(current.sample.conditions))
-  deseq2.dds <- DESeqDataSetFromMatrix(
-    countData = current.counts, 
-    colData = DataFrame(condition),
-    ~ condition)
-  
-  
-  ## Indicate that second condition is the reference condition. 
-  ## If not done, the conditions are considered by alphabetical order, 
-  ## which may be misleading to interpret the log2 fold changes. 
-  deseq2.dds$condition <- relevel(deseq2.dds$condition, ref=cond2) 
-  
-  ## Run the differential analysis
-  deseq2.dds <- DESeq(deseq2.dds)      ## Differential analysis with negbin distrib
-  deseq2.res <- results(deseq2.dds, independentFiltering=FALSE, pAdjustMethod = "BH")  ## Collect the result table
-  
-  deseq2.result.table <- data.frame(
-    "gene.id" = row.names(deseq2.res),
-    "mean" = deseq2.res$baseMean,
-    "log2FC" = deseq2.res$log2FoldChange,
-    "pvalue" = deseq2.res$pvalue,
-    "padj" = deseq2.res$padj)
-  deseq2.result.table <- complete.deg.table(
-    deseq2.result.table, 
-    paste(sep="_", "DESeq2", prefix["comparison"]),
-    sort.column = "padj",
-    thresholds=thresholds,
-    round.digits = 3,
-    dir.figures=dir.figures)
-  return(deseq2.result.table)
-}  
-
 
 ## The real script starts here
 
@@ -93,7 +51,6 @@ colnames(counts) <- rownames(coldata)
 i <- 1
 for (i in 1:nrow(design)) {
   ## Select samples according to the design
-  analysis <- design[i]
   ref.condition <- as.vector(unlist(design[i, 1]))
   test.condition <- as.vector(unlist(design[i, 2]))
   
@@ -130,16 +87,30 @@ for (i in 1:nrow(design)) {
   res <- res[order(res$padj),]
   View(data.frame(res))
   
+  ## Build prefix from conditions
+  file.prefix <- file.path(dir.output, paste(sep="_", test.condition, "vs", ref.condition))
   
   # MA plot
-  pdf(file.path(dir.output, "ma_plot.pdf"))
+  pdf(paste(sep="_", file.prefix, "ma_plot.pdf"))
   plotMA(res)
-  dev.off()
+  silence <- dev.off()
   
+  ## Build a data.frame for export
+  res.frame <- cbind("gene" = row.names(res), data.frame(res))
+  # names(res.frame)
+  # head(res.frame)
   
+  ## Print a result table with all genes
+  write.table(res.frame, row.names = FALSE, col.names=TRUE,
+              sep="\t", quote=FALSE, 
+              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv"))
   
-  write.table(as.data.frame(res), file="deseq2_res.tab")
-
+  ## Print a result table with genes passing the threshold
+  write.table(res.frame, row.names = FALSE, col.names=TRUE,
+              sep="\t", quote=FALSE, 
+              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv"))
+  
   list.files(dir.output)
-  # system(paste("open", dir.output))
+  # system(paste("open", dir.output)) ## to check the results; only works for Mac
 }
+
