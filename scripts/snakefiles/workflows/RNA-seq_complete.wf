@@ -275,7 +275,7 @@ ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_BW, GENOME_COV_TDF, GENOME_COV_PLUS,
 
 COUNTING_TOOLS = config["read_counts"].split()
 FEATURE_COUNTS_PER_SAMPLE   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{read_counts}.tab", samples=SAMPLE_IDS, prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
-ALL_FEATURE_COUNTS          = expand(DEG_DIR + "/{prefix}_{read_counts}_all.txt", prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
+ALL_FEATURE_COUNTS          = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_all.txt", zip, test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
 
 #----------------------------------------------------------------#
 # DEG analysis
