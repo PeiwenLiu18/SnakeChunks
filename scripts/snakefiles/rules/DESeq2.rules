@@ -46,7 +46,7 @@ rule DESeq2:
         gene_table = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_all_genes.tsv",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_deseq2_DEG_BH_alpha0.05_genes.txt"
     params:
-        rscript = "../../R-scripts/R/deseq2_test.R",
+        rscript = "../../R-scripts/R/deseq2.R",
         outdir = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
         diffexpr_dir = config["dir"]["diffexpr"],
         sample_tab = config["metadata"]["samples"],
