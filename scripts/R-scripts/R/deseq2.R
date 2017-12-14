@@ -169,7 +169,7 @@ silence <- dev.off()
   ## Print a result table with all genes
   write.table(res.frame, row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-              file=paste(sep="_", file.prefix, "deseq2_all_genes.tsv")) ## snakemake@output[["gene_table"]]
+              file=snakemake@output[["gene_table"]])
   
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
@@ -180,7 +180,7 @@ silence <- dev.off()
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
 #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters[["pAdjustMethod"]], "_alpha", parameters[["alpha"]], "_genes.txt")) ## snakemake@output[["gene_list"]]
-              file=paste(sep="", file.prefix, "_deseq2_gene_list.txt")) ## snakemake@output[["gene_list"]]
+              file=snakemake@output[["gene_list"]]))
 
   list.files(dir.output)
   # system(paste("open", dir.output)) ## to check the results; only works for Mac
