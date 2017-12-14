@@ -7,5 +7,4 @@ channels:
   - bioconda
 dependencies:
   - bioconductor-deseq2
-  - r-base
 ...

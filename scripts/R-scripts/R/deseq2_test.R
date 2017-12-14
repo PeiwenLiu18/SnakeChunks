@@ -125,14 +125,14 @@ for (i in 1:nrow(design)) {
   plotMA(res.sorted)
   silence <- dev.off()
   
-  ## Volcano plot
-  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
-  VolcanoPlot(multitest.table = res.frame, 
-              main=paste(sep="", test.condition, " vs ", ref.condition),
-              alpha = parameters[["alpha"]],
-              effect.size.col = "log2FoldChange",
-              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1)
-  silence <- dev.off()
+#  ## Volcano plot
+#  pdf(paste(sep="", file.prefix, "_volcano.pdf"), width = 7, height = 7)
+#  VolcanoPlot(multitest.table = res.frame, 
+#              main=paste(sep="", test.condition, " vs ", ref.condition),
+#              alpha = parameters[["alpha"]],
+#              effect.size.col = "log2FoldChange",
+#              control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1)
+#  silence <- dev.off()
   
   ## P-value histogram (unadjusted p-values)
   pdf(paste(sep="", file.prefix, "_pval_histo.pdf"), width = 7, height = 5)
