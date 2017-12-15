@@ -41,13 +41,14 @@ import datetime
 import re
 import pandas as pd
 
-wd = os.getcwd()
+#wd = os.getcwd()
 
-GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
+#GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
-# Python includes
-PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
-include: os.path.join(PYTHON, "util.py")
+## Python includes
+#PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
+
+include: os.path.join("SnakeChunks/scripts/python_lib/util.py")
 
 #================================================================#
 #                      Global variables
@@ -143,10 +144,10 @@ include: os.path.join(RULES, "subread_featureCounts_all.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "tophat.rules")
 
-#subworkflow mapping_wf:
-#    workdir: "../../../.."
-#    snakefile: config["mapping_wf"]["snakefile"]
-#    configfile: config["mapping_wf"]["configfile"]
+subworkflow mapping_wf:
+    workdir: "../../../.."
+    snakefile: config["mapping_wf"]["snakefile"]
+    configfile: config["mapping_wf"]["configfile"]
 
 #SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 

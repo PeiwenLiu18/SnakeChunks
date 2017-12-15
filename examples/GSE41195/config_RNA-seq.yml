@@ -38,6 +38,10 @@
   read_counts: "featureCounts"
   diffexpr: "DESeq2"
 
+  mapping_wf:
+    snakefile: "mapping.wf"
+    configfile: "metadata/config_RNA-seq.yml"
+
 ################################################################
 ## OPTIONAL PARAMETERS
 ##
