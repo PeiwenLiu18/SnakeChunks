@@ -41,9 +41,9 @@ import datetime
 import re
 import pandas as pd
 
-#wd = os.getcwd()
+wd = os.getcwd()
 
-#GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
+GENEREG_LIB = os.path.join(wd, config["dir"]["snakechunks"])
 
 ## Python includes
 #PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
