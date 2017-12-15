@@ -48,7 +48,7 @@ import pandas as pd
 ## Python includes
 #PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
 
-include: os.path.join("SnakeChunks/scripts/python_lib/util.py")
+include: os.path.join("../../../../SnakeChunks/scripts/python_lib/util.py")
 
 #================================================================#
 #                      Global variables
