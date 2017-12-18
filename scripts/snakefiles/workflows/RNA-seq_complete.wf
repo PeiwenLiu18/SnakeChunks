@@ -291,7 +291,8 @@ DEG_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{p
 ##----------------------------------------------------------------#
 
 #TRANSCRIPTS_TOOLS = config["tools"]["infer_transcripts"].split()
-#INFER_TRANSCRIPTS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{infer_transcripts}/transcripts.gtf", samples=SAMPLE_IDS, prefix=PREFIX, infer_transcripts=TRANSCRIPTS_TOOLS)
+TRANSCRIPTS_TOOLS="cufflinks"
+INFER_TRANSCRIPTS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{infer_transcripts}/transcripts.gtf", samples=SAMPLE_IDS, prefix=PREFIX, infer_transcripts=TRANSCRIPTS_TOOLS)
 
 
 
@@ -318,7 +319,7 @@ rule all:
 #            SARTOOLS_TARGETFILE,
             DEG_LIST,
 #            DEG,
-#            INFER_TRANSCRIPTS,
+            INFER_TRANSCRIPTS,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
