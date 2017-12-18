@@ -33,7 +33,7 @@ usage: peak-motifs_soap.py [-h] -test <TEST_FILE> [-control <CONTROL_FILE>]
 				[-disco [<DISCO_ALGORITHM> [<DISCO_ALGORITHM> ...]]]
 				[-source <SOURCE_FILE>] [-verb <VERBOSITY>]
 				[-motif_db <MOTIF_DB>] [-ref_motif <REF_MOTIF>] 
-                                -server <SERVER>
+				-server <SERVER>
 
 optional arguments:
   -h, --help		show this help message and exit
@@ -89,11 +89,11 @@ optional arguments:
   -verb <VERBOSITY>, --verbosity <VERBOSITY>
 			Verbosity.
   -motif_db <MOTIF_DB>, --motif_db <MOTIF_DB>
-                        Name(s) of motif database(s). List of databases
-                        of transcription factor binding motifs
-                        (e.g. JASPAR, TRANSFAC, RegulonDB, ...) which
-                        will be compared to the discovered motifs
-                        (task motifs_vs_db). 
+			Name(s) of motif database(s). List of databases
+			of transcription factor binding motifs
+			(e.g. JASPAR, TRANSFAC, RegulonDB, ...) which
+			will be compared to the discovered motifs
+			(task motifs_vs_db). 
   -ref_motif <REF_MOTIF>, --ref_motif <REF_MOTIF>
 			Motif annotated in some transcription factor database
 			(e.g. RegulonDB, Jaspar, TRANSFAC) for the
@@ -103,8 +103,8 @@ optional arguments:
   -output <OUMODE>, --output <OUTPUT>
 			Output mode requested to the Web service. Supported: "server", "client", "both"
   -prefix <PREFIX>, --prefix <PREFIX>
-                        Prefix to the output archive (the extension .zip will automaticalybe added).
-                        Default: peak-motifs_results.zip
+			Prefix to the output archive (the extension .zip will automaticalybe added).
+			Default: peak-motifs_results.zip
 
 Version 0.1 - 30/01/2015 - Adapted from Jocelyn Brayet, France Genomique team
 
@@ -233,7 +233,7 @@ if __name__ == '__main__':
 	parser.add_argument('-prefix', '--prefix', metavar='<PREFIX>', type=str, nargs=1, help='Prefix for the result archive (can include an existing path). Default: peak-motifs_result.zip. ', required=False)
 	parser.add_argument('-decompress', '--decompress',  action='store_true', help='Decompress the zip archive returned by peak-motifs. ')
 
-        
+	
 	################################ galaxy arguments ############################################################
 	#parser.add_argument('-outGalaxy', '--outGalaxy', metavar='<OUT_GALAXY>', type=str, nargs=1, required=True)
 	###########################################################'
@@ -372,7 +372,7 @@ if __name__ == '__main__':
 	"""
 
 	nameFile = "peak-motifs_results.zip"
-        nameFile = prefixValue + '.zip'
+	nameFile = prefixValue + '.zip'
 	urlResult=buildZipUrl(result.server)
 	print(urlResult)
 
@@ -399,24 +399,24 @@ if __name__ == '__main__':
 	###########################################################'
 	## Decompress results
 	#try:
-        if args.decompress:
-                zfile = zipfile.ZipFile(nameFile, 'r')
-                #except IOError:
-                #logFile.write("No zip file")
-                #Logger.error("No zip file")
-                
-                tempflag = 0
-                folderName =""
-                
-                for i in zfile.namelist():  ## On parcourt l'ensemble des fichiers de l'archive
-                
-                        #logFile.write(i+"\n")
-                        ###############################
-			if tempflag ==0:
+	if args.decompress:
+		zfile = zipfile.ZipFile(nameFile, 'r')
+		#except IOError:
+		#logFile.write("No zip file")
+		#Logger.error("No zip file")
+		
+		tempflag = 0
+		folderName =""
+		
+		for i in zfile.namelist():  ## On parcourt l'ensemble des fichiers de l'archive
+		
+			#logFile.write(i+"\n")
+			###############################
+			if tempflag == 0:
 				folderName = i
 		
 			tempflag = 1
-                        ###############################
+			###############################
 		
 			if i.endswith('/'):   ## S'il s'agit d'un repertoire, on se contente de creer le dossier 
 				os.makedirs(i)
@@ -425,7 +425,7 @@ if __name__ == '__main__':
 				fp = open(i, "wb")	  ## creation en local du nouveau fichier 
 				fp.write(data)		  ## ajout des donnees du fichier compresse dans le fichier local 
 				fp.close() 
-                zfile.close()
+		zfile.close()
 
 
 
