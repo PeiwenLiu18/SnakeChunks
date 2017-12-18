@@ -320,7 +320,7 @@ rule all:
 #            SARTOOLS_TARGETFILE,
             DEG_LIST,
 #            DEG,
-            INFER_TRANSCRIPTS,
+#            INFER_TRANSCRIPTS,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
