@@ -51,5 +51,6 @@ rule cufflinks:
         qsub = config["qsub"] + " -e {reads}_cufflinks_qsub.err -o {reads}_cufflinks_qsub.out"
     log:  "{reads}_cufflinks.log"
     benchmark:  "{reads}_cufflinks_benchmark.txt"
+    conda: "../envs/cufflinks.yaml"
     shell: "cufflinks --GTF-guide {input.gtf} --num-threads {params.threads}  --library-type {params.libtype}  --output-dir {output.outdir} {input.bam} 2> {log}" 
 
