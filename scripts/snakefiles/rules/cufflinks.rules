@@ -15,7 +15,7 @@ if not "threads" in config["cufflinks"].keys():
     config["cufflinks"]["threads"] = "1"
 
 if not "libtype" in config["cufflinks"].keys():
-    config["cufflinks"]["libtype"] = "below"
+    config["cufflinks"]["libtype"] = "fr-unstranded"
 
 # Rule
 rule cufflinks:
