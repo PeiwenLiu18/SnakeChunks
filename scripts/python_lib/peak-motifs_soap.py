@@ -124,6 +124,17 @@ import time
 import platform
 from suds.client import Client
 
+try:
+    #python 3
+    from urllib.request import urlopen
+    from urllib.parse import urlparse, urlencode
+    from urllib.error import HTTPError
+    from urllib.request import Request
+except:
+    from urllib import urlencode
+    from urllib2  import urlopen, Request, HTTPError
+
+
 ###########################################################'
 
 ###########################################################'
