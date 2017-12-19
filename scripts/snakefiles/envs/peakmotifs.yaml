@@ -1,5 +1,5 @@
 ---
-name: peak-motifs
+name: peakmotifs
 channels:
   - conda-forge
   - defaults
