@@ -1,11 +1,7 @@
 ---
 name: peak-motifs
 channels:
-  - conda-forge
-  - defaults
-  - r
-  - bioconda
+  - cokelaer
 dependencies:
   - suds-jurko
-  - urllib3
 ...
