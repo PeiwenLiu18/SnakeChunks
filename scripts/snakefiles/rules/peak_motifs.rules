@@ -9,7 +9,7 @@ if not "peak-motifs" in config.keys():
 #    sys.exit("The parameter peak-motif:motif_db must be defined in the config file")
 
 if not "python" in config["peak-motifs"].keys():
-    config["peak-motifs"]["python"] = "python3"
+    config["peak-motifs"]["python"] = "python2"
 
 if not "motif_db" in config["peak-motifs"].keys():
     config["peak-motifs"]["motif_db"] = ""
