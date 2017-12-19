@@ -122,7 +122,9 @@ import urllib
 import zipfile
 import time
 import platform
-from suds.client import Client
+#from suds.client import Client ## NOT SUPPORTED ANYMORE -> Switch to zeep (JvH, 2017-12-19)
+from zeep import Client
+
 
 try:
     #python 3
@@ -172,10 +174,9 @@ def testNone(argument):
 
 def buildZipUrl(algoResults):
 	"""
-	Recup results give by RSAT server.
-		algoResults -> result give by RSAT server
+	Get the URL of the result archive from RSAT server.
+	algoResults -> result given by RSAT server
 	"""
-	
 	recupResult = str(algoResults)
 	tabResults=recupResult.split("\n")
 	urlZip = tabResults[4]
