@@ -123,8 +123,8 @@ import zipfile
 import time
 import platform
 #from suds.client import Client ## NOT SUPPORTED ANYMORE -> Switch to zeep (JvH, 2017-12-19)
-from zeep import Client
-
+#from zeep import Client
+import zeep
 
 try:
     #python 3
