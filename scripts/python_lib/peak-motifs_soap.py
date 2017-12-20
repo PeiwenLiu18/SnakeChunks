@@ -337,18 +337,8 @@ if __name__ == '__main__':
 	## Run job in RSAT server
 	result = call_run_service(rsat_service, peakMotifsRequest)
 
-	#logFile = open("/bioinfo/users/jbrayet/Bureau/peak_motifs.log","w")
-
-	#logFile.write("###############################################\n")
-	#logFile.write("Command performed on server\n")
-	#logFile.write(result.command)
-	#logFile.write("\n")
-	#logFile.write("###############################################\n")
-	#logFile.write("Result\n")
-	#logFile.write(result.server)
-
 	print("###############################################\n")
-	print("Command performed on server\n")
+	print("Command called on server\n")
 	print(result.command)
 	print("\n")
 	print("###############################################\n")
@@ -379,22 +369,14 @@ if __name__ == '__main__':
 	###########################################################'
 	## Wait for RSAT server
 	while urllib.urlopen(urlResult).getcode() != 200:
-	#logFile.write(str(urllib.urlopen(urlResult).getcode())+"\n")
 		time.sleep(5)
 
-	#logFile.write(str(nameFile)+"\n")
-
-	#while urllib.urlretrieve(urlResult, nameFile) 
-	#try:
 	###########################################################'
 	## Download RSAT results
 	urllib.urlretrieve(urlResult, nameFile)
 	#except IOError:
 	#logFile.write("\nResult URL is false")
 	#Logger.error("Result URL is false")
-
-
-	#logFile.write("\n"+nameFile+"\n")
 
 	###########################################################'
 	## Decompress results
