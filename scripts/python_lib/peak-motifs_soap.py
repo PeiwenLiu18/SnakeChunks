@@ -123,19 +123,7 @@ import zipfile
 import time
 import platform
 #from suds.client import Client ## NOT SUPPORTED ANYMORE -> Switch to zeep (JvH, 2017-12-19)
-#from zeep import Client
-import zeep
-
-try:
-    #python 3
-    from urllib.request import urlopen
-    from urllib.parse import urlparse, urlencode
-    from urllib.error import HTTPError
-    from urllib.request import Request
-except:
-    from urllib import urlencode
-    from urllib2  import urlopen, Request, HTTPError
-
+from zeep import Client
 
 ###########################################################'
 
@@ -175,8 +163,9 @@ def testNone(argument):
 def buildZipUrl(algoResults):
 	"""
 	Get the URL of the result archive from RSAT server.
-	algoResults -> result given by RSAT server
+        algoResults -> result given by RSAT server
 	"""
+	
 	recupResult = str(algoResults)
 	tabResults=recupResult.split("\n")
 	urlZip = tabResults[4]
@@ -303,17 +292,19 @@ if __name__ == '__main__':
 	# Need service interface to perform requests
 	rsat_service = client.service
 
-	# Define client header
-	userAgent = 'RSAT-Client/v%s (%s; Python %s; %s)' % (
-		peakMotifsVersion, 
-		os.path.basename( __file__ ),
-		platform.python_version(), 
-		platform.system()
-	)
-
-	httpHeaders = {'User-agent': userAgent}
-	client.set_options(headers=httpHeaders)
-	client.set_options(timeout=300)
+        ## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ## SUPPRESSED (JvH, 2017-12-19): suds-specific, and not even required with suds
+	# Define client header 
+	# userAgent = 'RSAT-Client/v%s (%s; Python %s; %s)' % (
+	# 	peakMotifsVersion, 
+	# 	os.path.basename( __file__ ),
+	# 	platform.python_version(), 
+	# 	platform.system()
+	# )
+	# httpHeaders = {'User-agent': userAgent}
+	# client.set_options(headers=httpHeaders)
+	# client.set_options(timeout=300)
+        ## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 	###########################################################'
@@ -347,7 +338,7 @@ if __name__ == '__main__':
 
 	###########################################################'
 	## Run job in RSAT server
-	result = call_run_service(rsat_service, peakMotifsRequest)
+	result = call_run_service(rsat_service, peakMotifsRequest) 
 
 	print("###############################################\n")
 	print("Command called on server\n")
