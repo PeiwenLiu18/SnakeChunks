@@ -46,7 +46,7 @@ def bowtie2_inputs(wildcards):
     if (seq_type == "pe"):
         reads = expand("{fastq_dir}/{samples}/{prefix}_{strand}." + ext, strand=config["metadata"]["strands"].split(), samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{prefix}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+        reads = expand("{fastq_dir}/{samples}/{prefix}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)[0]
     else:
         sys.exit("Error: invalid sequencing type parameter. Must be 'se' or 'pe'")
     return reads

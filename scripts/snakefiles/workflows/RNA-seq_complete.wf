@@ -256,7 +256,7 @@ if not ("diffexpr" in config.keys()):
 
 #SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 #SORTED_BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
-#BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
+BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
 #SORTED_BED      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bed", samples=SAMPLE_IDS, prefix=PREFIX)
 
 #GENOME_COV_GZ   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph.gz", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -313,7 +313,7 @@ rule all:
 #            MAPPING,
 #            SORTED_BAM,
 #            SORTED_BAM_BAI,
-#            BAM_STATS,
+            BAM_STATS,
 #            ALL_COVERAGE,
 #            FEATURE_COUNTS_PER_SAMPLE,
             ALL_FEATURE_COUNTS,
