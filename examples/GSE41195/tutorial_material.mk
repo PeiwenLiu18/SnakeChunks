@@ -16,16 +16,16 @@ export LANG=C
 
 .PHONY: \
 	init\
-	create_dir\
+#	create_dir\
 	download_genome_data\
 	download_raw_data
 
 
 
-create_dir:
-	@echo "Creating $(ANALYSIS_DIR) directory" && \
-	mkdir -p $(ANALYSIS_DIR) && \
-	mv $(HOME)/SnakeChunks $(ANALYSIS_DIR)/SnakeChunks # to be changed when v4.1 is available
+#create_dir:
+#	@echo "Creating $(ANALYSIS_DIR) directory" && \
+#	mkdir -p $(ANALYSIS_DIR) && \
+#	mv $(HOME)/SnakeChunks $(ANALYSIS_DIR)/SnakeChunks # to be changed when v4.1 is available
 
 
 ### Download genome & annotations 
@@ -81,7 +81,7 @@ copy_metadata:
 
 all: \
 	init\
-	create_dir\
+#	create_dir\
 	copy_metadata\
 	download_genome_data\
 	download_raw_data

@@ -7,4 +7,5 @@ channels:
   - bioconda
 dependencies:
   - zeep
+  - python=2.7.13
 ...
