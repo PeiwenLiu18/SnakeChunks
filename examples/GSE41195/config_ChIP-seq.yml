@@ -1,4 +1,6 @@
----
+################################################################
+## MANDATORY PARAMETERS
+##
   description: ""
   author: "Claire Rioualen and Jacques van Helden"
   title: "FNR analysis protocol for ChIP-seq data"
@@ -37,6 +39,13 @@
   peakcalling: "homer macs2"
   annotation: "intersect"
 
+
+################################################################
+## OPTIONAL PARAMETERS
+##
+## These are the parameters that are used by rules & programs. 
+##
+## If nothing is mentionned  below, all prgrams will use their default parameters.
   cutadapt:
     qual_threshold: "20"                                                # Optional (def. 20)
     length_threshold: "20"                                              # Optional (def. 20)
