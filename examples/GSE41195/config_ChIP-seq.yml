@@ -39,7 +39,7 @@
 
   cutadapt:
     qual_threshold: "20"                                                # Optional (def. 20)
-    length-threshold: "20"                                              # Optional (def. 20)
+    length_threshold: "20"                                              # Optional (def. 20)
 
   homer: 
     style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
