@@ -261,8 +261,8 @@ rule all:
 	Run analyses.
 	"""
 	input: \
-           REGULONDB_SITES,
-           REGULONDB_TF_SITES,
+#           REGULONDB_SITES,
+#           REGULONDB_TF_SITES,
 ##            MAPPING,
 #            MAPPING_QC,
 ##            SORTED_BAM,
@@ -272,7 +272,7 @@ rule all:
 #            ALL_COVERAGE,
 #            SORTED_BED,
             PEAKS,
-            PEAKS_VS_TFBS,
+#            PEAKS_VS_TFBS,
             FORMAT_PEAKS,
             GET_FASTA,
 #            GENOMIC_FEAT,
