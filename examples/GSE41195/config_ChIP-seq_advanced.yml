@@ -26,7 +26,7 @@
     reads_source: ""
     fastq: "ChIP-seq/fastq"
     genome: "genome"                                                    # Required. Directory containing the genome of references, annotations, and genoms indexes.
-    results: "ChIP-seq_advanced/results"                                # Required. Directory containing all result files that are produced by the pipeline
+    results: "ChIP-seq/results_advanced"                                # Required. Directory containing all result files that are produced by the pipeline
     snakechunks: "SnakeChunks"                                          # Required. Location of the SnakeChunks library
 
     samples: "ChIP-seq/results/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
