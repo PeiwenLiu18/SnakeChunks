@@ -1,5 +1,5 @@
 ################################################################
-## MANDATORY PARAMETERS
+## GENERAL PARAMETERS
 ##
   description: ""
   author: "Claire Rioualen and Jacques van Helden"
@@ -34,21 +34,29 @@
     reports: "ChIP-seq/results/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
     regulondb: "data/RegulonDB"
 
+################################################################
+## WORKFLOW DESIGN
+##
   trimming: "cutadapt"
   mapping: "bowtie2"
   peakcalling: "homer macs2"
   annotation: "intersect"
 
-
 ################################################################
 ## OPTIONAL PARAMETERS
 ##
-## These are the parameters that are used by rules & programs. 
-##
-## If nothing is mentionned  below, all prgrams will use their default parameters.
+## Parameters used by rules & programs.
+## If nothing is mentionned  below, all programs will use their default parameters.
   cutadapt:
     qual_threshold: "20"                                                # Optional (def. 20)
     length_threshold: "20"                                              # Optional (def. 20)
+
+  macs2: 
+    qval: "0.001"                                                       # Optional (def. 0.05)
+    keep_dup: "all"                                                     # Optional (def. 1)
+    mfold_min: "2"                                                      # Optional (def. 5)
+    mfold_max: "50"                                                     # Optional (def. 50)
+    other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
   homer: 
     style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
@@ -57,12 +65,6 @@
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
-  macs2: 
-    qval: "0.001"                                                       # Optional (def. 0.05)
-    keep_dup: "all"                                                     # Optional (def. 1)
-    mfold_min: "2"                                                      # Optional (def. 5)
-    mfold_max: "50"                                                     # Optional (def. 50)
-    other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
 #  peak-motifs: 
 #    tasks: "all"                                                                                                    # Optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
