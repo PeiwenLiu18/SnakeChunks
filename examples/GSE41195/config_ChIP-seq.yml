@@ -51,6 +51,10 @@
     qual_threshold: "20"                                                # Optional (def. 20)
     length_threshold: "20"                                              # Optional (def. 20)
 
+  sickle:
+    qual_threshold: "25"                                                # Optional (def. 20)
+    length_threshold: "25"                                              # Optional (def. 20)
+
   macs2: 
     qval: "0.001"                                                       # Optional (def. 0.05)
     keep_dup: "all"                                                     # Optional (def. 1)
@@ -65,11 +69,6 @@
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
-
-#  peak-motifs: 
-#    tasks: "all"                                                                                                    # Optional (def. "all", incl. purge,seqlen,composition,ref_motifs,disco,meme,chipmunk,merge_words,motifs_vs_ref,motifs_vs_db,timelog,synthesis) (what about collect_motifs,motifs_vs_motifs,archive,small_summary,scan ?...)
-#    max_seq_len: "0"                                                                                                # default ? curr not used
-#    motif_db: "RegulonDB tf $RSAT/public_html/motif_databases/REGULONDB/regulonDB_2015-08-07.tf"                    # Required. name format db_file
-#    disco: "oligos,positions,dyads"                                                                                 # default ? oligos|dyads|positions|local_words|merged_words|meme|chipmunk
-
+spp: 
+  fdr: "0.01"                                                           # Optional (def. 0.01)
 

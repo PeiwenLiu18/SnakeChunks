@@ -38,7 +38,7 @@
 ## WORKFLOW DESIGN
 ##
   trimming: "sickle"
-  mapping: "subrea-align"
+  mapping: "subread-align"
   peakcalling: "homer macs2 spp"
   annotation: "intersect"
 
@@ -70,5 +70,5 @@
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
 spp: 
-  fdr: "0.01"
+  fdr: "0.01"                                                           # Optional (def. 0.05)
 
