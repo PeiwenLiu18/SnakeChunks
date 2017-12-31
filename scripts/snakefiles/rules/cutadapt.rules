@@ -108,9 +108,3 @@ then
 fi
 """
 
-
-
-#trim_galore -o . --paired GSM1010244_1.fastq.gz GSM1010244_2.fastq.gz
-#GSM1010244_1_val_1.fq.gz
-
-
