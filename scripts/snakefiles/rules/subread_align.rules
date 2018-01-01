@@ -102,6 +102,7 @@ then
 elif [[ "{params.seq_type}" == "se" ]]
 then
     subread-align -i {input.index} -r {input.reads} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {output.bam} 2> {log}
+fi
 """
 
 
