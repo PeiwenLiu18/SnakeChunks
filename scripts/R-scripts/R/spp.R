@@ -1,5 +1,3 @@
-sink(log)
-
 library(caTools)
 library(Rsamtools)
 library(spp)
@@ -18,6 +16,8 @@ output.peaks_broadPeak <- snakemake@output[["peaks_broadPeak"]]
 output.bdg_positions <- snakemake@output[["bdg_positions"]]
 output.peaks_narrowPeak <- snakemake@output[["peaks_narrowPeak"]]
 output.peaks_bed <- snakemake@output[["peaks_bed"]]
+
+fdr <- snakemake@params[["fdr"]]
 
 ## Analyse data
 treatment.data <- read.bam.tags(input.treatment)
@@ -47,7 +47,6 @@ writewig(enrichment.estimates,output.enrich_est_wig,"conservative fold-enrichmen
 broad.clusters <- get.broad.enrichment.clusters(treatment.data.qua, control.data.qua, window.size=1e3, z.thr=3,tag.shift=round(binding.characteristics$peak$x/2))
 write.broadpeak.info(broad.clusters,output.peaks_broadPeak)
 
-fdr <- {params.fdr}
 detection.window.halfsize <- binding.characteristics$whs;
 bp <- find.binding.positions(signal.data=treatment.data.qua,control.data=control.data.qua,fdr=fdr,whs=detection.window.halfsize)
 print(paste("detected",sum(unlist(lapply(bp$npl,function(d) length(d$x)))),"peaks"))
@@ -70,8 +69,3 @@ write.table(bed, output.peaks_bed, row.names=FALSE, col.names=FALSE, sep="\t", q
 } else {
     file.create(output.peaks_narrowPeak, output.peaks_bed, output.pdf, output.sm_density_wig, output.enrich_est_wig, output.peaks_broadPeak, output.bdg_positions)
 }
-
-
-
-
-sink()
