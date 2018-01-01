@@ -2,9 +2,11 @@
 name: r-spp
 channels:
   - bioconda
+  - conda-forge
 dependencies:
 #  - bioconductor-biocinstaller
 #  - r-fastcluster
+  - libiconv
   - bioconductor-rsamtools
   - r-catools
   - r-spp
