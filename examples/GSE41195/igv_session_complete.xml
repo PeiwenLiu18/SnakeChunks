@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Session genome="/root/mydisk/FNR_analysis/genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa" hasGeneTrack="false" hasSequenceTrack="true" locus="Chromosome:925015-961485" nextAutoscaleGroup="6" path="/root/mydisk/FNR_analysis/igv_session.xml" version="8">
+    <Resources>
+        <Resource path="/root/mydisk/FNR_analysis/genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010246/GSM1010246_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010244/GSM1010244_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2_vs_FNR_matching_sites.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/samples/GSM1010220/GSM1010220_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer_vs_FNR_matching_peaks.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010247/GSM1010247_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010245/GSM1010245_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/data/RegulonDB/FNR/FNR_BS.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/samples/GSM1010224/GSM1010224_cutadapt_bowtie2.tdf"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2_vs_FNR_matching_peaks.bed"/>
+        <Resource path="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer_vs_FNR_matching_sites.bed"/>
+    </Resources>
+    <Panel height="240" name="DataPanel" width="1347">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/samples/GSM1010224/GSM1010224_cutadapt_bowtie2.tdf" name="ChIP-seq input" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,153,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/samples/GSM1010220/GSM1010220_cutadapt_bowtie2.tdf" name="ChIP-seq FNR " normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010244/GSM1010244_cutadapt_bowtie2.tdf" name="RNA-seq WT1" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="2000.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010245/GSM1010245_cutadapt_bowtie2.tdf" name="RNA-seq WT2" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="2000.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,153,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010246/GSM1010246_cutadapt_bowtie2.tdf" name="RNA-seq dFNR 1" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="2000.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,153,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/RNA-seq/results/samples/GSM1010247/GSM1010247_cutadapt_bowtie2.tdf" name="RNA-seq dFNR 2" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="2000.0" minimum="0.0" type="LINEAR"/>
+        </Track>
+    </Panel>
+    <Panel height="360" name="FeaturePanel" width="1347">
+        <Track altColor="0,0,178" autoScale="false" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="Reference sequence" name="Reference sequence" sortable="false" visible="true"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="204,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3" name="GFF3 realease 37" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/root/mydisk/FNR_analysis/genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz" name="Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/data/RegulonDB/FNR/FNR_BS.bed" name="FNR sites from RegulonDB" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="51,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer.bed" name="Homer peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="51,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer_vs_FNR_matching_peaks.bed" name="matching_peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="51,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/homer/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_homer_vs_FNR_matching_sites.bed" name="matching_sites" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="255,153,51" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2.bed" name="Macs2 peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="255,153,51" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2_vs_FNR_matching_peaks.bed" name="matching_peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="255,153,51" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="/root/mydisk/FNR_analysis/ChIP-seq/results/peaks/GSM1010220_vs_GSM1010224/macs2/GSM1010220_vs_GSM1010224_cutadapt_bowtie2_macs2_vs_FNR_matching_sites.bed" name="matching_sites" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+    </Panel>
+    <PanelLayout dividerFractions="0.4444444444444444"/>
+    <Regions>
+        <Region chromosome="Chromosome" end="1630748" start="1625467"/>
+        <Region chromosome="Chromosome" end="130753" start="118372"/>
+        <Region chromosome="Chromosome" end="790321" start="768693"/>
+        <Region chromosome="Chromosome" end="882187" start="877363"/>
+        <Region chromosome="Chromosome" end="947549" start="938284"/>
+        <Region chromosome="Chromosome" end="1168020" start="1163805"/>
+        <Region chromosome="Chromosome" end="1287049" start="1278943"/>
+        <Region chromosome="Chromosome" end="1665782" start="1656560"/>
+        <Region chromosome="Chromosome" end="1844920" start="1831787"/>
+        <Region chromosome="Chromosome" end="1940603" start="1936375"/>
+        <Region chromosome="Chromosome" end="2076272" start="2062492"/>
+        <Region chromosome="Chromosome" end="2349428" start="2343985"/>
+        <Region chromosome="Chromosome" end="2420961" start="2408261"/>
+        <Region chromosome="Chromosome" end="2427281" start="2423725"/>
+        <Region chromosome="Chromosome" end="2717170" start="2715700"/>
+        <Region chromosome="Chromosome" description="rRNA" end="2732734" start="2724627"/>
+        <Region chromosome="Chromosome" description="rRNA" end="3435814" start="3415667"/>
+        <Region chromosome="Chromosome" description="rRNA" end="3960702" start="3940736"/>
+        <Region chromosome="Chromosome" end="4018799" start="4010467"/>
+        <Region chromosome="Chromosome" description="rRNA" end="4042417" start="4033460"/>
+        <Region chromosome="Chromosome" description="rRNA" end="4181582" start="4165394"/>
+        <Region chromosome="Chromosome" description="rRNA" end="4213633" start="4206753"/>
+        <Region chromosome="Chromosome" end="4382649" start="4378759"/>
+        <Region chromosome="Chromosome" description="rRNA" end="230014" start="222255"/>
+        <Region chromosome="Chromosome" end="2312942" start="2311495"/>
+        <Region chromosome="Chromosome" description="tmRNA" end="2756022" start="2755485"/>
+        <Region chromosome="Chromosome" description="ncRNA" end="2924715" start="2923961"/>
+        <Region chromosome="Chromosome" description="ncRNA" end="3056672" start="3055676"/>
+        <Region chromosome="Chromosome" description="ncRNA" end="3270756" start="3269908"/>
+        <Region chromosome="Chromosome" description="2 sites?" end="3354772" start="3353747"/>
+        <Region chromosome="Chromosome" end="1278641" start="1276955"/>
+        <Region chromosome="Chromosome" end="1307763" start="1294329"/>
+        <Region chromosome="Chromosome" end="1758690" start="1753372"/>
+        <Region chromosome="Chromosome" end="2314653" start="2295388"/>
+        <Region chromosome="Chromosome" description="FNR site, no binding no change in expression" end="2686578" start="2683451"/>
+        <Region chromosome="Chromosome" description="Binding, no change in expression" end="3615819" start="3612365"/>
+        <Region chromosome="Chromosome" end="3669470" start="3664605"/>
+        <Region chromosome="Chromosome" end="35000" start="27995"/>
+        <Region chromosome="Chromosome" end="84301" start="78634"/>
+    </Regions>
+    <HiddenAttributes>
+        <Attribute name="DATA FILE"/>
+        <Attribute name="DATA TYPE"/>
+        <Attribute name="NAME"/>
+    </HiddenAttributes>
+</Session>
