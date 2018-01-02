@@ -1,0 +1,7 @@
+---
+name: bowtie
+channels:
+  - bioconda
+dependencies:
+  - bowtie
+...
