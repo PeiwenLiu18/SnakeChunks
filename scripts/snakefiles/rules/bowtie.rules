@@ -76,6 +76,7 @@ rule bowtie:
     output:
         bam = sample_dir + "/{samples}/{prefix}_bowtie.bam"
     params:
+        seq_type = config["metadata"]["seq_type"],
         threads = config["bowtie"]["threads"], 
         sam = sample_dir + "/{samples}/{prefix}_bowtie.sam", \
         max_mismatches = config["bowtie"]["max_mismatches"],
@@ -84,6 +85,7 @@ rule bowtie:
           + " -o " + sample_dir + "/{samples}/{prefix}_bowtie_qsub.out"
     log: sample_dir + "/{samples}/{prefix}_bowtie.log"
     benchmark: sample_dir + "/{samples}/{prefix}_bowtie_benchmark.txt"
+    conda: "../envs/bowtie.yaml"
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
