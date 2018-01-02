@@ -35,7 +35,6 @@ seq_type = config["metadata"]["seq_type"]
 
 # Define input files
 def bwa_inputs(wildcards):
-def bowtie_inputs(wildcards):
     if not "input_format" in config["metadata"].keys():
         ext = "fastq"
     else:
@@ -44,7 +43,7 @@ def bowtie_inputs(wildcards):
     if (seq_type == "pe"):
         reads = expand("{fastq_dir}/{samples}/{prefix}_{strand}." + ext, strand=config["metadata"]["strands"].split(), samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{prefix}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+        reads = expand("{fastq_dir}/{samples}/{prefix}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)[0]
     else:
         sys.exit("Error: invalid sequencing type parameter. Must be 'se' or 'pe'")
     return reads
@@ -74,6 +73,7 @@ rule bwa:
     output:
         bam = sample_dir + "/{samples}/{prefix}_bwa.bam"
     params:
+        seq_type = config["metadata"]["seq_type"],
         threads = config["bwa"]["threads"], 
 #        sai = sample_dir + "/{samples}/{prefix}_bwa.sai", 
         sam = sample_dir + "/{samples}/{prefix}_bwa.sam", 
