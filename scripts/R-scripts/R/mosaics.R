@@ -9,8 +9,8 @@ output.peaks_broadPeak <- snakemake@output[["peaks_broadPeak"]]
 output.peaks_narrowPeak <- snakemake@output[["peaks_narrowPeak"]]
 output.peaks_bed <- snakemake@output[["peaks_bed"]]
 
+params.outdir <- snakemake@params[["outdir"]]
 params.fdr <- snakemake@params[["fdr"]]
-
 params.frag_len = snakemake@params[["frag_len"]]
 params.bin_size = snakemake@params[["bin_size"]]
 params.bin_treatment = snakemake@params[["bin_treatment"]]
