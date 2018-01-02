@@ -17,7 +17,7 @@ output.bdg_positions <- snakemake@output[["bdg_positions"]]
 output.peaks_narrowPeak <- snakemake@output[["peaks_narrowPeak"]]
 output.peaks_bed <- snakemake@output[["peaks_bed"]]
 
-fdr <- snakemake@params[["fdr"]]
+params.fdr <- snakemake@params[["fdr"]]
 
 ## Analyse data
 treatment.data <- read.bam.tags(input.treatment)
@@ -48,7 +48,7 @@ broad.clusters <- get.broad.enrichment.clusters(treatment.data.qua, control.data
 write.broadpeak.info(broad.clusters,output.peaks_broadPeak)
 
 detection.window.halfsize <- binding.characteristics$whs;
-bp <- find.binding.positions(signal.data=treatment.data.qua,control.data=control.data.qua,fdr=fdr,whs=detection.window.halfsize)
+bp <- find.binding.positions(signal.data=treatment.data.qua,control.data=control.data.qua,fdr=params.fdr,whs=detection.window.halfsize)
 print(paste("detected",sum(unlist(lapply(bp$npl,function(d) length(d$x)))),"peaks"))
 output.binding.results(bp,output.bdg_positions);
 
