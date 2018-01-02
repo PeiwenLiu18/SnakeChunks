@@ -59,6 +59,7 @@ rule mosaics:
         ## TODO
         #nCore
         #peak_type
+        rscript = "../../R-scripts/R/mosaics.R",
         FDR = config["mosaics"]["FDR"],
         frag_len = config["mosaics"]["frag_len"],
         bin_size = config["mosaics"]["bin_size"],
