@@ -35,11 +35,16 @@ seq_type = config["metadata"]["seq_type"]
 
 # Define input files
 def bwa_inputs(wildcards):
+def bowtie_inputs(wildcards):
+    if not "input_format" in config["metadata"].keys():
+        ext = "fastq"
+    else:
+        ext = config["metadata"]["input_format"]
     seq_type = config["metadata"]["seq_type"]
     if (seq_type == "pe"):
-        reads = expand("{fastq_dir}/{samples}/{prefix}_{strand}.fastq", strand=config["metadata"]["strands"].split(), samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+        reads = expand("{fastq_dir}/{samples}/{prefix}_{strand}." + ext, strand=config["metadata"]["strands"].split(), samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{prefix}.fastq", samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+        reads = expand("{fastq_dir}/{samples}/{prefix}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
     else:
         sys.exit("Error: invalid sequencing type parameter. Must be 'se' or 'pe'")
     return reads
@@ -77,16 +82,31 @@ rule bwa:
           + " -o " + sample_dir + "/{samples}/{prefix}_bwa_qsub.out"
     log: sample_dir + "/{samples}/{prefix}_bwa.log"
     benchmark: sample_dir + "/{samples}/{prefix}_bwa_benchmark.txt"
-    run:
-        if (seq_type == "pe"):
-            shell("bwa aln -t {threads} {input.index} " + input.reads[0] + " > " + input.reads[0] + ".sai 2> {log}")
-            shell("bwa aln -t {threads} {input.index} " + input.reads[1] + " > " + input.reads[1] + ".sai 2> {log}")
-            shell("bwa sampe {input.index} " + input.reads[0] + ".sai " + input.reads[1] + ".sai " + input.reads[0] + " " + input.reads[1] + " > {params.sam} 2> {log}")
-        elif (seq_type == "se"):
-            shell("bwa aln -t {params.threads} {input.index} {input.reads} > {input.reads}.sai 2> {log}")
-            shell("bwa samse {input.index} {input.reads}.sai {input.reads} > {params.sam} 2> {log}")
-        shell("samtools view -b -S {params.sam} > {output.bam} 2> {log}")
-        shell("rm {params.sam}")
+    conda: "../envs/bwa.yaml"
+    shell:"""
+if [[ "{params.seq_type}" == "pe" ]]
+then
+    bwa aln -t {threads} {input.index} {input.reads[0]} > {input.reads[0]}.sai 2> {log}
+    bwa aln -t {threads} {input.index} {input.reads[1]} > {input.reads[1]}.sai 2> {log}
+    bwa sampe {input.index} {input.reads[0]}.sai {input.reads[1]}.sai {input.reads[0]} {input.reads[1]} > {params.sam} 2> {log}
+elif [[ "{params.seq_type}" == "se" ]]
+then
+    bwa aln -t {params.threads} {input.index} {input.reads} > {input.reads}.sai 2> {log}
+    bwa samse {input.index} {input.reads}.sai {input.reads} > {params.sam} 2> {log}
+fi
+samtools view -b -S {params.sam} > {output.bam} 2> {log}
+rm {params.sam}
+"""
+#    run:
+#        if (seq_type == "pe"):
+#            shell("bwa aln -t {threads} {input.index} " + input.reads[0] + " > " + input.reads[0] + ".sai 2> {log}")
+#            shell("bwa aln -t {threads} {input.index} " + input.reads[1] + " > " + input.reads[1] + ".sai 2> {log}")
+#            shell("bwa sampe {input.index} " + input.reads[0] + ".sai " + input.reads[1] + ".sai " + input.reads[0] + " " + input.reads[1] + " > {params.sam} 2> {log}")
+#        elif (seq_type == "se"):
+#            shell("bwa aln -t {params.threads} {input.index} {input.reads} > {input.reads}.sai 2> {log}")
+#            shell("bwa samse {input.index} {input.reads}.sai {input.reads} > {params.sam} 2> {log}")
+#        shell("samtools view -b -S {params.sam} > {output.bam} 2> {log}")
+#        shell("rm {params.sam}")
 
 
 
