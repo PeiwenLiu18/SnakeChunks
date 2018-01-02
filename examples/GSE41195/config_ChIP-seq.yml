@@ -69,6 +69,6 @@
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
-spp: 
-  fdr: "0.01"                                                           # Optional (def. 0.01)
+  spp: 
+    fdr: "0.01"                                                           # Optional (def. 0.01)
 
