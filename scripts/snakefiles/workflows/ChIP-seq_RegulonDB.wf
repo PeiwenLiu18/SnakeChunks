@@ -136,7 +136,7 @@ include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "index_fasta.rules")
 include: os.path.join(RULES, "macs2.rules")
 include: os.path.join(RULES, "macs14.rules")
-#include: os.path.join(RULES, "mosaics.rules")
+include: os.path.join(RULES, "mosaics.rules")
 include: os.path.join(RULES, "peak_motifs.rules")
 include: os.path.join(RULES, "peaks_vs_tfbs.rules")
 include: os.path.join(RULES, "regulondb_download.rules")
@@ -262,8 +262,8 @@ rule all:
 	Run analyses.
 	"""
 	input: \
-#           REGULONDB_SITES,
-#           REGULONDB_TF_SITES,
+           REGULONDB_SITES,
+           REGULONDB_TF_SITES,
 ##            MAPPING,
 #            MAPPING_QC,
 ##            SORTED_BAM,
@@ -273,7 +273,7 @@ rule all:
 #            ALL_COVERAGE,
 #            SORTED_BED,
             PEAKS,
-#            PEAKS_VS_TFBS,
+            PEAKS_VS_TFBS,
 #            FORMAT_PEAKS,
             GET_FASTA,
 #            GENOMIC_FEAT,
