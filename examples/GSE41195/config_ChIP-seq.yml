@@ -55,15 +55,6 @@
     qual_threshold: "25"                                                # Optional (def. 20)
     length_threshold: "25"                                              # Optional (def. 20)
 
-  bowtie2:
-    threads: "1"                                                       # Default 1
-    max_mismatches: "0"                                                # Default 0 (0 or 1)
-
-  subread-align:
-    threads: "1"                                                       # Default 1
-    max_mismatches: "3"                                                 # Default 3
-
-
   macs2: 
     qval: "0.001"                                                       # Optional (def. 0.05)
     keep_dup: "all"                                                     # Optional (def. 1)
@@ -79,5 +70,5 @@
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
   spp: 
-    fdr: "0.01"                                                           # Optional (def. 0.01)
+   fdr: "0.01"                                                           # Optional (def. 0.01)
 
