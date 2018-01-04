@@ -40,10 +40,10 @@ download_genome_data:
 download_chipseq_data:
 	cd $(ANALYSIS_DIR) && \
 	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/input $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR && \
-	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/input && \
-	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR && \
-	mv $(ANALYSIS_DIR)/ChIP-seq/fastq/input/SRR576934.fastq.gz $(ANALYSIS_DIR)/ChIP-seq/fastq/input/input.fastq.gz && \
-	mv $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/SRR576938.fastq.gz $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/FNR.fastq.gz
+	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR && \
+	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -P $(ANALYSIS_DIR)/ChIP-seq/fastq/input && \
+	mv $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/SRR576934.fastq.gz $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/FNR.fastq.gz && \
+	mv $(ANALYSIS_DIR)/ChIP-seq/fastq/input/SRR576938.fastq.gz $(ANALYSIS_DIR)/ChIP-seq/fastq/input/input.fastq.gz
 
 download_rnaseq_data:
 	cd $(ANALYSIS_DIR) && \
