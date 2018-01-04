@@ -78,7 +78,8 @@ rule bowtie:
     params:
         seq_type = config["metadata"]["seq_type"],
         threads = config["bowtie"]["threads"], 
-        sam = sample_dir + "/{samples}/{prefix}_bowtie.sam", \
+        sam = sample_dir + "/{samples}/{prefix}_bowtie.sam", 
+        unsorted_bam = sample_dir + "/{samples}/{prefix}_bowtie_unsorted.bam", 
         max_mismatches = config["bowtie"]["max_mismatches"],
         qsub = config["qsub"] \
           + " -e " + sample_dir + "/{samples}/{prefix}_bowtie_qsub.err" \
@@ -94,8 +95,9 @@ elif [[ "{params.seq_type}" == "se" ]]
 then
     bowtie -t -q -S -n {params.max_mismatches} --threads {params.threads} --phred33-quals {input.index} {input.reads} {params.sam} 2> {log}
 fi
-samtools view -b -S {params.sam} > {output.bam} 2> {log}
+samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
 rm {params.sam}
+samtools sort  {params.unsorted_bam} -o {output} 2> {log}
 """
 #    run:
 #        if (seq_type == "pe"):

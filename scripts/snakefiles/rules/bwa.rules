@@ -77,6 +77,7 @@ rule bwa:
         threads = config["bwa"]["threads"], 
 #        sai = sample_dir + "/{samples}/{prefix}_bwa.sai", 
         sam = sample_dir + "/{samples}/{prefix}_bwa.sam", 
+        unsorted_bam = sample_dir + "/{samples}/{prefix}_bwa_unsorted.bam", 
         qsub = config["qsub"] \
           + " -e " + sample_dir + "/{samples}/{prefix}_bwa_qsub.err" \
           + " -o " + sample_dir + "/{samples}/{prefix}_bwa_qsub.out"
@@ -94,8 +95,9 @@ then
     bwa aln -t {params.threads} {input.index} {input.reads} > {input.reads}.sai 2> {log}
     bwa samse {input.index} {input.reads}.sai {input.reads} > {params.sam} 2> {log}
 fi
-samtools view -b -S {params.sam} > {output.bam} 2> {log}
+samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
 rm {params.sam}
+samtools sort  {params.unsorted_bam} -o {output} 2> {log}
 """
 #    run:
 #        if (seq_type == "pe"):

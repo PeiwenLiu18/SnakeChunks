@@ -22,8 +22,8 @@ rule genome_coverage_bigwig_normalized:
     input: 
 
     input:
-        treatment = config["dir"]["samples"] + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bed",
-        control=config["dir"]["samples"] + "/{control}/{control}{preprocess,.*}_sorted_pos.bed"
+        treatment = config["dir"]["samples"] + "/{treatment}/{treatment}{preprocess,.*}.bed",
+        control=config["dir"]["samples"] + "/{control}/{control}{preprocess,.*}.bed"
         bam = "{reads}_sorted_pos.bam",
         bai = "{reads}_sorted_pos.bam.bai"
     output: "{reads}.bw"

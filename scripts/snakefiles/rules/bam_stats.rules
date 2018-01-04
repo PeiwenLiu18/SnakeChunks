@@ -13,7 +13,7 @@ rule bam_stats:
 
     Contributors: Claire Rioualen
     """
-    input: "{reads}_sorted_pos.bam"
+    input: "{reads}.bam"
     output: "{reads}_bam_stats.txt"
     params:
         qsub = config["qsub"]\
