@@ -44,6 +44,7 @@ rule subread_index:
           + " -o " + subread_dir + "index_qsub.out"
     log: subread_dir + "/index.log"
     benchmark: subread_dir + "/index_benchmark.json"
+    conda: "../envs/subread.yaml"
     shell: """
 (mkdir -p {params.dir}
 cp {input} {params.dir}/{params.fasta}
