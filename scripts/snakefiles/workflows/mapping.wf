@@ -221,7 +221,7 @@ rule all:
 	"""
 	input: \
 #            MAPPING,
-            MAPPING_QC,
+#            MAPPING_QC,
 #            SORTED_BAM,
             BAM_STATS,
 #            SORTED_BAM_BAI,
