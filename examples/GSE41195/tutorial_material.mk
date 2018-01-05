@@ -38,18 +38,33 @@ download_genome_data:
 
 ### Download raw data 
 download_chipseq_data:
-	cd $(ANALYSIS_DIR) && \
-	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/input $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR && \
-	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -O $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/FNR.fastq.gz && \
-	wget -nc ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -O $(ANALYSIS_DIR)/ChIP-seq/fastq/input/input.fastq.gz
+	cd $(ANALYSIS_DIR)
+	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/input $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR
+	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/FNR.fastq.gz
+	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/input/input.fastq.gz
 
 download_rnaseq_data:
+	cd $(ANALYSIS_DIR) && \
+	mkdir -p $(ANALYSIS_DIR)/RNA-seq/fastq/WT1 $(ANALYSIS_DIR)/RNA-seq/fastq/WT2 $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1 $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2 && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_1.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_1.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_2.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_2.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_1.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_1.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_2.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_2.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_1.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_1.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_2.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_2.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_1.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_1.fastq.gz && \
+	curl --create-dirs  ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_2.fastq.gz -o $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_2.fastq.gz
+
+
+download_rnaseq_data_prev:
 	cd $(ANALYSIS_DIR) && \
 	mkdir -p $(ANALYSIS_DIR)/RNA-seq/fastq/WT1 $(ANALYSIS_DIR)/RNA-seq/fastq/WT2 $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1 $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/001/SRR5344681/SRR5344681_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/WT1 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/002/SRR5344682/SRR5344682_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/WT2 && \
 	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/003/SRR5344683/SRR5344683_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1 && \
-	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2 && \
+	wget -nc ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_1.fastq.gz ftp.sra.ebi.ac.uk/vol1/fastq/SRR534/004/SRR5344684/SRR5344684_2.fastq.gz -P $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2
+
+mv_previous:
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_1.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_1.fastq.gz && \
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_2.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_2.fastq.gz && \
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_1.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_1.fastq.gz && \
