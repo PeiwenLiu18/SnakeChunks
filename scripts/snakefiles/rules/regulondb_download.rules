@@ -15,6 +15,7 @@ rule RegulonDB_download:
     """
 #    input: 
     output: 
+        all_tus_txt="{dir}/TUSet.txt",
         all_tfbs_txt="{dir}/BindingSiteSet.txt",
         all_tfbs_bed="{dir}/BindingSiteSet.bed"
     params: qsub = config["qsub"] + " -e {dir}/BindingSiteSet_qsub.err -o {dir}/BindingSiteSet_qsub.out"
@@ -22,6 +23,7 @@ rule RegulonDB_download:
     benchmark: "{dir}/BindingSiteSet_benchmark.tab"
 #    conda: ""
     shell:"""
+    wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/TUSet.txt -O {output.all_tus_txt} &> {log}
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/BindingSiteSet.txt -O {output.all_tfbs_txt} &> {log}
     awk '($1 !~ "#") && !(($4 == 0) && ($5 == 0)) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$4-1"\t"$5"\t"$2"\t.\t"$6}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
 """
