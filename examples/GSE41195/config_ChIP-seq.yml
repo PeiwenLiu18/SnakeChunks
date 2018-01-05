@@ -40,7 +40,7 @@
   trimming: "cutadapt"
   mapping: "bowtie2"
   peakcalling: "homer macs2"
-  annotation: "intersect"
+#  annotation: "intersect"
 
 ################################################################
 ## OPTIONAL PARAMETERS
