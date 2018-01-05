@@ -12,7 +12,7 @@
     size: "4639221"
     fasta_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa
     gff3_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3
-    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz
+    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf
 
   metadata:
     samples: "metadata/samples_ChIP-seq.tab"                            # Required. Has to contain at least an "ID" column. 
