@@ -22,6 +22,15 @@ subworkflow rna:
     snakefile: config["RNA_seq"]["snakefile"]
     configfile: config["RNA_seq"]["configfile"]
 
+-subworkflow mapping_wf:
+-    workdir: "../../../.."
+-    snakefile: config["mapping_wf"]["snakefile"]
+-    configfile: config["mapping_wf"]["configfile"]
+
+  mapping_wf:
+    snakefile: "mapping.wf"
+configfile: "metadata/config_RNA-seq.yml"
+
 
 # from chip
 GENE_LIST = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
