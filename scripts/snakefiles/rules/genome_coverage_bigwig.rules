@@ -14,8 +14,8 @@ rule genome_coverage_bigwig:
     Contributors: Claire Rioualen
     """
     input: 
-        bam = "{reads}_sorted_pos.bam",
-        bai = "{reads}_sorted_pos.bam.bai"
+        bam = "{reads}.bam",
+        bai = "{reads}.bam.bai"
     output: "{reads}.bw"
     params: 
 #            output_prefix = "{reads}",

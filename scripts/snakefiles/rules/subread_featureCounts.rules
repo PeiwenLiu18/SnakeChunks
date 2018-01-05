@@ -53,7 +53,7 @@ rule subread_featureCounts:
     Contributors: Jacques van Helden, Claire Rioualen
     """
     input: 
-        bam = "{reads}_sorted_pos.bam",
+        bam = "{reads}.bam",
         gtf = os.path.join(config["dir"]["genome"], config["genome"]["gtf_file"])
     output: 
         featureCounts_output = "{reads}_featureCounts.tab",

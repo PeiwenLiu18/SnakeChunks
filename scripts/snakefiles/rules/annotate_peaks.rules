@@ -35,14 +35,26 @@ rule annotate_peaks:
         bed = "{regions}.bed",
         fasta = fasta_file,
         gtf = gtf_file
-    output: "{regions}_gene_list.tab"
+    output: 
+      peaks_to_transcripts = "{regions}_peaks_to_transcripts.tsv",
+      transcript_list = "{regions}_transcript_list.tsv",
+      gene_list = "{regions}_gene_list.tsv"
     log: "{regions}_gene_list.log"
     benchmark: "{regions}_gene_list_benchmark.txt"
     params: 
+        transcripts_to_genes =  gtf_file + "_transcript.tsv",
         qsub = config["qsub"] + " -e {regions}_gene_list_qsub.err -o {regions}_gene_list_qsub.out"
     conda: "../envs/homer.yaml"
     shell:
-        "annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}"
+        """annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output.peaks_to_transcripts}; 
+cut -f 11 {output.peaks_to_transcripts} | sort -u  > {output.transcript_list} ; 
+awk '$3==\"transcript\"' {input.gtf} \
+  | perl -pe 's|;|\t|g' \
+  | perl -pe 's| "|\t|g' \
+  | perl -pe 's|"||g' \
+  | cut -f 1-8,10,12,14,16,18,20,22,24,26,28,30 > {params.transcripts_to_genes} ;
+grep -f {output.transcript_list}  {params.transcripts_to_genes} | cut -f 9 | sort -u > {output.gene_list}
+"""
 #    run:
 #        shell("annotatePeaks.pl {input.bed} {input.fasta} -gtf {input.gtf} > {output}")
 #        R("""

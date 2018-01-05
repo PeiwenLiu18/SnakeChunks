@@ -95,9 +95,9 @@ then
     bwa aln -t {params.threads} {input.index} {input.reads} > {input.reads}.sai 2> {log}
     bwa samse {input.index} {input.reads}.sai {input.reads} > {params.sam} 2> {log}
 fi
-samtools view -b -S {params.sam} > {output.unsorted_bam} 2> {log}
+samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
 rm {params.sam}
-samtools sort  {output.unsorted_bam} -o {output} 2> {log}
+samtools sort  {params.unsorted_bam} -o {output} 2> {log}
 """
 #    run:
 #        if (seq_type == "pe"):

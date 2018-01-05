@@ -32,8 +32,8 @@ rule spp:
     Contributors: Claire Rioualen
     """
     input:
-        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bam",
-        control = dir_samples + "/{control}/{control}{preprocess,.*}_sorted_pos.bam"
+        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}.bam",
+        control = dir_samples + "/{control}/{control}{preprocess,.*}.bam"
     output:
         peaks_narrowPeak = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp_peaks.narrowPeak",
         peaks_bed = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp.bed",
