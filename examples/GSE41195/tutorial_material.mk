@@ -31,10 +31,10 @@ export LANG=C
 ### Download genome & annotations 
 download_genome_data:
 	mkdir -p $(ANALYSIS_DIR)/genome && \
-	wget -nc ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/dna/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa.gz -P $(ANALYSIS_DIR)/genome && \
-	wget -nc ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/gff3/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3.gz -P $(ANALYSIS_DIR)/genome && \
-	wget -nc ftp://ftp.ensemblgenomes.org/pub/release-37/bacteria/gtf/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz -P $(ANALYSIS_DIR)/genome && \
-	gunzip $(ANALYSIS_DIR)/genome/*.gz
+	wget -d -nc ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/dna/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa.gz -P $(ANALYSIS_DIR)/genome && \
+	wget -d -nc ftp://ftp.ensemblgenomes.org/pub/bacteria/release-37/gff3/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3.gz -P $(ANALYSIS_DIR)/genome && \
+	wget -d -nc ftp://ftp.ensemblgenomes.org/pub/release-37/bacteria/gtf/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz -P $(ANALYSIS_DIR)/genome
+#	gunzip -f $(ANALYSIS_DIR)/genome/*.gz
 
 ### Download raw data 
 download_chipseq_data:
@@ -60,14 +60,14 @@ download_rnaseq_data:
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_2.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_2.fastq.gz && \
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_1.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_1.fastq.gz && \
 	mv $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_2.fastq.gz $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_2.fastq.gz
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_1.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_2.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_1.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_2.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_1.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_2.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_1.fastq.gz && \
-#	gunzip -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_2.fastq.gz
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_1.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/WT1_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT1/SRR5344681_2.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_1.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/WT2_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/WT2/SRR5344682_2.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_1.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/dFNR1_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR1/SRR5344683_2.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_1.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_1.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_1.fastq.gz && \
+#	gunzip -f -c $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_2.fastq.gz > $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/dFNR2_2.fastq; rm -f $(ANALYSIS_DIR)/RNA-seq/fastq/dFNR2/SRR5344684_2.fastq.gz
 
 
 ### Copy metadata from SnakeChunks library to analysis directory
