@@ -35,7 +35,7 @@ rule annotate_peaks:
         bed = "{regions}.bed",
         fasta = fasta_file,
         gtf = gtf_file
-    output: "{regions}_gene_list.tab"
+    output: "{regions}_gene_list.tsv"
     log: "{regions}_gene_list.log"
     benchmark: "{regions}_gene_list_benchmark.txt"
     params: 
