@@ -47,7 +47,7 @@ rule sartools_targetfile:
             + " -e " + diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_targetfile_qsub.err"\
             + " -o " + diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_targetfile_qsub.out"
     log: diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_SARTools_targetfile.log"
-    benchmark: diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_SARTools_targetfile_benchmark.json"
+    benchmark: diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_SARTools_targetfile_benchmark.txt"
     run:
 #        sys.stdout = open('{log}', 'w')
         cwd = os.getcwd()

@@ -94,7 +94,7 @@ rule sartools_edgeR:
           + " -e " + "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_qsub.err" \
           + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_qsub.out"
     log: "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR.log"
-    benchmark: "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_benchmark.json"
+    benchmark: "{diffexpr_dir}/{test}_vs_{ref}/edgeR/{test}_vs_{ref}_{preprocess,.*}edgeR_benchmark.txt"
     conda: "../envs/sartools.yaml"
     script:
         "{params.rscript}"

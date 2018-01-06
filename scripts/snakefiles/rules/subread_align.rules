@@ -94,7 +94,7 @@ rule subread_align:
           + " -e " + sample_dir + "/{samples}/{prefix}_subread-align_qsub.err" \
           + " -o " + sample_dir + "/{samples}/{prefix}_subread-align_qsub.out"
     log: sample_dir + "/{samples}/{prefix}_subread-align.log"
-    benchmark: sample_dir + "/{samples}/{prefix}_subread-align_benchmark.json"
+    benchmark: sample_dir + "/{samples}/{prefix}_subread-align_benchmark.txt"
     conda: "../envs/subread.yaml"
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]

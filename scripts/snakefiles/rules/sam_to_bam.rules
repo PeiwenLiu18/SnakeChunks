@@ -16,7 +16,7 @@ rule sam_to_bam:
     input: sam="{reads}.sam"
     output: bam="{reads}.bam"
     log: "{reads}_sam_to_bam.log"
-    benchmark: "{reads}_sam_to_bam_benchmark.json"
+    benchmark: "{reads}_sam_to_bam_benchmark.txt"
     params: qsub = config["qsub"] + " -e {reads}_sam_to_bam_qsub.err -o {reads}_sam_to_bam_qsub.out", \
             stats = "{reads}_bam_stat.txt"
     shell: """

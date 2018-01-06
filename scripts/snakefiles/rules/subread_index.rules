@@ -43,7 +43,7 @@ rule subread_index:
           + " -e " + subread_dir + "index_qsub.err" \
           + " -o " + subread_dir + "index_qsub.out"
     log: subread_dir + "/index.log"
-    benchmark: subread_dir + "/index_benchmark.json"
+    benchmark: subread_dir + "/index_benchmark.txt"
     conda: "../envs/subread.yaml"
     shell: """
 (mkdir -p {params.dir}

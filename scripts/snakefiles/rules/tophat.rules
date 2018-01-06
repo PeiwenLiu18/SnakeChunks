@@ -82,7 +82,7 @@ rule tophat:
           + " -e " + sample_dir + "/{samples}/{prefix}_tophat_qsub.err" \
           + " -o " + sample_dir + "/{samples}/{prefix}_tophat_qsub.out"
     log: sample_dir + "/{samples}/{prefix}_tophat.log"
-    benchmark: sample_dir + "/{samples}/{prefix}_tophat_benchmark.json"
+    benchmark: sample_dir + "/{samples}/{prefix}_tophat_benchmark.txt"
     run:
         if (seq_type == "pe"):
             shell("tophat --num-threads {params.threads} --read-mismatches {params.max_mismatches} --output-dir {params.outdir} {input.index} " + input.reads[0] + " " + input.reads[1] + " 2> {log}")

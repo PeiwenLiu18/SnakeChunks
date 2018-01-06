@@ -67,7 +67,7 @@ rule subread_featureCounts:
             + " -e {reads}_featureCounts_qsub.err"\
             + " -o {reads}_featureCounts_qsub.out"
     log: "{reads}_featureCounts.log"
-    benchmark: "{reads}_featureCounts_benchmark.json"
+    benchmark: "{reads}_featureCounts_benchmark.txt"
     conda: "../envs/subread.yaml"
     shell:"""
 #        featureCounts -a {input.gtf} -o {output.featureCounts_output} {input.bam} -g {params.attr_type} -t {params.feature_type} -s {params.strand_specificity} {params.multi_mapping} &> {log}
@@ -188,7 +188,7 @@ rule subread_featureCounts:
 #                + " -e {aligned_reads}_featurecounts_qsub.err" \
 #                + " -o {aligned_reads}_featurecounts_qsub.out"
 #	log: "{aligned_reads}_featurecounts.log"
-#	benchmark: "{aligned_reads}_featurecounts_benchmark.json"
+#	benchmark: "{aligned_reads}_featurecounts_benchmark.txt"
 #        shell: "featureCounts -a {input.annotation} -o {output.count_table} -t {params.feature_type} -g {params.gtf_attrtype} -T {params.threads} {params.flags} -s {params.strand} {params.count_options} {input.reads}  2> {log} "
 
 
@@ -221,7 +221,7 @@ rule subread_featureCounts:
 #    input: path_table = config["files"]["count_file_paths"]
 #    output: count_table = config["files"]["count_table"]
 #    log: config["files"]["count_table"] + ".log"
-#    benchmark: config["files"]["count_table"] + "_benchmark.json"
+#    benchmark: config["files"]["count_table"] + "_benchmark.txt"
 #    params: qsub = config["qsub"] \
 #            + " -e " + config["files"]["count_table"] + "_qsub.err" \
 #            + " -o " + config["files"]["count_table"] + "_qsub.out"

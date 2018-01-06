@@ -58,7 +58,7 @@ rule swembl:
           + " -e " + dir_swembl + "/{treatment}_vs_{control}{preprocess,.*}_swembl_qsub.err" \
           + " -o " + dir_swembl + "/{treatment}_vs_{control}{preprocess,.*}_swembl_qsub.out"
     log: dir_swembl + "/{treatment}_vs_{control}{preprocess,.*}_swembl.log"
-    benchmark: dir_swembl + "/{treatment}_vs_{control}{preprocess,.*}_swembl_benchmark.json"
+    benchmark: dir_swembl + "/{treatment}_vs_{control}{preprocess,.*}_swembl_benchmark.txt"
     shell: """
 (SWEMBL -i {input.treatment} -r {input.control} -B -R {params.R} -N {params.N} -x {params.x} -o {output.peaks_swembl}; \
 grep -v '^#' {output.peaks_swembl} \

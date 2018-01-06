@@ -20,7 +20,7 @@ rule split_bam_strands:
             + " -e {reads}_split_bam_strands_qsub.err " \
             + " -o {reads}_split_bam_strands_qsub.out"
     log: "{reads}_split_bam_strands.log"
-    benchmark: "{reads}_split_bam_strands_benchmark.json"
+    benchmark: "{reads}_split_bam_strands_benchmark.txt"
     shell: """
 (samtools  view -f99 -hb {input} > {output.min}_99.bam
 samtools  view -f147 -hb {input} > {output.min}_147.bam

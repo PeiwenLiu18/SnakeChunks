@@ -34,7 +34,7 @@ rule sra_to_fastq_split:
         forward = "{fastq}/{sample}/{sample}_" + config["metadata"]["strands"].split()[0] + ".fastq", \
         reverse = "{fastq}/{sample}/{sample}_" + config["metadata"]["strands"].split()[1] + ".fastq"
     log: "{fastq}/{sample}/{sample}_sra-conversion.log"
-    benchmark: "{fastq}/{sample}/{sample}_sra-conversion_benchmark.json"
+    benchmark: "{fastq}/{sample}/{sample}_sra-conversion_benchmark.txt"
     params: 
         datadir = config["dir"]["reads_source"],
         forward_strand = config["metadata"]["strands"].split()[0],
