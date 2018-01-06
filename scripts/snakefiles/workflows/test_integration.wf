@@ -1,0 +1,21 @@
+subworkflow chip:
+    snakefile: "ChIP-seq_snakefile"
+    configfile: "ChIP-seq.yml"
+
+subworkflow rna:
+    snakefile: "RNA-seq_snakefile"
+    configfile: "RNA-seq.yml"
+
+GENE_LIST_CHIP = "/path/to/my/file_chip.txt"
+
+GENE_LIST_RNA = "/path/to/my/file_rna.txt"
+
+rule all:
+    input:
+        chip_genes = chip(GENE_LIST_CHIP[0]),
+        rna_genes = rna(GENE_LIST_RNA[0])
+    output: "output.txt"
+    params:
+        rscript = "myscript.R",
+    script:
+        "{params.rscript}"

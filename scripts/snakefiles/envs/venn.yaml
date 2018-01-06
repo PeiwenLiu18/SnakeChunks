@@ -1,0 +1,7 @@
+---
+name: venn
+channels:
+  - bioconda
+dependencies:
+  - r-venndiagram
+...

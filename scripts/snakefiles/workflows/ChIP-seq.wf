@@ -181,10 +181,9 @@ else:
 MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
 
-SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-SORTED_BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
+BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
-SORTED_BED      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bed", samples=SAMPLE_IDS, prefix=PREFIX)
+
 
 GENOME_COV_BDG  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX)
 GENOME_COV_GZ   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph.gz", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -258,12 +257,10 @@ rule all:
             REGULONDB_SITES,
 #            MAPPING,
             MAPPING_QC,
-#            SORTED_BAM,
             BAM_STATS,
-#            SORTED_BAM_BAI,
+#           BAM_BAI,
 #            GENOME_INDEX,
             ALL_COVERAGE,
-#            SORTED_BED,
             PEAKS,
             FORMAT_PEAKS,
             GET_FASTA,

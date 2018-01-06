@@ -26,7 +26,7 @@ samples_ids = snakemake.params["samples_ids"]
 samples_dir = snakemake.params["samples_dir"]
 trim_tools = snakemake.params["trim_tools"]
 map_tools = snakemake.params["map_tools"]
-#pc_tools = snakemake.params["pc_tools"]
+pc_tools = snakemake.params["pc_tools"]
 
 
 d_samples = {}
@@ -38,6 +38,8 @@ for sample in samples_ids:
 #tfs = read_table(config["metadata"]["design"])['treatment'].split()
 tfs = ["Nac", "NtrC", "OmpR"]
 pc_tools = ["macs2", "spp", "homer", "swembl"]
+
+peak_collections = 
 
 d_peaks = {}
 for tf in tfs:

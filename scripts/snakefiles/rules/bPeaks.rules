@@ -56,8 +56,8 @@ rule bPeaks:
     Contributors: Claire Rioualen
     """
     input:
-        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bam", \
-        control = dir_samples + "/{control}/{control}{preprocess,.*}_sorted_pos.bam"
+        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}.bam", \
+        control = dir_samples + "/{control}/{control}{preprocess,.*}.bam"
     output: 
 #        peaks_all = dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks_allGenome.bed", \
         peaks_bed = dir_bPeaks + "/{treatment}_vs_{control}{preprocess,.*}_bPeaks.bed"

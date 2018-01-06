@@ -142,7 +142,7 @@ def writeCategory(outputdir, project_name, dataset_id, datatype, menu, d_samples
 #    mkdir $imageDir;
 
     peakPageContent = ""
-    peakPageContent = peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, level, d_peaks)
+    peakPageContent = peakListPage(peakPageContent, outputdir, project_name, dataset_id, datatype, menu, level, d_peaks)
 
     peakPageName = dataset_id + "-" + datatype + "-peak.html";
     file = open(outputdir + "/" + dataset_id + "/" + datatype + "/" + peakPageName, "w") 
@@ -151,8 +151,8 @@ def writeCategory(outputdir, project_name, dataset_id, datatype, menu, d_samples
 
 #    # gene part
 
-#    geneDir = "$outputdir/$dataset_id/$network/genes";
-#    mkdir $geneDir;
+    peakDir = outputdir + "/" + dataset_id + "/" + datatype + "/peaks"
+    mkdir_p(peakDir)
 
 #    genePageContent = "";
 #    genePageName = "$dataset_id-$network-gene.html";
@@ -1176,7 +1176,7 @@ def sampleListBox(filecontent, dataset_id, datatype, level, d_samples):
 
 #=cut
 
-def peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, level, d_peaks):
+def peakListPage(peakPageContent, outputdir, project_name, dataset_id, datatype, menu, level, d_peaks):
 
     
 #sub geneListPage {
@@ -1212,7 +1212,7 @@ def peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, leve
     TFs = d_peaks.keys()
 
     for TF in TFs: 
-        filecontent = peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF)
+        filecontent = peakListBox(filecontent, outputdir, project_name, dataset_id, datatype, menu, tab, level, d_peaks, TF)
         filecontent = filecontent + "<img class=\"caption\" title=\"\" src=\"../../../../results/peaks/" + TF + "/multi_peaks_vs_tfbs.png\" alt=\"\"/>" ### adapt level param !
 
 #    }
@@ -1229,7 +1229,7 @@ def peakListPage(peakPageContent, project_name, dataset_id, datatype, menu, leve
 
 ##=cut
 
-def peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF):
+def peakListBox(filecontent, outputdir, project_name, dataset_id, datatype, menu, tab, level, d_peaks, TF):
 #    filecontent = shift;
 #    dataset_id = shift;
 #    network = shift;
@@ -1315,6 +1315,8 @@ def peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF):
             filecontent = filecontent + "<td>" + data[1] + "</td>\n"
             filecontent = filecontent + "<td>" + data[2] + "</td>\n"
             filecontent = filecontent + "<td>" + str(round(float(data[3]), 2)) + "</td>\n"
+
+            peakPage(filecontent, outputdir, project_name, dataset_id, datatype, menu, tab, level)
 
 #    # My Code
 #    finally:
@@ -1599,76 +1601,76 @@ def peakListBox(filecontent, dataset_id, datatype, level, d_peaks, TF):
 
 ##=pod
 
-##=head2 genePage()
+#=head2 genePage()
 
-##Creates the page of the specified gene.
+#Creates the page of the specified gene.
 
-##=cut
+#=cut
+
+def peakPage(filecontent, outputdir, project_name, dataset_id, datatype, menu, tab, level):
 
 #sub genePage {
 #    outputdir = shift;
-##    projName = shift;
-##    dataset_id = shift;
-##    network = shift;
-##    geneID = shift;
-##    rh_noa = shift;
-##    rh_subnets_nwa = shift;
-##    rh_subnetsOrMetas_nwa = shift;
-##    rh_dsLists = shift;
-##    menu = shift;
-##    resHeading = shift;
-##    rh_GO = shift;
-##    level = shift;
+#    projName = shift;
+#    dataset_id = shift;
+#    network = shift;
+#    geneID = shift;
+#    rh_noa = shift;
+#    rh_subnets_nwa = shift;
+#    rh_subnetsOrMetas_nwa = shift;
+#    rh_dsLists = shift;
+#    menu = shift;
+#    resHeading = shift;
+#    rh_GO = shift;
+#    level = shift;
 
-##    $level++;
-#    tab = "gene";
-##    my @geneList = ($geneID);
+    level = level + 1
+    tab = "gene"
+#    my @geneList = ($geneID);
 
-##    geneDir = "$outputdir/$dataset_id/$network/genes";
+#    geneDir = "$outputdir/$dataset_id/$network/genes";
+    peakDir = outputdir + "/" + dataset_id + "/" + datatype + "/peaks"
 
-##    my %h_geneSubnets = ();
-##    foreach sub (@{$$rh_noa{$geneID}{'Subnets'}}) {
-##        $h_geneSubnets{$sub} = $$rh_subnetsOrMetas_nwa{$sub};
-##    }
+#    my %h_geneSubnets = ();
+#    foreach sub (@{$$rh_noa{$geneID}{'Subnets'}}) {
+#        $h_geneSubnets{$sub} = $$rh_subnetsOrMetas_nwa{$sub};
+#    }
 
-#    filecontent = "";
-#    filename = "$dataset_id-$network-$tab-$geneID.html";
+    filecontent = ""
+    filename = dataset_id + "-" + datatype + "-" + tab + "-" + peaks_id + ".html"
 
-#    $filecontent = header($filecontent, $projName, $dataset_id,
-#                          $level, $network, $tab,
-#                          $menu, $resHeading, $rh_GO);
+    filecontent = header(filecontent, project_name, dataset_id, datatype, menu, tab, level)
 
-#    filecontent = filecontent + "<div class=\"title\">\n"
-#    filecontent = filecontent + "<h1>".$$rh_noa{$geneID}{'Gene_symbol'}."</h1>\n"
-#    filecontent = filecontent + "</div>\n"
+    filecontent = filecontent + "<div class=\"title\">\n"
+    filecontent = filecontent + "<h1>" + peaks_id + "</h1>\n"
+    filecontent = filecontent + "</div>\n"
 
-##    $filecontent = geneListBox($filecontent, $dataset_id,
-##                               $network, $rh_dsLists, \@geneList,
-##                               $rh_noa, undef, undef, $level);
-##    $filecontent = geneBoxNCBI($filecontent, $geneID, $rh_noa);
+#    $filecontent = geneListBox($filecontent, $dataset_id,
+#                               $network, $rh_dsLists, \@geneList,
+#                               $rh_noa, undef, undef, $level);
+#    $filecontent = geneBoxNCBI($filecontent, $geneID, $rh_noa);
 
-##    if($network eq "itg"){
-##        $filecontent = metasubnetListBox($filecontent, $dataset_id, $network, \%h_geneSubnets, $rh_noa, $level);
-##    }
-##    else{
-##        $filecontent = subnetListBox($filecontent,    $dataset_id,      $network, $rh_dsLists,
-##                                     $rh_subnets_nwa, \%h_geneSubnets, $rh_noa,  $level,      undef);
-##    }
+#    if($network eq "itg"){
+#        $filecontent = metasubnetListBox($filecontent, $dataset_id, $network, \%h_geneSubnets, $rh_noa, $level);
+#    }
+#    else{
+#        $filecontent = subnetListBox($filecontent,    $dataset_id,      $network, $rh_dsLists,
+#                                     $rh_subnets_nwa, \%h_geneSubnets, $rh_noa,  $level,      undef);
+#    }
 
-##    if(defined $rh_GO && defined $$rh_noa{$geneID}{'GO_terms'}){
-##        my @goList = @{$$rh_noa{$geneID}{'GO_terms'}};
-##        $filecontent = goListBox($filecontent, $dataset_id,
-##                                 $network, \@goList, $rh_GO,
-##                                 undef, undef, $level,
-##                                 "genepage");
-##    }
+#    if(defined $rh_GO && defined $$rh_noa{$geneID}{'GO_terms'}){
+#        my @goList = @{$$rh_noa{$geneID}{'GO_terms'}};
+#        $filecontent = goListBox($filecontent, $dataset_id,
+#                                 $network, \@goList, $rh_GO,
+#                                 undef, undef, $level,
+#                                 "genepage");
+#    }
 
-#    $filecontent = footer($filecontent);
+    filecontent = footer(filecontent)
 
-#    open (FILE, ">$geneDir/$filename") || die "Cannot open $filename:\n$!";
-#    print FILE $filecontent;
-#    close FILE;
-#}
+    file = open(peakDir + "/" + fileName, "w") 
+    file.write(filecontent)
+    file.close()
 
 ##=pod
 

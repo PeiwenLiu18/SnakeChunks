@@ -84,10 +84,11 @@ rule subread_align:
     output:
         bam = sample_dir + "/{samples}/{prefix}_subread-align.bam"
     params:
+        unsorted_bam = sample_dir + "/{samples}/{prefix}_subread-align_unsorted.bam", 
         threads = config["subread-align"]["threads"], 
-        seq_data = config["subread-align"]["seq_data"], \
-        max_mismatches = config["subread-align"]["max_mismatches"], \
-        align_options = config["subread-align"]["align_options"], \
+        seq_data = config["subread-align"]["seq_data"],
+        max_mismatches = config["subread-align"]["max_mismatches"],
+        align_options = config["subread-align"]["align_options"],
         seq_type = config["metadata"]["seq_type"],
         qsub = config["qsub"] \
           + " -e " + sample_dir + "/{samples}/{prefix}_subread-align_qsub.err" \
@@ -98,11 +99,12 @@ rule subread_align:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-    subread-align -i {input.index} -r {input.reads[0]} -R {input.reads[1]} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {output.bam} 2> {log}
+    subread-align -i {input.index} -r {input.reads[0]} -R {input.reads[1]} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {params.unsorted_bam} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
-    subread-align -i {input.index} -r {input.reads} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {output.bam} 2> {log}
+    subread-align -i {input.index} -r {input.reads} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {params.unsorted_bam} 2> {log}
 fi
+samtools sort  {params.unsorted_bam} -o {output.bam} 2> {log}
 """
 
 

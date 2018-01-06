@@ -39,6 +39,7 @@ rule bwa_index:
           + " -o " + bwa_dir + "index_qsub.out"
     log: bwa_dir + "/index.log"
     benchmark: bwa_dir + "/index_benchmark.txt"
+    conda:  "../envs/bwa.yaml"
     shell: """
 mkdir -p {params.dir}
 cp {input} {params.dir}/{params.fasta}

@@ -54,8 +54,8 @@ rule macs14:
     Contributors: Claire Rioualen, Lucie Khamvongsa
     """
     input:
-        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}_sorted_pos.bed",
-        control=dir_samples + "/{control}/{control}{preprocess,.*}_sorted_pos.bed"
+        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}.bed",
+        control=dir_samples + "/{control}/{control}{preprocess,.*}.bed"
     output:
         peaks_bed = dir_macs14 + "/{treatment}_vs_{control}{preprocess,.*}_macs14.bed"
     params:

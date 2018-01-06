@@ -136,7 +136,7 @@ include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "index_fasta.rules")
 include: os.path.join(RULES, "macs2.rules")
 include: os.path.join(RULES, "macs14.rules")
-#include: os.path.join(RULES, "mosaics.rules")
+include: os.path.join(RULES, "mosaics.rules")
 include: os.path.join(RULES, "peak_motifs.rules")
 include: os.path.join(RULES, "peaks_vs_tfbs.rules")
 include: os.path.join(RULES, "regulondb_download.rules")
@@ -172,29 +172,6 @@ if TRIMMING_TOOLS:
 else:
     PREFIX = expand("{aligner}", aligner=MAPPING_TOOLS)
 
-##----------------------------------------------------------------#
-## Alignment
-##----------------------------------------------------------------#
-
-
-##INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
-
-#MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-#MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
-
-#SORTED_BAM      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-#SORTED_BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
-#BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
-#SORTED_BED      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bed", samples=SAMPLE_IDS, prefix=PREFIX)
-
-#GENOME_COV_BDG  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_GZ   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph.gz", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_BW   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bw", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_PLUS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_plus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
-#GENOME_COV_MINUS= expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_minus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
-
-#ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_BW, GENOME_COV_PLUS, GENOME_COV_MINUS
 
 # ----------------------------------------------------------------
 # Peak-calling
@@ -211,13 +188,13 @@ GET_FASTA   = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{t
 # Peak annotation
 # ----------------------------------------------------------------
 
-if not ("annotation" in config.keys()):
-    sys.exit("The parameter config['tools']['annotation'] should be specified in the config file.")
+# if not ("annotation" in config.keys()):
+#     sys.exit("The parameter config['tools']['annotation'] should be specified in the config file.")
 
-DISTANCE = config["annotation"].split()
-GENOMIC_FEAT    = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE, prefix=PREFIX)
+# DISTANCE = config["annotation"].split()
+# GENOMIC_FEAT    = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE, prefix=PREFIX)
 
-GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
+GENE_LIST      = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_gene_list.tsv", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
 PEAK_MOTIFS     = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/peak-motifs/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_peak-motifs/peak-motifs_synthesis.html", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
@@ -240,16 +217,12 @@ GRAPHICS = expand(REPORTS_DIR + "/flowcharts/ChIP-seq_{graph}.{ext}", graph=["da
 # Reports
 # ----------------------------------------------------------------
 
-HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
-
+#HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
 
 #igv_session(xml_file, genome=GENOME_FASTA, gff3=GENOME_GFF3, gtf=GENOME_GTF, peaks=PEAKS, coverage=GENOME_COV_GZ)
-
 #IGV_SESSION = REPORTS_DIR + "/igv_session.xml"
-
 #        session = "{dir}/{treatment}_vs_{control}{preprocess,.*}_igv.html"
-
-IGV_SESSION         = expand(REPORTS_DIR + "/{treat}_vs_{control}_igv.xml", zip, treat=TREATMENT, control=CONTROL)
+#IGV_SESSION         = expand(REPORTS_DIR + "/{treat}_vs_{control}_igv.xml", zip, treat=TREATMENT, control=CONTROL)
 
 FORMAT_PEAKS        = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_formatted.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
@@ -262,25 +235,17 @@ rule all:
 	Run analyses.
 	"""
 	input: \
-#           REGULONDB_SITES,
-#           REGULONDB_TF_SITES,
-##            MAPPING,
-#            MAPPING_QC,
-##            SORTED_BAM,
-#            BAM_STATS,
-##            SORTED_BAM_BAI,
-##            GENOME_INDEX,
-#            ALL_COVERAGE,
-#            SORTED_BED,
+           REGULONDB_SITES,
+           REGULONDB_TF_SITES,
             PEAKS,
-#            PEAKS_VS_TFBS,
-            FORMAT_PEAKS,
+            PEAKS_VS_TFBS,
+#            FORMAT_PEAKS,
             GET_FASTA,
 #            GENOMIC_FEAT,
             GENE_LIST,
-            PEAK_MOTIFS,
+#            PEAK_MOTIFS,
 #            HTML_REPORT,
-            IGV_SESSION,
+#            IGV_SESSION,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"

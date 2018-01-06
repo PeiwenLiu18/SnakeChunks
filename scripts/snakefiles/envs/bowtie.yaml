@@ -1,0 +1,8 @@
+---
+name: bowtie
+channels:
+  - bioconda
+dependencies:
+  - samtools
+  - bowtie
+...

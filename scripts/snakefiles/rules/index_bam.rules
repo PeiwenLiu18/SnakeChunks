@@ -13,12 +13,12 @@ rule index_bam:
 
     Contributors: Jacques van Helden
     """
-    input: "{reads}_sorted_pos.bam"
-    output: "{reads}_sorted_pos.bam.bai"
+    input: "{reads}.bam"
+    output: "{reads}.bam.bai"
     params: qsub = config["qsub"] + "" \
-            + " -e {reads}_sorted_pos.bam.bai_qsub.err" \
-            + " -o {reads}_sorted_pos.bam.bai_qsub.err"
+            + " -e {reads}.bam.bai_qsub.err" \
+            + " -o {reads}.bam.bai_qsub.err"
     log: "{reads}.bam.bai.log"
-    benchmark: "{reads}_sorted_pos.bam.bai_benchmark.log"
+    benchmark: "{reads}.bam.bai_benchmark.log"
     conda: "../envs/samtools.yaml"
     shell:"samtools index {input} 2> {log}"
