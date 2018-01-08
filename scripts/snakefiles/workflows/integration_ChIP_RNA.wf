@@ -1,71 +1,148 @@
-## This is just a draft
 
-"""
-This is a prototype of combined workflow using Snakemake's subworkflow feature. 
-It requires to use Snakemake 3.8.1+
+#================================================================#
+#                       Python Imports 
+#================================================================#
 
-Command to run the combined workflow is currently:
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile gene-regulation/examples/Combined_ChIP-seq_RNA-seq --nolock
+from snakemake.utils import R
+import os
+import sys
+import datetime
+import re
+import pandas as pd
 
-Author:
-    Claire Rioualen
-"""
+wd = os.getcwd()
 
-# Subworkflows
-subworkflow chip:
-    workdir: config["ChIP_seq"]["directory"]
-    snakefile: config["ChIP_seq"]["snakefile"]
-    configfile: config["ChIP_seq"]["configfile"]
+GENEREG_LIB = os.path.join(wd, "SnakeChunks")
 
-subworkflow rna:
-    workdir: config["RNA_seq"]["directory"]
-    snakefile: config["RNA_seq"]["snakefile"]
-    configfile: config["RNA_seq"]["configfile"]
+## Python includes
+#PYTHON = os.path.join(GENEREG_LIB, "scripts/python_lib")
 
--subworkflow mapping_wf:
--    workdir: "../../../.."
--    snakefile: config["mapping_wf"]["snakefile"]
--    configfile: config["mapping_wf"]["configfile"]
+include: os.path.join(GENEREG_LIB, "scripts/python_lib/util.py")
 
-  mapping_wf:
-    snakefile: "mapping.wf"
-configfile: "metadata/config_RNA-seq.yml"
+#================================================================#
+#                      ChIP & RNA samples
+#================================================================#
+
+# ChIP-seq
+chip_sample_ids = read_table("metadata/samples_ChIP-seq.tab")['ID']
+chip_treatment = read_table("metadata/design_ChIP-seq.tab")['treatment']
+chip_control = read_table("metadata/design_ChIP-seq.tab")['control']
+
+# RNA-seq  
+rna_sample_ids = read_table("metadata/samples_RNA-seq.tab")['ID']
+rna_reference = read_table("metadata/design_RNA-seq.tab")['Reference']
+rna_test = read_table("metadata/design_RNA-seq.tab")['Test']
+
+#================================================================#
+#               Snakemake rules
+#================================================================#
+
+RULES = os.path.join(GENEREG_LIB, "scripts/snakefiles/rules")
+
+include: os.path.join(RULES, "annotate_peaks.rules")
+include: os.path.join(RULES, "bam_by_pos.rules")
+include: os.path.join(RULES, "bam_to_bed.rules")
+include: os.path.join(RULES, "bam_stats.rules")
+include: os.path.join(RULES, "bed_formatting.rules")
+include: os.path.join(RULES, "bedgraph_to_tdf.rules")
+include: os.path.join(RULES, "bedtools_closest.rules")
+include: os.path.join(RULES, "bedtools_intersect.rules")
+include: os.path.join(RULES, "bedtools_window.rules")
+include: os.path.join(RULES, "bowtie_index.rules")
+include: os.path.join(RULES, "bowtie.rules")
+include: os.path.join(RULES, "bowtie2_index.rules")
+include: os.path.join(RULES, "bowtie2.rules")
+include: os.path.join(RULES, "bPeaks.rules")
+include: os.path.join(RULES, "bwa_index.rules")
+include: os.path.join(RULES, "bwa.rules")
+include: os.path.join(RULES, "fastqc.rules")
+include: os.path.join(RULES, "genome_coverage_bedgraph.rules")
+include: os.path.join(RULES, "genome_coverage_bedgraph_strands.rules")
+include: os.path.join(RULES, "genome_coverage_bigwig.rules")
+include: os.path.join(RULES, "getfasta.rules")
+include: os.path.join(RULES, "get_chrom_sizes.rules")
+include: os.path.join(RULES, "gzip.rules")
+include: os.path.join(RULES, "homer.rules")
+include: os.path.join(RULES, "index_bam.rules")
+include: os.path.join(RULES, "index_fasta.rules")
+include: os.path.join(RULES, "macs2.rules")
+include: os.path.join(RULES, "macs14.rules")
+include: os.path.join(RULES, "mosaics.rules")
+include: os.path.join(RULES, "peak_motifs.rules")
+include: os.path.join(RULES, "peaks_vs_tfbs.rules")
+include: os.path.join(RULES, "regulondb_download.rules")
+include: os.path.join(RULES, "regulondb_download_one_tf.rules")
+include: os.path.join(RULES, "spp.rules")
+include: os.path.join(RULES, "sickle.rules")
+include: os.path.join(RULES, "subread_index.rules")
+include: os.path.join(RULES, "subread_align.rules")
+#include: os.path.join(RULES, "swembl.rules")
+include: os.path.join(RULES, "tophat.rules")
+
+## Workflow design ##
+
+trimming = "cutadapt"
+mapping = "bwa"
+peakcalling = "homer"
+read_counts = "featureCounts"
+diffexpr = "DESeq2"
+
+prefix = trimming + "_" + mapping
+
+## Directories
+
+PEAKS_DIR = "ChIP-seq/results/peaks"
+DEG_DIR = "RNA-seq/results/diffexpr"
+REGULON_DIR = "data/RegulonDB"
+
+INTEGRATION_DIR = "integration" 
+
+## Final targets ##
+
+outdir_prefix = "ChIP-RNA-regulons"
+venn_format = "png" # svg"
+
+VENN = expand(INTEGRATION_DIR + "/" + outdir_prefix + "_venn.{ext}", ext=venn_format)
+TABLE = INTEGRATION_DIR + "/" + outdir_prefix + "_gene_table.tsv"
+GFF_CHIP = INTEGRATION_DIR + "/" + outdir_prefix + "_ChIP-seq.gff"
+GFF_RNA = INTEGRATION_DIR + "/" + outdir_prefix + "_RNA-seq.gff"
+GFF_REGULON = INTEGRATION_DIR + "/" + outdir_prefix + "_RegulonDB.gff"
 
 
-# from chip
-GENE_LIST = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
 
-# from RNA
-GENE_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.tab", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
-
-# Combined workflow
-VENN = "/data/analyses/Combined_ChIP-seq_RNA-seq/venn.png"
-
-VENN_DIAGS = "venn/{{prefix}}_{{peakcaller}}_{{distance}}_{{read_counts}}_{{deg}}
-
-rule all:
-    input: VENN
-
-
-# this should be moved to an external rule
-rule venn:
-    """This draft rule takes 3 inputs and creates a Venn Diagram:
-        - a gene_list generated by the ChIP-seq workflow (genes intersecting with peaks associated with FNR binding, see dataset GSE41187)
-        - a gene_list generated by the RNA-seq workflow (genes differentially expressed in FNR mutants, see dataset GSE41190)
-        - a gene_list manually generated from RegulonDB data (genes regulated by the FNR regulon, according to curated database RegulonDB) (optional)
-    """
+rule all: 
     input:
-        chip_genes = chip("/data/analyses/ChIP-seq_SE_GSE41187/results/peaks/GSM1010219_vs_GSM1010224/homer-fdr0.001/GSM1010219_vs_GSM1010224_sickle_bowtie2_homer-fdr0.001_intersect_annot_gene_list.tab"),
-        rna_genes = rna("/data/analyses/RNA-seq_PE_GSE41190/results/diffexpr/FNR_vs_WT/edgeR/FNR_vs_WT_subread-align_edgeR_gene_list.tab")
-    output: "/data/analyses/Combined_ChIP-seq_RNA-seq/venn.png"
-    run:
-        R("""
-library(VennDiagram)
+        VENN,
+        TABLE, 
+        GFF_CHIP,
+        GFF_RNA, 
+        GFF_REGULON
 
-chip <- as.vector(read.table("{input.chip_genes}")[,1])
-rna <- as.vector(read.table("{input.rna_genes}")[,1])
-#regulon <- as.vector(read.table("{input.regulon_genes}")[,1])
 
-#venn.plot <- venn.diagram(list(ChIP=chip, RNA=rna, Regulon=regulon), filename="{output}", imagetype="png", fill=rainbow(3))
-venn.plot <- venn.diagram(list(ChIP=chip, RNA=rna), filename="{output}", imagetype="png", fill=rainbow(3))
-""")
+rule gene_comparison:
+    input:
+        chip_genes = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_gene_list.txt", zip, treat=chip_treatment, control=chip_control), peakcaller=peakcalling, prefix=prefix),
+        rna_genes = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, prefix=prefix, read_counts=read_counts),
+        regulondb_tus = REGULON_DIR + "/TUSet.txt",
+        regulondb_sites = REGULON_DIR + "/BindingSiteSet.txt",
+        regulondb_gene_product = REGULON_DIR + "/GeneProductSet.txt"       
+    params:
+        outdir = INTEGRATION_DIR,
+        image_format = venn_format,
+        TF = "FNR"
+    output: 
+        venn = VENN,
+        gene_table = TABLE,
+        chip_genes_gff = GFF_CHIP,
+        rna_genes_gff = GFF_RNA,
+        regulon_genes_gff = GFF_REGULON,
+    log: INTEGRATION_DIR + "/" + outdir_prefix + ".log"
+    benchmark: INTEGRATION_DIR + "/" + outdir_prefix + "_benchmark.txt"
+    conda: "../envs/venn.yaml"
+    script:
+        "../../R-scripts/R/gene_lists_comparison.R"
+
+ 
+
+
+
