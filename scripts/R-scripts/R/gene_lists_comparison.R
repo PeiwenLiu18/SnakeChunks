@@ -5,25 +5,29 @@
 
 library(VennDiagram)
 
-dir.main <- "~/FNR_analysis"
-setwd(dir.main)
+## Parameters from Snakemake rule
 
 parameters <- list(
-  "chip_genes" = "ChIP-seq/results/peaks/FNR_vs_input/homer/FNR_vs_input_cutadapt_bowtie2_homer_gene_list.txt",
-  "rna_genes" = "RNA-seq/results/diffexpr/FNR_vs_WT/DESeq2/FNR_vs_WT_cutadapt_bwa_featureCounts_DESeq2_gene_list.txt",
-  "gene.descriptions" = "data/regulonDB/GeneProductSet.txt",
-  "TFBS" = "data/regulonDB/BindingSiteSet.txt",
-  "TUs" = "data/regulonDB/TUSet.txt",
-  "TF" = "FNR",
-  "venn.format" = "png svg"
+  "chip_genes" = snakemake@input[["chip_genes"]],
+  "rna_genes" = snakemake@input[["rna_genes"]],
+  "gene.descriptions" = snakemake@input[["regulondb_gene_product"]],
+  "TFBS" = snakemake@input[["regulondb_sites"]],
+  "TUs" = snakemake@input[["regulondb_tus"]],
+  "TF" = snakemake@params[["TF"]],
+  "venn.format" = snakemake@params[["image_format"]]
 )
 
 output <- list(
-  "dir" = "integration",
-  "venn" = "ChIP-RNA-regulons_Venn",
-  "annotated_genes" = "ChIP-RNA-regulons_table"
+  "dir" = snakemake@params[["outdir"]],
+  "venn" = snakemake@output[["venn"]],
+  "annotated_genes" = snakemake@output[["gene_table"]],
+  "chip_genes_gff" = snakemake@output[["chip_genes_gff"]],
+  "rna_genes_gff" = snakemake@output[["rna_genes_gff"]],
+  "regulon_genes_gff" = snakemake@output[["regulon_genes_gff"]]
 )
 
+print(parameters)
+print(output)
 #### Load gene description table ####
 # Columns:
 # (1) Gene identifier assigned by RegulonDB
@@ -115,15 +119,16 @@ genes <- list(
 dir.create(output[["dir"]], showWarnings = FALSE, recursive = TRUE)
 
 #venn.plot <- venn.diagram(list(ChIP=chip, RNA=rna, Regulon=regulon), filename="{output}", imagetype="png", fill=rainbow(3))
-for (venn.format in unlist(strsplit(parameters[["venn.format"]], split = " "))) {
-  venn.file <- file.path(output[["dir"]], paste(sep=".", output[["venn"]], venn.format))
-  message("Exporting Venn diagram", venn.file)
+#for (venn.format in unlist(strsplit(parameters[["venn.format"]], split = " "))) {
+  venn.file <- output[["venn"]]
+  print(venn.file)
+  message("Exporting Venn diagram ", venn.file)
   venn.plot <- venn.diagram(genes, 
                             filename = venn.file, 
-                            imagetype = venn.format,
+                            imagetype = parameters[["venn.format"]],
                             fill=rainbow(length(genes)))
 
-}
+#}
 
 #### Export summary table with the different criteria ####
 row.names(gene.table) <- gene.table$gene_id
@@ -134,9 +139,7 @@ gene.table[, regulon.name] <- 0
 gene.table[gene.table$bnumber %in% genes$ChIPseq, "ChIPseq"] <- 1
 gene.table[gene.table$bnumber %in% genes$RNAseq, "RNAseq"] <- 1
 gene.table[gene.table$bnumber %in% genes$regulon, regulon.name] <- 1
-out.gene.table <- file.path(
-  output[["dir"]], 
-  paste(sep=".", output[["annotated_genes"]], "tsv"))
+out.gene.table <- output[["annotated_genes"]]
 message("Exporting annotated gene table: ", out.gene.table)
 write.table(x = gene.table, sep="\t", quote=FALSE,
             row.names = FALSE,
@@ -157,7 +160,7 @@ write.table(x = gene.table, sep="\t", quote=FALSE,
 ## group - All lines with the same group are linked together into a single item.
 
 gff <- data.frame(
-  "seqname" = "Chromsome",
+  "seqname" = "Chromosome",
   "source" = "SnakeChunks",
   "feature" = "gene",
   "start" = gene.table$gene_left,
@@ -168,10 +171,22 @@ gff <- data.frame(
   "attribute" = paste(sep="", "gene_id: ", gene.table$bnumber)
 )
 
-chipseq.gff <- file.path(output[["dir"]], paste(sep="", output[["annotated_genes"]], "_ChIP-seq.tsv"))
+chipseq.gff <- output[["chip_genes_gff"]]
 message('Exporting GFF file for ChIP-seq results: ', chipseq.gff)
 write.table(x = subset(gff, gene.table$ChIPseq == 1), file = chipseq.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
 
-rnapseq.gff <- file.path(output[["dir"]], paste(sep="", output[["annotated_genes"]], "_RNA-seq.tsv"))
+rnaseq.gff <- output[["rna_genes_gff"]]
 message('Exporting GFF file for RNA-seq results: ', rnaseq.gff)
 write.table(x = subset(gff, gene.table$RNAseq == 1), file = rnaseq.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
+
+regulon.gff <- output[["regulon_genes_gff"]]
+message('Exporting GFF file for RegulonDB results: ', regulon.gff)
+write.table(x = subset(gff, gene.table[[regulon.name]] == 1), file = regulon.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
+
+print(head(gene.table))
+print(regulon.name)
+print(head(gene.table[[regulon.name]]))
+
+
+
+
