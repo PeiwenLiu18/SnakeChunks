@@ -38,7 +38,7 @@ rule annotate_peaks:
     output: 
       peaks_to_transcripts = "{regions}_peaks_to_transcripts.tsv",
       transcript_list = "{regions}_transcript_list.tsv",
-      gene_list = "{regions}_gene_list.tsv"
+      gene_list = "{regions}_gene_list.txt"
     log: "{regions}_gene_list.log"
     benchmark: "{regions}_gene_list_benchmark.txt"
     params: 
