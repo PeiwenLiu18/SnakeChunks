@@ -44,7 +44,53 @@ subworkflow rna:
 #    snakefile: "mapping.wf"
 #    configfile: "metadata/config_RNA-seq.yml"
 
+## This is just a draft
 
+"""
+This is a prototype of combined workflow using Snakemake's subworkflow feature. 
+It requires to use Snakemake 3.8.1+
+
+Command to run the combined workflow is currently:
+    snakemake -s gene-regulation/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile gene-regulation/examples/Combined_ChIP-seq_RNA-seq --nolock
+
+Author:
+    Claire Rioualen
+"""
+
+# Subworkflows
+subworkflow chip:
+    workdir: config["ChIP_seq"]["directory"]
+    snakefile: config["ChIP_seq"]["snakefile"]
+    configfile: config["ChIP_seq"]["configfile"]
+
+subworkflow rna:
+    workdir: config["RNA_seq"]["directory"]
+    snakefile: config["RNA_seq"]["snakefile"]
+    configfile: config["RNA_seq"]["configfile"]
+
+-subworkflow mapping_wf:
+-    workdir: "../../../.."
+-    snakefile: config["mapping_wf"]["snakefile"]
+-    configfile: config["mapping_wf"]["configfile"]
+
+  mapping_wf:
+    snakefile: "mapping.wf"
+configfile: "metadata/config_RNA-seq.yml"
+
+
+# from chip
+GENE_LIST = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
+
+# from RNA
+GENE_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.tab", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
+
+# Combined workflow
+VENN = "/data/analyses/Combined_ChIP-seq_RNA-seq/venn.png"
+
+VENN_DIAGS = "venn/{{prefix}}_{{peakcaller}}_{{distance}}_{{read_counts}}_{{deg}}
+
+rule all:
+    input: VENN
 
 
 
