@@ -248,12 +248,12 @@ BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
 
 #GENOME_COV_GZ   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bedgraph.gz", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
+GENOME_COV_TDF  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.tdf", samples=SAMPLE_IDS, prefix=PREFIX)
 #GENOME_COV_BW   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bw", samples=SAMPLE_IDS, prefix=PREFIX)
-#GENOME_COV_PLUS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_plus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
-#GENOME_COV_MINUS= expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_minus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
+GENOME_COV_PLUS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_plus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
+GENOME_COV_MINUS= expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_minus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
 
-#ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_BW, GENOME_COV_TDF, GENOME_COV_PLUS, GENOME_COV_MINUS
+ALL_COVERAGE    = GENOME_COV_TDF, GENOME_COV_PLUS, GENOME_COV_MINUS
 
 #----------------------------------------------------------------#
 # Counting features
@@ -301,7 +301,7 @@ rule all:
 #            MAPPING,
 #           BAM_BAI,
             BAM_STATS,
-#            ALL_COVERAGE,
+            ALL_COVERAGE,
 #            FEATURE_COUNTS_PER_SAMPLE,
             ALL_FEATURE_COUNTS,
 #            SARTOOLS_TARGETFILE,
