@@ -26,8 +26,7 @@ output <- list(
   "regulon_genes_gff" = snakemake@output[["regulon_genes_gff"]]
 )
 
-print(parameters)
-print(output)
+
 #### Load gene description table ####
 # Columns:
 # (1) Gene identifier assigned by RegulonDB
@@ -121,7 +120,6 @@ dir.create(output[["dir"]], showWarnings = FALSE, recursive = TRUE)
 #venn.plot <- venn.diagram(list(ChIP=chip, RNA=rna, Regulon=regulon), filename="{output}", imagetype="png", fill=rainbow(3))
 #for (venn.format in unlist(strsplit(parameters[["venn.format"]], split = " "))) {
   venn.file <- output[["venn"]]
-  print(venn.file)
   message("Exporting Venn diagram ", venn.file)
   venn.plot <- venn.diagram(genes, 
                             filename = venn.file, 
@@ -182,11 +180,4 @@ write.table(x = subset(gff, gene.table$RNAseq == 1), file = rnaseq.gff, row.name
 regulon.gff <- output[["regulon_genes_gff"]]
 message('Exporting GFF file for RegulonDB results: ', regulon.gff)
 write.table(x = subset(gff, gene.table[[regulon.name]] == 1), file = regulon.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
-
-print(head(gene.table))
-print(regulon.name)
-print(head(gene.table[[regulon.name]]))
-
-
-
 
