@@ -1,7 +1,8 @@
 ---
 name: venn
 channels:
-  - bioconda
+  - conda-forge
 dependencies:
+  - cairo
   - r-venndiagram
 ...
