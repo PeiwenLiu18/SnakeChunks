@@ -105,6 +105,7 @@ then
     subread-align -i {input.index} -r {input.reads} -t {params.seq_data} -T {params.threads} -M {params.max_mismatches} {params.align_options} -o {params.unsorted_bam} 2> {log}
 fi
 samtools sort  {params.unsorted_bam} -o {output.bam} 2> {log}
+rm {params.unsorted_bam}
 """
 
 

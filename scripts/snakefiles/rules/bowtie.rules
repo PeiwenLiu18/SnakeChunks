@@ -98,6 +98,7 @@ fi
 samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
 rm {params.sam}
 samtools sort  {params.unsorted_bam} -o {output} 2> {log}
+rm {params.unsorted_bam}
 """
 #    run:
 #        if (seq_type == "pe"):
