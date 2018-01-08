@@ -144,3 +144,34 @@ write.table(x = gene.table, sep="\t", quote=FALSE,
 
 
 ##### Export gff #####
+##
+## Format specifications: https://genome.ucsc.edu/FAQ/FAQformat.html#format3
+## seqname - The name of the sequence. Must be a chromosome or scaffold.
+## source - The program that generated this feature.
+## feature - The name of this type of feature. Some examples of standard feature types are "CDS" "start_codon" "stop_codon" and "exon"li>
+##   start - The starting position of the feature in the sequence. The first base is numbered 1.
+## end - The ending position of the feature (inclusive).
+## score - A score between 0 and 1000. If the track line useScore attribute is set to 1 for this annotation data set, the score value will determine the level of gray in which this feature is displayed (higher numbers = darker gray). If there is no score value, enter ":.":.
+## strand - Valid entries include "+", "-", or "." (for don't know/don't care).
+## frame - If the feature is a coding exon, frame should be a number between 0-2 that represents the reading frame of the first base. If the feature is not a coding exon, the value should be ".".
+## group - All lines with the same group are linked together into a single item.
+
+gff <- data.frame(
+  "seqname" = "Chromsome",
+  "source" = "SnakeChunks",
+  "feature" = "gene",
+  "start" = gene.table$gene_left,
+  "end" = gene.table$gene_right,
+  "score" = ".",
+  "strand" = sub(pattern="reverse", replacement = "-", sub(pattern = "forward", replacement = "+", x = gene.table$strand)),
+  "frame" = ".",
+  "attribute" = paste(sep="", "gene_id: ", gene.table$bnumber)
+)
+
+chipseq.gff <- file.path(output[["dir"]], paste(sep="", output[["annotated_genes"]], "_ChIP-seq.tsv"))
+message('Exporting GFF file for ChIP-seq results: ', chipseq.gff)
+write.table(x = subset(gff, gene.table$ChIPseq == 1), file = chipseq.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
+
+rnapseq.gff <- file.path(output[["dir"]], paste(sep="", output[["annotated_genes"]], "_RNA-seq.tsv"))
+message('Exporting GFF file for RNA-seq results: ', rnaseq.gff)
+write.table(x = subset(gff, gene.table$RNAseq == 1), file = rnaseq.gff, row.names = FALSE, col.names = FALSE, sep="\t", quote=FALSE)
