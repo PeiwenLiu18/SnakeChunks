@@ -38,7 +38,7 @@
 ## WORKFLOW DESIGN
 ##
   trimming: "cutadapt"
-  mapping: "bowtie2"
+  mapping: "bwa"
   peakcalling: "homer macs2"
 #  annotation: "intersect"
 
