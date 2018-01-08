@@ -1,5 +1,5 @@
 ---
-name: bioconductor-mosaics
+name: bioconductor-deseq2
 channels:
   - conda-forge
   - defaults
