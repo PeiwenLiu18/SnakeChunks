@@ -219,9 +219,6 @@ GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}
 
 PEAK_MOTIFS     = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/peak-motifs/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_peak-motifs_synthesis.html", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
-REGULONDB_SITES = config["dir"]["regulondb"] + "/BindingSiteSet.txt"
-REGULONDB_TUS = config["dir"]["regulondb"] + "/TUSet.txt"
-
 # ----------------------------------------------------------------
 # Flowcharts
 # ----------------------------------------------------------------
@@ -255,8 +252,6 @@ rule all:
 	Run analyses.
 	"""
 	input: \
-            REGULONDB_SITES,
-            REGULONDB_TUS,
 #            MAPPING,
             MAPPING_QC,
             BAM_STATS,
