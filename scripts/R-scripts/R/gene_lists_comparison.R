@@ -110,7 +110,7 @@ target.gene.ids <- unlist(subset(gene.table, gene_name %in% target.genes, select
 genes <- list(
   "ChIPseq" = scan(parameters[["chip_genes"]], what = "character"),
   "RNAseq" =  scan(parameters[["rna_genes"]], what = "character"),
-  "regulon" = target.gene.ids
+  "RegulonDB" = target.gene.ids
 )
 
 
@@ -136,7 +136,7 @@ gene.table[, "RNAseq"] <- 0
 gene.table[, regulon.name] <- 0
 gene.table[gene.table$bnumber %in% genes$ChIPseq, "ChIPseq"] <- 1
 gene.table[gene.table$bnumber %in% genes$RNAseq, "RNAseq"] <- 1
-gene.table[gene.table$bnumber %in% genes$regulon, regulon.name] <- 1
+gene.table[gene.table$bnumber %in% genes$RegulonDB, regulon.name] <- 1
 out.gene.table <- output[["annotated_genes"]]
 message("Exporting annotated gene table: ", out.gene.table)
 write.table(x = gene.table, sep="\t", quote=FALSE,
