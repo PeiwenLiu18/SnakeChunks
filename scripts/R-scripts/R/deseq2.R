@@ -20,7 +20,7 @@ library("DESeq2")
 ## in order to load other scripts in the same dir as this one. 
 ## Solution proposed Bernhard Kausler on
 ## https://stackoverflow.com/questions/3452086/getting-path-of-an-r-script
-getScriptPath <- function(){
+getScriptPath <- function() {
   cmd.args <- commandArgs()
   m <- regexpr("(?<=^--file=).+", cmd.args, perl=TRUE)
   script.dir <- dirname(regmatches(cmd.args, m))
@@ -164,7 +164,7 @@ for (i in 1:nrow(design)) {
   # sort by p-value
   res.sorted <- res[order(res$padj),]
   # View(data.frame(res.sorted))
-
+  
   ## Build a data.frame for export
   res.frame <- cbind("gene" = row.names(res.sorted), data.frame(res.sorted))
   # names(res.frame)
@@ -173,58 +173,64 @@ for (i in 1:nrow(design)) {
   ## Select differentially expressed genes
   DEG.genes <- res.frame$padj < parameters$alpha
   
-  ################ Export result files ################
+  ################ Export result files ###############
   message("Exporting results to directory ", parameters$output.dir)
   ## Build prefix from conditions
   file.prefix <- file.path(parameters$output.dir, paste(sep="_", test.condition, "vs", ref.condition))
   
+  #### Print all figures in a pdf file ####
+  
+  ## Open a pdf file to store the figures
+  pdf(snakemake@output[["pdf_file"]], width = 7, height = 7)
+  
   ## Draw an MA plot
-  pdf(snakemake@output[["ma_plot"]], width = 7, height = 7)
+  # pdf(snakemake@output[["ma_plot"]], width = 7, height = 7)
   DESeq2::plotMA(res.sorted, alpha=parameters$alpha, las=1)
   grid()
-  silence <- dev.off()
+  # silence <- dev.off()
   
   ## Volcano plot
-  pdf(snakemake@output[["volcano_plot"]], width = 7, height = 7)
+  # pdf(snakemake@output[["volcano_plot"]], width = 7, height = 7)
   VolcanoPlot(multitest.table = res.frame, 
               main=paste(sep="", test.condition, " vs ", ref.condition),
               alpha = parameters$alpha,
               effect.size.col = "log2FoldChange",
               control.type = "padj", legend.corner = "top", legend.cex = 0.8, las=1, col.positive = "#BB0000")
+  # silence <- dev.off()
+  
+  ## P-value histogram (unadjusted p-values)
+  # pdf(snakemake@output[["pval_histo"]], width = 8, height = 6)
+  
+  hist(res.frame$pvalue, main="P-value histogram", 
+       breaks=seq(from=0, to=1, by=0.05),
+       col="#CC6666", xlab="Nominal p-value", ylab="Number of genes", las=1)
+  
+  ## Highlight number of genes declared positive
+  hist(unlist(res.frame[!DEG.genes, "pvalue"]), 
+       breaks=seq(from=0, to=1, by=0.05), add = TRUE, col="#BBBBBB")
+  ## Estimate the number of genes under null hypothesis
+  n.genes <- nrow(res.frame) ## Number of genes
+  
+  ## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
+  ## based on the method defined by Storey and Tibshirani (2003).
+  m <- nrow(res.frame)
+  n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
+  n1 <- m - n0
+  abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
+  legend("topright", 
+         legend = c(
+           paste("N = ", n.genes),
+           paste("n0 = ", n0),
+           paste("n1 = ", n1),
+           paste("DEG = ", sum(DEG.genes)),
+           paste("Sn = ", signif(digits=2, sum(DEG.genes) / n1))
+         ), 
+         lty=c("solid", "dashed", "solid", "solid", "solid"), 
+         lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
   silence <- dev.off()
-
-## P-value histogram (unadjusted p-values)
-pdf(snakemake@output[["pval_histo"]], width = 8, height = 6)
-
-hist(res.frame$pvalue, main="P-value histogram", 
-     breaks=seq(from=0, to=1, by=0.05),
-     col="#CC6666", xlab="Nominal p-value", ylab="Number of genes", las=1)
-
-## Highlight number of genes declared positive
-hist(unlist(res.frame[!DEG.genes, "pvalue"]), 
-     breaks=seq(from=0, to=1, by=0.05), add = TRUE, col="#BBBBBB")
-## Estimate the number of genes under null hypothesis
-n.genes <- nrow(res.frame) ## Number of genes
-
-## Estimation of the number of genes under null (n0) or alternative (n1) hypothesis, 
-## based on the method defined by Storey and Tibshirani (2003).
-m <- nrow(res.frame)
-n0 <- min(2*sum(res.frame$pvalue >= 0.5), m) 
-n1 <- m - n0
-abline(h=n0/20, lty="dashed", col="#0000BB", lwd=2)
-legend("topright", 
-       legend = c(
-         paste("N = ", n.genes),
-         paste("n0 = ", n0),
-         paste("n1 = ", n1),
-         paste("DEG = ", sum(DEG.genes)),
-         paste("Sn = ", signif(digits=2, sum(DEG.genes) / n1))
-       ), 
-       lty=c("solid", "dashed", "solid", "solid", "solid"), 
-       lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
-silence <- dev.off()
-
-
+  
+  #### Export result tables ####
+  
   ## Print a result table with all genes
   write.table(res.frame, row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
@@ -233,15 +239,15 @@ silence <- dev.off()
   ## Print a result table with genes passing the threshold
   write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
-#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
+              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
               file=snakemake@output[["gene_pval"]])
-
+  
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
-#              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
+              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
               file=snakemake@output[["gene_list"]])
-
+  
   list.files(parameters$output.dir)
   # system(paste("open", parameters$output.dir)) ## to check the results; only works for Mac
 }
