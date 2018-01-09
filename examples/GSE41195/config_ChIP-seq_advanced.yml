@@ -37,10 +37,10 @@
 ################################################################
 ## WORKFLOW DESIGN
 ##
-  trimming: "sickle"
-  mapping: "subread-align"
-  peakcalling: "homer macs2 spp"
-  annotation: "intersect"
+  trimming: "sickle"                                                    # Available options > sickle, cutadapt
+  mapping: "subread-align"                                              # Available options > bwa, bowtie, bowtie2, subread-align
+  peakcalling: "homer macs2 spp"                                        # Available options > homer, macs2, spp
+  annotation: "intersect"                                               # Available options > intersect, window, closest (bedtools annotations)
 
 ################################################################
 ## OPTIONAL PARAMETERS
@@ -69,6 +69,6 @@
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
-spp: 
-  fdr: "0.01"                                                           # Optional (def. 0.05)
+  spp: 
+    fdr: "0.01"                                                         # Optional (def. 0.05)
 
