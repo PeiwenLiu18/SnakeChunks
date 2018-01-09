@@ -83,7 +83,7 @@ include: os.path.join(RULES, "tophat.rules")
 
 trimming = "cutadapt"
 mapping = "bwa"
-peakcalling = "homer"
+peakcalling = "macs2"
 read_counts = "featureCounts"
 diffexpr = "DESeq2"
 
