@@ -2,5 +2,5 @@
 ; Organism: Saccharomyces cerevisiae
 ; Experiment type: ChIP-seq
 ;
-treatment	control		descr
-GSM521935	GSM521934	-
+Control	Treatment
+GSM521934	GSM521935

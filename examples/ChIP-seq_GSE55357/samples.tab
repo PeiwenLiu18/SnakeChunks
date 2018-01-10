@@ -4,7 +4,7 @@
 ; Organism: Saccharomyces cerevisiae
 ; Experiment type: ChIP-seq
 ;
-ID	Condition	Scan Name
+ID	Condition	SRR_ID
 GSM1334674	input	SRR1176905
 GSM1334676	input	SRR1176907
 GSM1334679	chip	SRR1176908
