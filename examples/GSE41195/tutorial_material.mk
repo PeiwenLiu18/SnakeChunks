@@ -39,9 +39,9 @@ download_genome_data:
 ### Download raw data 
 download_chipseq_data:
 	cd $(ANALYSIS_DIR)
-	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/input $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR
-	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR/FNR.fastq.gz
-	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/input/input.fastq.gz
+	mkdir -p $(ANALYSIS_DIR)/ChIP-seq/fastq/input1 $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR1
+	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576934/SRR576934.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/FNR1/FNR1.fastq.gz
+	curl --create-dirs ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR576/SRR576938/SRR576938.fastq.gz -o $(ANALYSIS_DIR)/ChIP-seq/fastq/input1/input1.fastq.gz
 
 download_rnaseq_data:
 	cd $(ANALYSIS_DIR) && \
