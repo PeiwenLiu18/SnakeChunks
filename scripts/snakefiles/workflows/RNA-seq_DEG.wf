@@ -213,7 +213,7 @@ rule all:
 	Run analyses.
 	"""
 	input: 
-            mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
+#            mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
 #            MAPPING,
 #            BAM_BAI,
 #            BAM_STATS,

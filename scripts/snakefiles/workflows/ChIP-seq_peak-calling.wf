@@ -65,8 +65,8 @@ SAMPLE_IDS = read_table(config["metadata"]["samples"])['ID']
 
 # Design
 DESIGN = read_table(config["metadata"]["design"])
-TREATMENT = DESIGN['treatment']
-CONTROL = DESIGN['control']
+TREATMENT = DESIGN['Treatment']
+CONTROL = DESIGN['Control']
 
 ## Data & results dir
 if not (("dir" in config.keys()) and ("reads_source" in config["dir"].keys())):
