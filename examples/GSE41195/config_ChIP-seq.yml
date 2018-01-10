@@ -40,7 +40,6 @@
   trimming: "cutadapt"
   mapping: "bwa"
   peakcalling: "homer macs2"
-#  annotation: "intersect"
 
 ################################################################
 ## OPTIONAL PARAMETERS
@@ -51,10 +50,6 @@
     qual_threshold: "20"                                                # Optional (def. 20)
     length_threshold: "20"                                              # Optional (def. 20)
 
-  sickle:
-    qual_threshold: "25"                                                # Optional (def. 20)
-    length_threshold: "25"                                              # Optional (def. 20)
-
   macs2: 
     qval: "0.001"                                                       # Optional (def. 0.05)
     keep_dup: "all"                                                     # Optional (def. 1)
@@ -63,12 +58,9 @@
     other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
   homer: 
-    style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
+    style: "factor"                                                     # Optional (def. factor), can be factor, histone... , groseq, tss, dnase, super, mC (beware of output filenames)
     F: "2"                                                              # Optional (def. 4)
     L: "2"                                                              # Optional (def. 4)
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
-
-  spp: 
-   fdr: "0.01"                                                           # Optional (def. 0.01)
 

@@ -40,7 +40,6 @@
   trimming: "sickle"                                                    # Available options > sickle, cutadapt
   mapping: "subread-align"                                              # Available options > bwa, bowtie, bowtie2, subread-align
   peakcalling: "homer macs2 spp"                                        # Available options > homer, macs2, spp
-  annotation: "intersect"                                               # Available options > intersect, window, closest (bedtools annotations)
 
 ################################################################
 ## OPTIONAL PARAMETERS
