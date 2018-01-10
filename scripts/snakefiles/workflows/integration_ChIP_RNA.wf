@@ -25,8 +25,8 @@ include: os.path.join(GENEREG_LIB, "scripts/python_lib/util.py")
 
 # ChIP-seq
 chip_sample_ids = read_table("metadata/samples_ChIP-seq.tab")['ID']
-chip_treatment = read_table("metadata/design_ChIP-seq.tab")['treatment']
-chip_control = read_table("metadata/design_ChIP-seq.tab")['control']
+chip_treatment = read_table("metadata/design_ChIP-seq.tab")['Treatment']
+chip_control = read_table("metadata/design_ChIP-seq.tab")['Control']
 
 # RNA-seq  
 rna_sample_ids = read_table("metadata/samples_RNA-seq.tab")['ID']
