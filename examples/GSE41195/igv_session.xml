@@ -2,33 +2,33 @@
 <Session genome="genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa" hasGeneTrack="false" hasSequenceTrack="true" locus="Chromosome:3596954-3618516" nextAutoscaleGroup="7" path="../metadata/igv_session.xml" version="8">
     <Resources>
         <Resource path="../integration/ChIP-RNA-regulons_RegulonDB.gff"/>
-        <Resource path="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa.tdf"/>
+        <Resource path="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa.tdf"/>
         <Resource path="../RNA-seq/results/samples/WT2/WT2_cutadapt_bwa.tdf"/>
         <Resource path="../RNA-seq/results/samples/dFNR2/dFNR2_cutadapt_bwa.tdf"/>
         <Resource path="../data/RegulonDB/FNR/FNR_BS.bed"/>
         <Resource path="../integration/ChIP-RNA-regulons_ChIP-seq.gff"/>
-        <Resource path="../ChIP-seq/results/samples/input/input_cutadapt_bwa.tdf"/>
-        <Resource path="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa_plus_strand.tdf"/>
-        <Resource path="../ChIP-seq/results/peaks/FNR_vs_input/homer/FNR_vs_input_cutadapt_bwa_homer.bed"/>
+        <Resource path="../ChIP-seq/results/samples/input1/input1_cutadapt_bwa.tdf"/>
+        <Resource path="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa_plus_strand.tdf"/>
+        <Resource path="../ChIP-seq/results/peaks/FNR1_vs_input1/homer/FNR1_vs_input1_cutadapt_bwa_homer.bed"/>
         <Resource path="../RNA-seq/results/samples/WT1/WT1_cutadapt_bwa.tdf"/>
-        <Resource path="../ChIP-seq/results/peaks/FNR_vs_input/macs2/FNR_vs_input_cutadapt_bwa_macs2.bed"/>
+        <Resource path="../ChIP-seq/results/peaks/FNR1_vs_input1/macs2/FNR1_vs_input1_cutadapt_bwa_macs2.bed"/>
         <Resource path="../genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf"/>
-        <Resource path="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa_minus_strand.tdf"/>
+        <Resource path="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa_minus_strand.tdf"/>
         <Resource path="../integration/ChIP-RNA-regulons_RNA-seq.gff"/>
         <Resource path="../RNA-seq/results/samples/dFNR1/dFNR1_cutadapt_bwa.tdf"/>
         <Resource path="../genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3"/>
     </Resources>
     <Panel height="354" name="DataPanel" width="1836">
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/input/input_cutadapt_bwa.tdf" name="ChIP-seq input" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/input1/input1_cutadapt_bwa.tdf" name="ChIP-seq input" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
         </Track>
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa.tdf" name="ChIP-seq FNR " normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa.tdf" name="ChIP-seq FNR " normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
         </Track>
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,0,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa_minus_strand.tdf" name="ChIP-seq FNR -" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,0,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa_minus_strand.tdf" name="ChIP-seq FNR -" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
         </Track>
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,0,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR/FNR_cutadapt_bwa_plus_strand.tdf" name="ChIP-seq FNR +" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,0,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/samples/FNR1/FNR1_cutadapt_bwa_plus_strand.tdf" name="ChIP-seq FNR +" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
             <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="500.0" minimum="0.0" type="LINEAR"/>
         </Track>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,204,204" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../RNA-seq/results/samples/WT1/WT1_cutadapt_bwa.tdf" name="RNA-seq WT1" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
@@ -49,8 +49,8 @@
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="204,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3" name="GFF3 realease 37" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="204,204,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../genome/Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf" name="GTF release 37" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="102,102,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../data/RegulonDB/FNR/FNR_BS.bed" name="FNR sites from RegulonDB" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/peaks/FNR_vs_input/homer/FNR_vs_input_cutadapt_bwa_homer.bed" name="Homer peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
-        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/peaks/FNR_vs_input/macs2/FNR_vs_input_cutadapt_bwa_macs2.bed" name="Macs2 peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/peaks/FNR1_vs_input1/homer/FNR_vs_input_cutadapt_bwa_homer.bed" name="Homer peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../ChIP-seq/results/peaks/FNR1_vs_input1/macs2/FNR_vs_input_cutadapt_bwa_macs2.bed" name="Macs2 peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="153,0,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../integration/ChIP-RNA-regulons_ChIP-seq.gff" name="ChIP-seq genes (macs2)" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,153,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../integration/ChIP-RNA-regulons_RNA-seq.gff" name="RNA-seq genes" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="102,102,0" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="12" id="../integration/ChIP-RNA-regulons_RegulonDB.gff" name="RegulonDB genes" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
