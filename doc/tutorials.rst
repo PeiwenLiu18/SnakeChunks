@@ -61,9 +61,9 @@ to the analysis directory.
 
 ::
 
-    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
-    tar xvzf 4.0.tar.gz
-    ln -s SnakeChunks-4.0 SnakeChunks
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.1.2.tar.gz 
+    tar xvzf 4.1.2.tar.gz
+    ln -s SnakeChunks-4.1.2 SnakeChunks
 
 Download reference genome & annotations
 ****************************************************************
@@ -92,9 +92,8 @@ Download raw data
 ::
 
     mkdir -p ${ANALYSIS_DIR}/data/GSM521934 ${ANALYSIS_DIR}/data/GSM521935
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX%2FSRX021%2FSRX021358/SRR051929/SRR051929.sra -P ${ANALYSIS_DIR}/data/GSM521934
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX%2FSRX021%2FSRX021359/SRR051930/SRR051930.sra -P ${ANALYSIS_DIR}/data/GSM521935
-
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR051/SRR051929/SRR051929.sra -P ${ANALYSIS_DIR}/data/GSM521934
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR051/SRR051930/SRR051930.sra -P ${ANALYSIS_DIR}/data/GSM521935
 
 Workflow 'import_from_sra'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,9 +205,9 @@ Download the SnakeChunks library
 
 ::
 
-    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
-    tar xvzf 4.0.tar.gz
-    ln -s SnakeChunks-4.0 SnakeChunks
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.1.2.tar.gz 
+    tar xvzf 4.1.2.tar.gz
+    ln -s SnakeChunks-4.1.2 SnakeChunks
 
 
 Download reference genome & annotations
@@ -228,10 +227,11 @@ Download ChIP-seq data
 
 ::
 
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476133/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476135/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476136/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476138/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176905/SRR1176905.sra -P ${ANALYSIS_DIR}/data/GSM1334674
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176907/SRR1176907.sra -P ${ANALYSIS_DIR}/data/GSM1334676
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176908/SRR1176908.sra -P ${ANALYSIS_DIR}/data/GSM1334679
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176910/SRR1176910.sra -P ${ANALYSIS_DIR}/data/GSM1334677
+
 
 Workflow execution
 ****************************************************************
@@ -268,9 +268,9 @@ Download the SnakeChunks library
 
 ::
 
-    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
-    tar xvzf 4.0.tar.gz
-    ln -s SnakeChunks-4.0 SnakeChunks
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.1.2.tar.gz 
+    tar xvzf 4.1.2.tar.gz
+    ln -s SnakeChunks-4.1.2 SnakeChunks
 
 
 Download reference genome & annotations
@@ -289,10 +289,12 @@ Download RNA-seq data
 
 ::
 
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476122/SRR1176894/SRR1176894.sra -P ${ANALYSIS_DIR}/data/GSM1334027
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476124/SRR1176896/SRR1176896.sra -P ${ANALYSIS_DIR}/data/GSM1334029
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476128/SRR1176900/SRR1176900.sra -P ${ANALYSIS_DIR}/data/GSM1334033
-    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX476/SRX476129/SRR1176901/SRR1176901.sra -P ${ANALYSIS_DIR}/data/GSM1334034
+ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176894/SRR1176894.sra
+
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176894/SRR1176894.sra -P ${ANALYSIS_DIR}/data/GSM1334027
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176896/SRR1176896.sra -P ${ANALYSIS_DIR}/data/GSM1334029
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176900/SRR1176900.sra -P ${ANALYSIS_DIR}/data/GSM1334033
+    wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176901/SRR1176901.sra -P ${ANALYSIS_DIR}/data/GSM1334034
 
 Workflow execution
 ****************************************************************
@@ -343,9 +345,9 @@ Download the SnakeChunks library
 
 ::
 
-    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
-    tar xvzf 4.0.tar.gz
-    ln -s SnakeChunks-4.0 SnakeChunks
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.1.2.tar.gz 
+    tar xvzf 4.1.2.tar.gz
+    ln -s SnakeChunks-4.1.2 SnakeChunks
 
 
 Download reference genome & annotations
@@ -402,9 +404,9 @@ Hereafter is a suggestion for the organization of your files.
 ::
 
     # Download the SnakeChunks library
-    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.0.tar.gz 
-    tar xvzf 4.0.tar.gz
-    ln -s SnakeChunks-4.0 SnakeChunks
+    wget --no-clobber https://github.com/SnakeChunks/SnakeChunks/archive/4.1.2.tar.gz 
+    tar xvzf 4.1.2.tar.gz
+    ln -s SnakeChunks-4.1.2 SnakeChunks
 
 ::
 
