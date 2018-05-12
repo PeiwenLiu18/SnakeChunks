@@ -299,14 +299,14 @@ rule all:
 	"""
 	input: 
 #            mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
-#            MAPPING,
-#           BAM_BAI,
-            BAM_STATS,
-            ALL_COVERAGE,
-#            FEATURE_COUNTS_PER_SAMPLE,
-            ALL_FEATURE_COUNTS,
+#            MAPPING, # Mapped reads
+            BAM_BAI, # Index files for BAM files
+            BAM_STATS, # Statistics about each BAM file
+            ALL_COVERAGE, # Coverage files
+#            FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
+            ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
 #            SARTOOLS_TARGETFILE,
-            DEG_LIST,
+            DEG_LIST, # Lists of differentially expressed genes
             DEG_FIGURES,
 #            DEG,
 #            INFER_TRANSCRIPTS,
