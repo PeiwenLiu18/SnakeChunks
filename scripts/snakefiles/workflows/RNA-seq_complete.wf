@@ -139,6 +139,7 @@ include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "subread_align.rules")
 include: os.path.join(RULES, "subread_featureCounts_all.rules")
+include: os.path.join(RULES, "subread_featureCounts.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "tophat.rules")
 
