@@ -271,21 +271,24 @@ for (i in 1:nrow(design.table)) {
   #### Export result tables ####
   
   ## Print a result table with all genes
-  write.table(res.frame, row.names = FALSE, col.names=TRUE,
+  write.table(format(res.frame, scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
               file=snakemake@output[["gene_table"]])
+  message("\tDEG table, all genes:\t", snakemake@output[["gene_table"]])
   
   ## Print a result table with genes passing the threshold
-  write.table(res.frame[DEG.genes, ], row.names = FALSE, col.names=TRUE,
+  write.table(format(res.frame[DEG.genes, ], scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
               sep="\t", quote=FALSE, 
               #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
               file=snakemake@output[["gene_pval"]])
+  message("\tDEG table, significant genes:\t", snakemake@output[["gene_pval"]])
   
   ## Export the list of differentially expressed gene names
   write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
               sep="\t", quote=FALSE, 
               #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
               file=snakemake@output[["gene_list"]])
+  message("\tDEG gene IDs:\t", snakemake@output[["gene_list"]])
   
   list.files(parameters$output_dir)
   # system(paste("open", parameters$output_dir)) ## to check the results; only works for Mac
