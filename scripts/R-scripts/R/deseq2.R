@@ -29,13 +29,13 @@ getScriptPath <- function() {
   return(script.dir)
 }
 script.dir <- getScriptPath()
-message("Script directory: ", script.dir)
+message("\tScript directory: ", script.dir)
 source(file.path(script.dir, "VolcanoPlot.R"))
 # source("SnakeChunks/scripts/R-scripts/R/VolcanoPlot.R")
 
 
 ## Report working directory
-message("Working directory: ", getwd())
+message("\tWorking directory: ", getwd())
 
 
 
@@ -67,35 +67,55 @@ if ((!is.numeric(parameters$rowsum_filter))
   stop(parameters$rowsum_filter, " (", class(parameters$rowsum_filter), ")  is not a valid value for alpha. Must be a positive number. ")
 }
 
-## Data and design
-parameters$sample.ids <- snakemake@params[["sample_ids"]] ## Claire: are these ever used ? 
 
+################################################################
 ## Tab-delimited file with sample descriptions
 parameters$sample_table <- snakemake@params[["sample_tab"]] 
+message("\tSample table:\t", parameters$sample_table)
+## Read sample descriptions
+coldata <- read.table(parameters$sample_table, header=TRUE, row.names = 1, comment.char=";")
+message("\tSample table contains ", nrow(coldata), " samples")
 
+## User-specified sample IDs
+if (!is.null(snakemake@params[["sample_ids"]])) {
+  parameters$sample.ids <- snakemake@params[["sample_ids"]] ## Claire: are these ever used ?
+} else {
+  parameters$sample.ids <- rownames(coldata)
+}
+#colnames(coldata) <- tolower(colnames(coldata)) ## Make the column "Condition" case-insensitive
+colnames(coldata) <- gsub(x = colnames(coldata), pattern = "condition", replacement = "Condition", ignore.case=TRUE) 
+sample.conditions <- as.vector(unlist(coldata[, "Condition"]))
+message("\t\tSample IDs: ", paste(collapse=", ", parameters$sample.ids))
+message("\t\tConditions: ", paste(collapse=", ", sample.conditions))
+
+################################################################
+## Read the design
+##
 ## Tab-delimited file with one or several pairs of conditions to be compared 
 ## (one comparison per row)
 parameters$design_file <- snakemake@params[["design_tab"]] 
+message("\tDesign file:\t", parameters$design_file)
+design.table <- read.table(parameters$design_file, header=TRUE, row.names = NULL, comment.char=";")
+message("\t\tDesign table contains ", nrow(design.table), " differential analyses")
+
 
 ## File containing the count table (one row per feature, one column per sample)
 parameters$count_file <- snakemake@input[["count_file"]] 
-
-## Output directory
-parameters$output.dir<- snakemake@params[["outdir"]]
-## Create output directory if required
-dir.create(parameters$output.dir, showWarnings = FALSE, recursive = TRUE)
-
+message("\tCount file:\t", parameters$count_file)
 ## Read the count table
 counts <- read.table(parameters$count_file, header=TRUE, row.names=1, comment.char = "#")
+message("\t\t", ncol(counts), " samples (columns)")
+message("\t\t", nrow(counts), " features (rows)")
 # dim(counts)
 # View(counts)
 # head(counts)
 
-## Read sample descriptions
-coldata <- read.table(parameters$sample_table, header=TRUE, row.names = 1)
+## Output directory
+parameters$output.dir<- snakemake@params[["outdir"]]
+message("\tOutput directory:\t", parameters$output.dir)
+## Create output directory if required
+dir.create(parameters$output.dir, showWarnings = FALSE, recursive = TRUE)
 
-## Read the design
-design <- read.table(parameters$design_file, header=TRUE, row.names = NULL)
 
 
 ## TO CHECK: is the order of the samples the same as column names in the coutns: check with feature count rule
@@ -111,45 +131,52 @@ if (length(parameters$sample.ids) == ncol(counts)) {
   colnames(counts) <- sub(pattern = "RNA.seq.results.samples.", replacement = "", names(counts))
   colnames(counts) <- sub(pattern = "\\..*", replacement  = "", x = colnames(counts), perl=TRUE)
   
-  ## Claire: it may be better to enforce the correct specification of sample IDs, either via the sample table or via user-specified parameters
-  ## -> rather than parsing the column headers, die with an error message
-  ## We should discuss this. In the meantime I put the stop. 
+  ## Claire: it may be better to enforce the correct specification of
+  ## sample IDs, either via the sample table or via user-specified
+  ## parameters -> rather than parsing the column headers, die with an
+  ## error message We should discuss this. In the meantime I put the
+  ## stop.
   stop("Invalid specification of sample IDs. ")
 }
 
 ## Iterate over each line of the design file.
+
 ## Note: a design fle can contain several differential expression analyses. 
 ## The two first columns of each row specify the two conditions to be compared. 
 i <- 1
-for (i in 1:nrow(design)) {
+for (i in 1:nrow(design.table)) {
   ## Define reference and test conditions from the design file
-  ref.condition <- as.vector(unlist(design[i, 1]))
-  test.condition <- as.vector(unlist(design[i, 2]))
+  ref.condition <- as.vector(unlist(design.table[i, 1]))
+  test.condition <- as.vector(unlist(design.table[i, 2]))
   
   ## Select reference and test samples
-  ref.samples <- row.names(coldata)[as.vector(coldata$Condition) == ref.condition]
-  test.samples <- row.names(coldata)[as.vector(coldata$Condition) == test.condition]
+  ref.samples <- row.names(coldata)[sample.conditions == ref.condition]
+  test.samples <- row.names(coldata)[sample.conditions == test.condition]
   selected.samples <- c(ref.samples, test.samples)
   
-  message ("DESEq2 analysis ", i, "/", nrow(design), 
+  message ("DESEq2 analysis ", i, "/", nrow(design.table), 
            "; ref condition: ", ref.condition, " (", length(ref.samples)," samples)",
            "; test condition: ", test.condition, " (", length(test.samples)," samples)")  
   
   ## Build a DESeq dataset
-  dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples,], design = ~Condition)
+  dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples,,drop=FALSE], design = ~Condition)
   
   ## Define the conditions to be compared
-  dds$Condition <- relevel(dds$Condition, ref=ref.condition) 
+  dds$Condition <- relevel(dds$Condition, ref=ref.condition)
   
   # remove uninformative columns ## ???? rows, genes
   ## Filter out genes with zero counts in all samples
+  if (is.null(parameters$rowsum_filter)) {
+          parameters$rowsum_filter <- 0
+  }
+  message("\tRow sum filter\t", parameters$rowsum_filter, " counts/feature")
   dds <- dds[ rowSums(counts(dds)) > parameters$rowsum_filter, ]
   
   # Normalization, preprocessing and differential analysis
   dds <- DESeq(dds)
   
   ## Extract the result
-  contrast <- c("Condition", c("FNR", "WT"))
+  contrast <- c("Condition", c(test.condition, ref.condition))
   res <- results(dds, contrast=contrast, 
                  alpha = parameters$alpha,
                  independentFiltering=FALSE, pAdjustMethod = parameters$pAdjustMethod)  ## Collect the result table
