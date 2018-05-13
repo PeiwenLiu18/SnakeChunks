@@ -117,11 +117,16 @@ message("\t\t", nrow(counts), " features (rows)")
 # View(counts)
 # head(counts)
 
+
+## CLAIRE, I COMMENT THIS (2018-05-13) BECAUSE I THINK IT IS OBSOLETE
+## The output directory is specified for each pair of conditions
+## separately.
+##
 ## Output directory
-parameters$output_dir<- snakemake@params[["outdir"]]
-message("\tOutput directory:\t", parameters$output_dir)
-## Create output directory if required
-dir.create(parameters$output_dir, showWarnings = FALSE, recursive = TRUE)
+# parameters$output_dir<- snakemake@params[["outdir"]]
+# message("\tOutput directory:\t", parameters$output_dir)
+# ## Create output directory if required
+# dir.create(parameters$output_dir, showWarnings = FALSE, recursive = TRUE)
 
 
 
@@ -207,16 +212,46 @@ for (i in 1:nrow(design.table)) {
   res.frame <- cbind("gene" = row.names(res.sorted), data.frame(res.sorted))
   # names(res.frame)
   # head(res.frame)
-  
+
+  ## Detect genes with NA value in the padj colum
+  NA.genes <- is.na(res$padj)
+  message("\tDiscarding\t", sum(NA.genes), " features with NA padj")
+        
   ## Select differentially expressed genes
   DEG.genes <- res.frame$padj < parameters$alpha
-  message("\tSignificant featuresa (alpha=", parameters$alpha, "):\t", sum(DEG.genes))
+  DEG.genes[is.na(DEG.genes)] <- FALSE ## Genes with NA values are not considered as DEG
+  message("\tSignificant features (alpha=", parameters$alpha, "):\t", sum(DEG.genes))
   
   ################ Export result files ###############
-  message("\tExporting results to directory ", parameters$output_dir)
+#  message("\tExporting results to directory ", parameters$output_dir)
   ## Build prefix from conditions
-  file.prefix <- file.path(parameters$output_dir, paste(sep="_", test.condition, "vs", ref.condition))
+#  file.prefix <- file.path(parameters$output_dir, paste(sep="_", test.condition, "vs", ref.condition))
   
+  #### Export result tables ####
+  
+  ## Print a result table with all genes
+  write.table(format(res.frame, scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
+              sep="\t", quote=FALSE, 
+              file=snakemake@output[["gene_table"]])
+  message("\tDEG table, all genes:\t", snakemake@output[["gene_table"]])
+  
+  ## Print a result table with genes passing the threshold
+  write.table(format(res.frame[DEG.genes, ], scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
+              sep="\t", quote=FALSE, 
+              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
+              file=snakemake@output[["gene_pval"]])
+  message("\tDEG table, significant genes:\t", snakemake@output[["gene_pval"]])
+  
+  ## Export the list of differentially expressed gene names
+  write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
+              sep="\t", quote=FALSE, 
+              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
+              file=snakemake@output[["gene_list"]])
+  message("\tDEG gene IDs:\t", snakemake@output[["gene_list"]])
+  
+#  list.files(parameters$output_dir)
+  # system(paste("open", parameters$output_dir)) ## to check the results; only works for Mac
+
   #### Print all figures in a pdf file ####
   
   ## Open a pdf file to store the figures
@@ -268,29 +303,5 @@ for (i in 1:nrow(design.table)) {
          lwd=c(0,2,0,7,0), col=c(NA,"#0000BB",NA, "#CC6666", NA))
   silence <- dev.off()
   
-  #### Export result tables ####
-  
-  ## Print a result table with all genes
-  write.table(format(res.frame, scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
-              sep="\t", quote=FALSE, 
-              file=snakemake@output[["gene_table"]])
-  message("\tDEG table, all genes:\t", snakemake@output[["gene_table"]])
-  
-  ## Print a result table with genes passing the threshold
-  write.table(format(res.frame[DEG.genes, ], scientific=F, digits=6), row.names = FALSE, col.names=TRUE,
-              sep="\t", quote=FALSE, 
-              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, ".tsv"))
-              file=snakemake@output[["gene_pval"]])
-  message("\tDEG table, significant genes:\t", snakemake@output[["gene_pval"]])
-  
-  ## Export the list of differentially expressed gene names
-  write.table(res.frame[DEG.genes, "gene"], row.names = FALSE, col.names=FALSE,
-              sep="\t", quote=FALSE, 
-              #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
-              file=snakemake@output[["gene_list"]])
-  message("\tDEG gene IDs:\t", snakemake@output[["gene_list"]])
-  
-  list.files(parameters$output_dir)
-  # system(paste("open", parameters$output_dir)) ## to check the results; only works for Mac
 }
 
