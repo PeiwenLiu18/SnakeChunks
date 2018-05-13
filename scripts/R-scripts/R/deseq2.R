@@ -12,8 +12,11 @@
 ## - Is there a way to pass an optional list of parameters from snakemake to R in the same way as the "..." specification for function headers ?
 ## > I don't think I understand what you mean
 
+message("Running DESeq2 analysis to detect differentially expressed genes")
+
 ## Load required librarires
-library("DESeq2")
+message("\tLoadin DESeq2 library")
+library("DESeq2", quietly=TRUE, verbose=FALSE)
 
 
 ## Get current script directory
@@ -46,10 +49,12 @@ parameters <- list()
 ## Get and check DESeq2 parameters
 
 ## Directory containing the differential expression
-parameters$diffexpr.dir <- snakemake@params[["diffexpr_dir"]]  ## Claide, do we use this parameter ?
+# parameters$diffexpr.dir <- snakemake@params[["diffexpr_dir"]]  ## CLAIRE, DO WE USE THIS PARAMETER ?
+# message("\tdiffexpr.dir:\t", parameters$diffexpr.dir) 
 
 ## Adjustment method for multiple testing
 parameters$pAdjustMethod <- snakemake@params[["pAdjustMethod"]] # "BH" ## Correction for multiple testing
+message("\tP adjust method:\t", parameters$pAdjustMethod)
 
 ## Significance threshold (applied on adjusted p-value)
 parameters$alpha <- as.numeric(snakemake@params[["alpha"]]) # 0.05 ## Threshold on adjusted p-value
@@ -58,6 +63,7 @@ if ((!is.numeric(parameters$alpha))
     || (parameters$alpha > 1)) {
   stop(parameters$alpha, " (", class(parameters$alpha), ")  is not a valid value for alpha. Must be number between 0 and 1. ")
 }
+message("\talpha:\t", parameters$alpha)
 
 
 ## Threshold on row sums, to filter out undetected genes
@@ -66,6 +72,7 @@ if ((!is.numeric(parameters$rowsum_filter))
     || (parameters$rowsum_filter < 0)) {
   stop(parameters$rowsum_filter, " (", class(parameters$rowsum_filter), ")  is not a valid value for alpha. Must be a positive number. ")
 }
+message("\trowsum_filter:\t", parameters$rowsum_filter)
 
 
 ################################################################
@@ -74,10 +81,10 @@ parameters$sample_table <- snakemake@params[["sample_tab"]]
 message("\tSample table:\t", parameters$sample_table)
 ## Read sample descriptions
 coldata <- read.table(parameters$sample_table, header=TRUE, row.names = 1, comment.char=";")
-message("\tSample table contains ", nrow(coldata), " samples")
+message("\t\tSample table contains ", nrow(coldata), " samples")
 
-## User-specified sample IDs
-if (!is.null(snakemake@params[["sample_ids"]])) {
+## Define sample IDs either from the config, or from column names of sample table
+if (exists("snakemake") && !is.null(snakemake@params[["sample_ids"]])) {
   parameters$sample.ids <- snakemake@params[["sample_ids"]] ## Claire: are these ever used ?
 } else {
   parameters$sample.ids <- rownames(coldata)
@@ -93,17 +100,17 @@ message("\t\tConditions: ", paste(collapse=", ", sample.conditions))
 ##
 ## Tab-delimited file with one or several pairs of conditions to be compared 
 ## (one comparison per row)
-parameters$design_file <- snakemake@params[["design_tab"]] 
-message("\tDesign file:\t", parameters$design_file)
-design.table <- read.table(parameters$design_file, header=TRUE, row.names = NULL, comment.char=";")
+parameters$design_table <- snakemake@params[["design_tab"]] 
+message("\tDesign table:\t", parameters$design_table)
+design.table <- read.table(parameters$design_table, header=TRUE, row.names = NULL, comment.char=";")
 message("\t\tDesign table contains ", nrow(design.table), " differential analyses")
 
 
 ## File containing the count table (one row per feature, one column per sample)
-parameters$count_file <- snakemake@input[["count_file"]] 
-message("\tCount file:\t", parameters$count_file)
+parameters$count_table <- snakemake@input[["count_file"]] 
+message("\tCount table:\t", parameters$count_table)
 ## Read the count table
-counts <- read.table(parameters$count_file, header=TRUE, row.names=1, comment.char = "#")
+counts <- read.table(parameters$count_table, header=TRUE, row.names=1, comment.char = "#")
 message("\t\t", ncol(counts), " samples (columns)")
 message("\t\t", nrow(counts), " features (rows)")
 # dim(counts)
@@ -111,10 +118,10 @@ message("\t\t", nrow(counts), " features (rows)")
 # head(counts)
 
 ## Output directory
-parameters$output.dir<- snakemake@params[["outdir"]]
-message("\tOutput directory:\t", parameters$output.dir)
+parameters$output_dir<- snakemake@params[["outdir"]]
+message("\tOutput directory:\t", parameters$output_dir)
 ## Create output directory if required
-dir.create(parameters$output.dir, showWarnings = FALSE, recursive = TRUE)
+dir.create(parameters$output_dir, showWarnings = FALSE, recursive = TRUE)
 
 
 
@@ -160,6 +167,7 @@ for (i in 1:nrow(design.table)) {
   
   ## Build a DESeq dataset
   dds <- DESeqDataSetFromMatrix(countData=counts[, selected.samples], colData=coldata[selected.samples,,drop=FALSE], design = ~Condition)
+  message("\tInitial features:\t", nrow(dds))
   
   ## Define the conditions to be compared
   dds$Condition <- relevel(dds$Condition, ref=ref.condition)
@@ -171,9 +179,12 @@ for (i in 1:nrow(design.table)) {
   }
   message("\tRow sum filter\t", parameters$rowsum_filter, " counts/feature")
   dds <- dds[ rowSums(counts(dds)) > parameters$rowsum_filter, ]
+  message("\tFeatures after rown sum filter:\t", nrow(dds))
+  
   
   # Normalization, preprocessing and differential analysis
-  dds <- DESeq(dds)
+  message("\tDetecting differentially expressed genes with DESeq2")
+  dds <- DESeq(dds, quiet=TRUE)
   
   ## Extract the result
   contrast <- c("Condition", c(test.condition, ref.condition))
@@ -199,11 +210,12 @@ for (i in 1:nrow(design.table)) {
   
   ## Select differentially expressed genes
   DEG.genes <- res.frame$padj < parameters$alpha
+  message("\tSignificant featuresa (alpha=", parameters$alpha, "):\t", sum(DEG.genes))
   
   ################ Export result files ###############
-  message("Exporting results to directory ", parameters$output.dir)
+  message("\tExporting results to directory ", parameters$output_dir)
   ## Build prefix from conditions
-  file.prefix <- file.path(parameters$output.dir, paste(sep="_", test.condition, "vs", ref.condition))
+  file.prefix <- file.path(parameters$output_dir, paste(sep="_", test.condition, "vs", ref.condition))
   
   #### Print all figures in a pdf file ####
   
@@ -275,7 +287,7 @@ for (i in 1:nrow(design.table)) {
               #              file=paste(sep="", file.prefix, "_deseq2_DEG_", parameters$pAdjustMethod, "_alpha", parameters$alpha, "_genes.txt")) ## snakemake@output[["gene_list"]]
               file=snakemake@output[["gene_list"]])
   
-  list.files(parameters$output.dir)
-  # system(paste("open", parameters$output.dir)) ## to check the results; only works for Mac
+  list.files(parameters$output_dir)
+  # system(paste("open", parameters$output_dir)) ## to check the results; only works for Mac
 }
 
