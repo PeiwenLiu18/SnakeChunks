@@ -72,6 +72,14 @@ VolcanoPlot <- function(
     col.positive = NA
   }
   
+
+  ## Filter out rowswith NA values in the effect size or p-value column
+  discarded <- is.na(multitest.table[,control.type]) | is.na(multitest.table[,effect.size.col])
+  if (sum(discarded > 0)) {
+      multitest.table <- multitest.table[!discarded,]
+      message("\tVolcanoPlot()\tdiscarding ", sum(discarded), " rows with NA values in effect size or P-value columns")
+  }
+    
   ## Identify features declared positive according to the specified alpha
   positive <- multitest.table[,control.type] <= alpha
   # table(positive)
