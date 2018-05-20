@@ -77,10 +77,10 @@ rule sickle:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-        sickle pe --pe-file1 {input.reads[0]} --pe-file2 {input.reads[1]} --qual-type {params.qual_type} -q {params.qual_threshold} -l {params.length_threshold} --output-pe1 {output.forward} --output-pe2 {output.reverse} --output-single {output.single} --gzip-output 2> {log}
+        sickle pe --pe-file1={input.reads[0]} --pe-file2={input.reads[1]} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-pe1={output.forward} --output-pe2={output.reverse} --output-single={output.single} {params.gzip_output} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
-    sickle se --fastq-file {input} --qual-type {params.qual_type} -q {params.qual_threshold} -l {params.length_threshold} --output-file {output.single} --gzip-output &> {log}
+    sickle se --fastq-file={input} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-file={output.single} {params.gzip_output} &> {log}
     touch {output.forward} {output.reverse}
 fi
 """
