@@ -132,15 +132,15 @@ include: os.path.join(RULES, "getfasta.rules")
 include: os.path.join(RULES, "get_chrom_sizes.rules")
 include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "homer.rules")
-include: os.path.join(RULES, "html_report.rules")
+#include: os.path.join(RULES, "html_report.rules")
 include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "index_fasta.rules")
 include: os.path.join(RULES, "macs2.rules")
 include: os.path.join(RULES, "macs14.rules")
 include: os.path.join(RULES, "mosaics.rules")
 #include: os.path.join(RULES, "peak_motifs.rules")
-include: os.path.join(RULES, "regulondb_download.rules")
-include: os.path.join(RULES, "regulondb_download_one_tf.rules")
+#include: os.path.join(RULES, "regulondb_download.rules")
+#include: os.path.join(RULES, "regulondb_download_one_tf.rules")
 include: os.path.join(RULES, "spp.rules")
 include: os.path.join(RULES, "subread_index.rules")
 include: os.path.join(RULES, "subread_align.rules")
@@ -151,20 +151,19 @@ include: os.path.join(RULES, "swembl.rules")
 #                         Workflow                               #
 #================================================================#
 
-
 #----------------------------------------------------------------#
 # Workflow design
 #----------------------------------------------------------------#
 
-if not (("tools" in config.keys()) and ("trimming" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-TRIMMING_TOOLS = config["tools"]["trimming"].split()
+TRIMMING_TOOLS = config["trimming"].split()
 
-if not (("tools" in config.keys()) and ("mapping" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['mapping'] should be specified in the config file.")
+if not ("mapping" in config.keys()):
+    sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
-MAPPING_TOOLS = config["tools"]["mapping"].split()
+MAPPING_TOOLS = config["mapping"].split()
 
 if TRIMMING_TOOLS:
     PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
@@ -179,7 +178,6 @@ else:
 #INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
 
 MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
 
 BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -198,10 +196,10 @@ ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_BW, GENOME_COV_PLUS, GENOME_COV_MINU
 # Peak-calling
 # ----------------------------------------------------------------
 
-if not (("tools" in config.keys()) and ("peakcalling" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['peakcalling'] should be specified in the config file.")
+if not ("peakcalling" in config.keys()):
+    sys.exit("The parameter config['peakcalling'] should be specified in the config file.")
 
-PEAKCALLING_TOOLS = config["tools"]["peakcalling"].split()
+PEAKCALLING_TOOLS = config["peakcalling"].split()
 PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 GET_FASTA   = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}.fasta", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
@@ -209,10 +207,10 @@ GET_FASTA   = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{t
 # Peak annotation
 # ----------------------------------------------------------------
 
-if not (("tools" in config.keys()) and ("annotation" in config["tools"].keys())):
-    sys.exit("The parameter config['tools']['annotation'] should be specified in the config file.")
+if not ("annotation" in config.keys()):
+    sys.exit("The parameter config['annotation'] should be specified in the config file.")
 
-DISTANCE = config["tools"]["annotation"].split()
+DISTANCE = config["annotation"].split()
 GENOMIC_FEAT    = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE, prefix=PREFIX)
 
 GENE_LIST       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_{{distance}}_annot_gene_list.tab", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, distance=DISTANCE,prefix=PREFIX)
@@ -232,16 +230,16 @@ GRAPHICS = expand(REPORTS_DIR + "/flowcharts/ChIP-seq_{graph}.{ext}", graph=["da
 
 
 
-HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
+#HTML_REPORT = REPORTS_DIR + "/html_report/index.html"
 
 
-#igv_session(xml_file, genome=GENOME_FASTA, gff3=GENOME_GFF3, gtf=GENOME_GTF, peaks=PEAKS, coverage=GENOME_COV_GZ)
+##igv_session(xml_file, genome=GENOME_FASTA, gff3=GENOME_GFF3, gtf=GENOME_GTF, peaks=PEAKS, coverage=GENOME_COV_GZ)
 
-IGV_SESSION = REPORTS_DIR + "/igv_session.xml"
+#IGV_SESSION = REPORTS_DIR + "/igv_session.xml"
 
 
 
-FORMAT_PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_formatted.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
+#FORMAT_PEAKS       = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_formatted.bed", zip, treat=TREATMENT, control=CONTROL), peakcaller=PEAKCALLING_TOOLS, prefix=PREFIX)
 
 #================================================================#
 #                        Rule all                                #
@@ -253,18 +251,17 @@ rule all:
 	"""
 	input: \
 #            MAPPING,
-            MAPPING_QC,
             BAM_STATS,
 #           BAM_BAI,
 #            GENOME_INDEX,
             ALL_COVERAGE,
             PEAKS,
-            FORMAT_PEAKS,
+#            FORMAT_PEAKS,
             GET_FASTA,
-            GENOMIC_FEAT,
-            GENE_LIST,
+#            GENOMIC_FEAT,
+#            GENE_LIST,
 #            PEAK_MOTIFS,
-            HTML_REPORT,
+#            HTML_REPORT,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
