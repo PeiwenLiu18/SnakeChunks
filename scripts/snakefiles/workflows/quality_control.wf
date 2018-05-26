@@ -193,7 +193,7 @@ rule all:
 	"""
 	input: \
 #            TRIMMING,
-            QC#, \
-            #GRAPHICS
+            QC,
+            GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
