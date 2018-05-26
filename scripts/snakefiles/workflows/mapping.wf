@@ -207,8 +207,8 @@ rule all:
             BAM_STATS,
             BAM_BAI,
 #            GENOME_INDEX,
-            ALL_COVERAGE#,
-#            GRAPHICS
+            ALL_COVERAGE,
+            GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
 
