@@ -190,7 +190,7 @@ GENOME_COV_BW   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bw", sample
 GENOME_COV_PLUS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_plus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
 GENOME_COV_MINUS= expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_minus_strand.bedgraph", samples=SAMPLE_IDS, prefix=PREFIX) 
 
-ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_BW, GENOME_COV_PLUS, GENOME_COV_MINUS
+ALL_COVERAGE    = GENOME_COV_GZ, GENOME_COV_PLUS, GENOME_COV_MINUS
 
 # ----------------------------------------------------------------
 # Peak-calling
