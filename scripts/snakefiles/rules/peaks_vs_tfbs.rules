@@ -33,8 +33,8 @@ rule peaks_vs_tfbs:
 	output: 
             matching_sites = "{peaks}_vs_{TF}_matching_sites.bed",
             matching_peaks = "{peaks}_vs_{TF}_matching_peaks.bed"
-	log: "{peaks}.log"
-	benchmark: "{peaks}_benchmark.txt"
+	log: "{peaks}_vs_{TF}.log"
+	benchmark: "{peaks}_vs_{TF}_benchmark.txt"
 	params: qsub = config["qsub"] + " -e {peaks}_qsub.err -o {peaks}_qsub.out"
 	conda:  "../envs/bedtools.yaml"
 	shell:"""
