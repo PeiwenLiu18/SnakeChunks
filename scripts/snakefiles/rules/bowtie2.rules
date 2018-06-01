@@ -118,6 +118,3 @@ rm {params.unsorted_bam}
 #            shell("bowtie2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 -N {params.max_mismatches} 2> {log}")
 #        shell("samtools view -b -S {params.sam} > {output.bam}")
 #        shell("rm {params.sam}")
-
-
-
