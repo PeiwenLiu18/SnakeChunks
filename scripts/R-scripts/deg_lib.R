@@ -566,6 +566,7 @@ calc.stats.per.sample <- function(sample.descriptions,
       "max" = apply(count.table, 2, max, na.rm=TRUE) ## Max counts per gene
     )
   )
+  rownames(stats.per.sample) <- colnames(all.counts)
   stats.per.sample$max.sum.ratio <- stats.per.sample$max / stats.per.sample$sum
   stats.per.sample$median.mean.ratio <- stats.per.sample$media / stats.per.sample$mean
   stats.per.sample$Mreads <- round(stats.per.sample$sum/1e6, digits = 1)
@@ -585,9 +586,23 @@ libsize.barplot <- function(stats.per.sample,
                             main="Read library sizes (libsum per sample)",
                             plot.file=NULL, 
                             ...) {
+  ## Get sample IDs
+  if (is.null(stats.per.sample$ID)) {
+    sample.ids <- as.vector(rownames(stats.per.sample))
+  } else {
+    sample.ids <- as.vector(stats.per.sample$ID)
+  }
+  
+  
+  ## Check if sample descriptions contain label column. If not, use ID.
+  if (is.null(stats.per.sample$label)) {
+    sample.labels <- sample.ids
+  } else {
+    sample.labels <- stats.per.sample$label
+  }
   
   ## Adapt boxplot size to the number of samples and label sizes
-  boxplot.lmargin <- max(nchar(sample.desc$label))/3+5
+  boxplot.lmargin <- max(nchar(sample.labels))/3+5
   boxplot.height <- length(sample.ids)/3+2
   
   ## Sample-wise library sizes
@@ -597,13 +612,14 @@ libsize.barplot <- function(stats.per.sample,
   }
   
   par(mar=c(5,boxplot.lmargin,4,1)) ## adapt axes
-  bplt <- barplot(stats.per.sample$Mreads, names.arg = stats.per.sample$label, 
+  bplt <- barplot(stats.per.sample$Mreads, 
+                  names.arg = sample.labels, 
                   main=main,
                   horiz = TRUE, las=1,
                   xlab="libsum (Million reads per sample)",
                   col=stats.per.sample$color, ...)
   grid(col="white", lty="solid",ny = 0)
-  text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt,pos=2, font=2)
+  text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt, pos=2, font=2)
   if (!is.null(plot.file)) {
     silence <- dev.off()
   }
@@ -641,8 +657,10 @@ count.boxplot <- function(count.table,
 count.correl.heatmap <- function(count.table, 
                                  main="Correlation between raw counts",
                                  plot.file=NULL,
-                                 log.transform=FALSE, # Perform a log transformation of the values before plotting
+                                 log.transform=TRUE, # Perform a log transformation of the values before plotting
                                  epsilon=0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+                                 zlim = NULL,
+                                 grey = FALSE, 
                                  ...
                                  ) {
   
@@ -657,14 +675,23 @@ count.correl.heatmap <- function(count.table,
   }
   count.cor <- as.matrix(cor(count.table))
   
-  ## Define a color palette for heatmaps. I like this Red-Blue palette because 
-  ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
-  ## - it can be seen by people suffering from red–green color blindness.
-  cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
+  ## Limits for the color scale
+  if (is.null(zlim)) {
+    zlim <- range(count.cor)
+  }
   
   ## Use a grayscale color  
-#
-  cols.heatmap <- gray.colors(100, start = 1, end = 0, gamma = 3, alpha = NULL)
+  if (grey) {
+    cols.heatmap <- gray.colors(256, start = 1, end = 0, gamma = 3, alpha = NULL)
+  } else {
+    ## Define a color palette for heatmaps. I like this Red-Blue palette because 
+    ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
+    ## - it can be seen by people suffering from red–green color blindness.
+    cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
+    
+  }
+  
+  
 
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
@@ -672,10 +699,12 @@ count.correl.heatmap <- function(count.table,
     pdf(file=plot.file, width=8, height=boxplot.height)
   }
   
+  
   hm <- heatmap.2(count.cor,  scale="none", trace="none", 
                   #breaks=c(-1, seq(0,1,length.out = 100)),
                   main=main, margins=c(margin,margin),
                   col=cols.heatmap,
+#                  zlim = zlim,
                   cellnote = signif(digits=2, count.cor),
                   ...
                   )

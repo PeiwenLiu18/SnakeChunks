@@ -44,7 +44,6 @@ RULES = os.path.join(GENEREG_LIB, "scripts/snakefiles/rules")
 include: os.path.join(RULES, "dot_graph.rules")
 include: os.path.join(RULES, "dot_to_image.rules")
 include: os.path.join(RULES, "gzip.rules")
-#include: os.path.join(RULES, "gunzip.rules")
 
 #================================================================#
 #                      Workflow setup
@@ -114,7 +113,7 @@ else:
 # Reporting
 #----------------------------------------------------------------#
 
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/import_from_sra_{graph}.png", graph=["dag", "rulegraph"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/import_from_sra_{graph}.svg", graph=["dag", "rulegraph"])
 
 #================================================================#
 #                        Rule all                                #
@@ -125,7 +124,7 @@ rule all:
 	Run the workflow.
 	"""
 	input: \
-            IMPORT, \
+            COMPRESS,
             GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"

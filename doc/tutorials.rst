@@ -164,7 +164,7 @@ Workflow execution
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq_peak-calling.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
 
 .. figure:: ../img/ChIP-seq_rulegraph.png
    :alt: 
@@ -249,7 +249,7 @@ And you should be able to execute it like this:
     cd ${ANALYSIS_DIR}
     snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
     snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq_peak-calling.wf -p --configfile SnakeChunks/examples/ChIP-seq_GSE55357/config.yml
 
 
 
@@ -289,8 +289,6 @@ Download RNA-seq data
 
 ::
 
-ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176894/SRR1176894.sra
-
     wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176894/SRR1176894.sra -P ${ANALYSIS_DIR}/data/GSM1334027
     wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176896/SRR1176896.sra -P ${ANALYSIS_DIR}/data/GSM1334029
     wget --no-clobber ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByRun/sra/SRR/SRR117/SRR1176900/SRR1176900.sra -P ${ANALYSIS_DIR}/data/GSM1334033
@@ -311,8 +309,7 @@ And you should be able to execute it like this:
 
     cd ${ANALYSIS_DIR}
     snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq_complete.wf -p --configfile SnakeChunks/examples/RNA-seq_GSE55316/config.yml
 
 
 

@@ -63,7 +63,7 @@ PUB_KEY=51716619E084DAB9
 
 BEDOPS_VER=2.4.19
 BEDTOOLS_VER=2.24.0
-BOWTIE1_VER=1.1.1
+BOWTIE1_VER=1.2.2
 BOWTIE2_VER=2.2.6
 CUFFLINKS_VER=2.2.1
 DEEPTOOLS_VER=2.5.0.1
@@ -283,7 +283,7 @@ bowtie:
 	cd $(SOURCE_DIR) && \
 	wget --no-clobber http://downloads.sourceforge.net/project/bowtie-bio/bowtie/$(BOWTIE1_VER)/bowtie-$(BOWTIE1_VER)-linux-x86_64.zip && \
 	unzip bowtie-$(BOWTIE1_VER)-linux-x86_64.zip && \
-	cp `find bowtie-$(BOWTIE1_VER)/ -maxdepth 1 -executable -type f` $(BIN_DIR)
+	cp `find bowtie-$(BOWTIE1_VER)-linux-x86_64/ -maxdepth 1 -executable -type f` $(BIN_DIR)
 
 bowtie2:
 	cd $(SOURCE_DIR) && \

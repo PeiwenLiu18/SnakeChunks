@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - bioconductor-deseq2
+  - bioconductor-deseq2=1.18.1
 ...

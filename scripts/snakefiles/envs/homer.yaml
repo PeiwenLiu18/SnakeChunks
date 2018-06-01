@@ -7,5 +7,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - homer
+  - homer=4.9.1
 ...

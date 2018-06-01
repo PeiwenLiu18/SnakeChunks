@@ -6,8 +6,8 @@ channels:
 dependencies:
 #  - bioconductor-biocinstaller
 #  - r-fastcluster
-  - libiconv
-  - bioconductor-rsamtools
-  - r-catools
-  - r-spp
+  - libiconv=1.15
+  - bioconductor-rsamtools=1.30.0
+  - r-catools=1.17.1
+  - r-spp=1.15.2
 ...

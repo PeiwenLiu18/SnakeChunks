@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - trim-galore
+  - trim-galore=0.4.5
 ...

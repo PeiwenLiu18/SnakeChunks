@@ -27,11 +27,10 @@
     diffexpr: "results/diffexpr"
     reports: "results/reports"
 
-  tools:
-    trimming: ""
-    mapping: "tophat"
-    read_counts: "featureCounts"
-    diffexpr: "edgeR DESeq2"
+  trimming: ""
+  mapping: "tophat"
+  read_counts: "featureCounts"
+  diffexpr: "DESeq2"
 
 ################################################################
 ## OPTIONAL PARAMETERS
@@ -41,7 +40,7 @@
 ## If nothing is mentionned  below, all prgrams will use their default parameters. 
   tophat:
     max_mismatches: 1                                                   # Default 2
-    threads: 1                                                          # Default 1
+    threads: 6                                                          # Default 1
 
   subread-featureCounts:
     attr_type: "gene_id"                                                # Default 'gene_id'

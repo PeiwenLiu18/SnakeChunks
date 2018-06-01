@@ -28,11 +28,10 @@
     diffexpr: "results/diffexpr"
     reports: "results/reports"
 
-  tools:
-    trimming: ""
-    mapping: "tophat"
-    read_counts: "featureCounts"
-    infer_transcripts: "cufflinks"
+  trimming: ""
+  mapping: "tophat"
+  read_counts: "featureCounts"
+  infer_transcripts: "cufflinks"
 
 ################################################################
 ## OPTIONAL PARAMETERS

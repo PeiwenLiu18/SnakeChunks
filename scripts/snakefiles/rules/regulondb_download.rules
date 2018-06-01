@@ -26,6 +26,6 @@ rule RegulonDB_download:
     shell:"""
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/TUSet.txt -O {output.all_tus_txt} &> {log}
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/BindingSiteSet.txt -O {output.all_tfbs_txt} &> {log}
-    awk '($1 !~ "#") && !(($4 == 0) && ($5 == 0)) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$4-1"\t"$5"\t"$2"\t.\t"$6}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
+    awk '($1 !~ "#") && !(($5 == "NA") && ($6 == "NA")) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$5-1"\t"$6"\t"$2"\t.\t"$7}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/GeneProductSet.txt -O {output.all_gene_products} &> {log}
 """
