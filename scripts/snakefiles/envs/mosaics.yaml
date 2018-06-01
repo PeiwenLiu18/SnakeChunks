@@ -3,6 +3,6 @@ name: bioconductor-mosaics
 channels:
   - bioconda
 dependencies:
-  - bioconductor-biocinstaller
-  - bioconductor-mosaics
+  - bioconductor-biocinstaller=1.28.0
+  - bioconductor-mosaics=2.16.0
 ...

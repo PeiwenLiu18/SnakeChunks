@@ -6,6 +6,6 @@ channels:
   - r
   - bioconda
 dependencies:
-  - samtools
-  - subread
+  - samtools=1.8
+  - subread=1.6.1
 ...

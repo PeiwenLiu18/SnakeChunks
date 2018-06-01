@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - samtools
+  - samtools=1.8
 ...

@@ -6,6 +6,6 @@ channels:
   - r
   - bioconda
 dependencies:
-  - graphviz
-  - snakemake
+  - graphviz=2.38.0
+  - snakemake=5.1.4
 ...

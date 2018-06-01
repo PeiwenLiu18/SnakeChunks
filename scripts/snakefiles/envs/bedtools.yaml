@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - bedtools
+  - bedtools=2.27.1
 ...

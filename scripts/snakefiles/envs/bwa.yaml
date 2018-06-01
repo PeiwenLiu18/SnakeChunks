@@ -3,6 +3,6 @@ name: bwa
 channels:
   - bioconda
 dependencies:
-  - samtools
-  - bwa
+  - samtools=1.8
+  - bwa=0.7.17
 ...
