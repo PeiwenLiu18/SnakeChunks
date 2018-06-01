@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - sickle-trim
+  - sickle-trim=1.33
 ...

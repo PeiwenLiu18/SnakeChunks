@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - multiqc
+  - multiqc=1.5
 ...

@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - cufflinks
+  - cufflinks=2.2.1
 ...

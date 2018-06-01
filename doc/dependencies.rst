@@ -504,15 +504,15 @@ Bowtie performs ungapped alignment, and is therefore not suitable for certain ty
 ::
 
     cd $HOME/app_sources
-    wget --no-clobber http://downloads.sourceforge.net/project/bowtie-bio/bowtie/1.1.1/bowtie-1.1.1-linux-x86_64.zip
-    unzip bowtie-1.1.1-linux-x86_64.zip
-    cp `find bowtie-1.1.1/ -maxdepth 1 -executable -type f` $HOME/bin
+    wget --no-clobber http://downloads.sourceforge.net/project/bowtie-bio/bowtie/1.2.2/bowtie-1.2.2-linux-x86_64.zip
+    unzip bowtie-1.2.2-linux-x86_64.zip
+    cp `find bowtie-1.2.2-linux-x86_64/ -maxdepth 1 -executable -type f` $HOME/bin
 
 Check installation:
 
 ::
 
-     bowtie --help
+     bowtie --version
 
 Bowtie2
 ****************************************************************

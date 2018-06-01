@@ -3,6 +3,6 @@ name: bowtie
 channels:
   - bioconda
 dependencies:
-  - samtools
-  - bowtie
+  - samtools=1.8
+  - bowtie=1.2.2
 ...

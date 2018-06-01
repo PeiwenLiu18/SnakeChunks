@@ -6,5 +6,5 @@ channels:
   - r
   - bioconda
 dependencies:
-  - deeptools
+  - deeptools=3.0.2
 ...

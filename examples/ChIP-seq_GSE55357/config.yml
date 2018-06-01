@@ -28,11 +28,10 @@
     peaks: "results/peaks"
     reports: "results/reports"
 
-  tools:
-    trimming: ""
-    mapping: "bowtie2"
-    peakcalling: "macs2 homer"
-    annotation: "intersect"
+  trimming: ""
+  mapping: "bowtie2"
+  peakcalling: "macs2 homer"
+  annotation: "intersect"
 
 ################################################################
 ## OPTIONAL PARAMETERS

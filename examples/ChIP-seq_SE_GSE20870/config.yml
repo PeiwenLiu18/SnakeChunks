@@ -28,11 +28,10 @@
     peaks: "results/peaks"
     reports: "results/reports"
 
-  tools:
-    trimming: "sickle cutadapt"
-    mapping: "bowtie2 subread-align bowtie bwa"
-    peakcalling: "macs2 macs14 homer spp swembl mosaics" # bPeaks"
-    annotation: "intersect" # window closest"
+  trimming: "cutadapt sickle"
+  mapping: "bowtie2 bowtie subread-align bwa"
+  peakcalling: "macs2 homer spp" # mosaics" # macs14 bPeaks" swembl
+  annotation: "intersect" # window closest"
 
 ################################################################
 ## OPTIONAL PARAMETERS

@@ -33,21 +33,20 @@ elif (seq_type == "se"):
 
 # Define input files
 def cutadapt_inputs(wildcards):
-    if not "input_format" in config["metadata"].keys():
-        ext = "fastq"
-    else:
-        ext = config["metadata"]["input_format"]
+#    if not "input_format" in config["metadata"].keys():
+#        ext = "fastq"
+#    else:
+#        ext = config["metadata"]["input_format"]
     if (seq_type == "pe"):
-        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}." + ext, strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
-#        sys.exit("Sorry; cutadapt currently only works with single-end data")
+        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}.fastq.gz", strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{samples}." + ext, samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand("{fastq_dir}/{samples}/{samples}.fastq.gz", samples=wildcards.samples, fastq_dir=fastq_dir)
     else:
         sys.exit("Error: invalid seq_type parameter. Must be 'se' or 'pe'")
     return reads
 
 rule cutadapt:
-    """Trim one a single end raw reads file with cutadapt.
+    """Trimming raw reads with cutadapt using the trim_galore pipeline.
 
     Required parameters:
         config["qsub"]
