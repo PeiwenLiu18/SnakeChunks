@@ -164,6 +164,17 @@ for (i in 1:nrow(design.table)) {
   ## Select reference and test samples
   ref.samples <- row.names(coldata)[sample.conditions == ref.condition]
   test.samples <- row.names(coldata)[sample.conditions == test.condition]
+
+  ## Subsampling option: select a subset of the samples to study the
+  ## impact on sensitivity and robustness of DEG to sampling
+  ## fluctuations
+  parameters$subsampling <- 0
+  if (!is.null(parameters$subsampling) & parameters$subsampling > 0) {
+    message("\tSubsampling: selecting ", parameters$subsampling, " samples per condition")
+    ref.samples <- sample(x=ref.samples, size=parameters$subsampling, replace=FALSE)
+    test.samples <- sample(x=test.samples, size=parameters$subsampling, replace=FALSE)
+  }
+        
   selected.samples <- c(ref.samples, test.samples)
   
   message ("DESEq2 analysis ", i, "/", nrow(design.table), 
