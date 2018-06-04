@@ -22,7 +22,7 @@ if  "gzip_output" in config["sickle"].keys():
         gzip_ext = ""
 
 if not "length_threshold" in config["sickle"].keys():
-    config["sickle"]["length_threshold"] = "20"
+    config["sickle"]["length_threshold"] = "30"
 
 if not "qual" in config["sickle"].keys():
     config["sickle"]["qual"] = "sanger"
@@ -69,7 +69,7 @@ rule sickle:
     output:
         forward = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[0] + ".fastq" + gzip_ext,
         reverse = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[1] + ".fastq" + gzip_ext,
-        single = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_single.fastq" + gzip_ext
+        single = config["dir"]["fastq"] + "/{samples}/{samples}_sickle.fastq" + gzip_ext
     params:
         qual_threshold = config["sickle"]["qual_threshold"],
         length_threshold = config["sickle"]["length_threshold"],
@@ -85,7 +85,7 @@ rule sickle:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-        sickle pe --pe-file1={input.reads[0]} --pe-file2={input.reads[1]} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-pe1={output.forward} --output-pe2={output.reverse} --output-single={output.single} {params.gzip_option} 2> {log}
+        sickle pe --pe-file1={input.reads[0]} --pe-file2={input.reads[1]} --qual-type={params.qual_type} --qual-threshold={params.qual_threshold} --length-threshold={params.length_threshold} --output-pe1={output.forward} --output-pe2={output.reverse} --output-single={output.single} {params.gzip_option} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
     sickle se --fastq-file={input} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-file={output.single} {params.gzip_option} &> {log}
