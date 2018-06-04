@@ -14,7 +14,7 @@ rule md5sum:
     find fastq/ -name '*.fastq'  \
        | awk '{print $1".md5sum"}' \
        | xargs snakemake  -j 20 -p \
-           -s gene-regulation/scripts/snakefiles/rules/md5sum.rules \
+           -s SnakeChunks/scripts/snakefiles/rules/md5sum.rules \
            --configfile metadata/Glossina_palpalis.yml
 
     Required parameters:
