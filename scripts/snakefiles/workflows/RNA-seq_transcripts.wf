@@ -15,11 +15,11 @@ Under construction:
 Parameters are specified in a yaml-formatted configuration file.
 
 Usage:
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/rna-seq_workflow_pe.py --configfile gene-regulation/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/rna-seq_workflow_pe.py --configfile SnakeChunks/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml
 
     snakemake -p  -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/rna-seq_workflow_pe.py \
-        --configfile gene-regulation/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml \
+        -s SnakeChunks/scripts/snakefiles/workflows/rna-seq_workflow_pe.py \
+        --configfile SnakeChunks/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml \
         [targets]
 
 Sequencing type: 	paired end
