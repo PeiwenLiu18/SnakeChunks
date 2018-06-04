@@ -15,14 +15,14 @@ Usage:
 
 1. Run in command line mode
 
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/mapping.wf \
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
         --configfile path/to/specific/config_file.yml \
         [targets]
 
 2. Send tasks to qsub job scheduler
 
     snakemake -p -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/mapping.wf \
+        -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
         --configfile path/to/specific/config_file.yml \
         [targets]
 

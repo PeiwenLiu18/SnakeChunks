@@ -5,10 +5,10 @@ and thus get a work base that is compatible with subsequent workflows of analysi
 Parameters are specified in a yaml-formatted configuration file.
 
 Usage:
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/import.wf --configfile ...
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/import.wf --configfile ...
 
     snakemake -p  -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/import.wf \
+        -s SnakeChunks/scripts/snakefiles/workflows/import.wf \
         --configfile ... \
         [targets]
 

@@ -4,10 +4,10 @@ Quality control pipeline for fastq/fastq.gz/bam data.
 Parameters are specified in a yaml-formatted configuration file.
 
 Usage:
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf --configfile ...
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf --configfile ...
 
     snakemake -p  -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/quality_control.wf \
+        -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf \
         --configfile ... \
         [targets]
 
@@ -25,10 +25,10 @@ and thus get a work base that is compatible with subsequent workflows of analysi
 Parameters are specified in a yaml-formatted configuration file.
 
 Usage:
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/import.wf --configfile ...
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/import.wf --configfile ...
 
     snakemake -p  -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/import.wf \
+        -s SnakeChunks/scripts/snakefiles/workflows/import.wf \
         --configfile ... \
         [targets]
 
@@ -66,6 +66,7 @@ include: os.path.join(RULES, "dot_to_image.rules")
 include: os.path.join(RULES, "fastqc.rules")
 include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "sickle.rules")
+include: os.path.join(RULES, "md5sum.rules")  # md5sum files are required for submission of the fastq files to GEO
 include: os.path.join(RULES, "cutadapt.rules")
 include: os.path.join(RULES, "bbduk.rules")
 
@@ -121,6 +122,7 @@ if (SEQ_TYPE == "pe"):
 #----------------------------------------------------------------#
 
 if (SEQ_TYPE == "se"):
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}.fastq.gz.md5sum", samples=SAMPLE_IDS)
     RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastqc/{samples}_fastqc.html", samples=SAMPLE_IDS)
 
 #----------------------------------------------------------------#
@@ -128,6 +130,7 @@ if (SEQ_TYPE == "se"):
 #----------------------------------------------------------------#
 
 elif (SEQ_TYPE == "pe"):
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}.fastq.gz.md5sum", samples=SAMPLE_IDS, strand=STRANDS)
     RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastqc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
 
 
@@ -147,8 +150,14 @@ TRIMMING_TOOLS = config["trimming"].split()
 
 print(TRIMMING_TOOLS)
 
-if (len(TRIMMING_TOOLS) != 0):
-
+if (len(TRIMMING_TOOLS) == 0):
+    TRIMMING = ""
+    TRIM_MD5 = ""
+    TRIM_QC = ""
+    MD5 = RAW_MD5
+    QC = RAW_QC
+    
+else:
     #----------------------------------------------------------------#
     # Single-end
     #----------------------------------------------------------------#
@@ -156,6 +165,7 @@ if (len(TRIMMING_TOOLS) != 0):
     if (SEQ_TYPE == "se"):
 
         TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz.md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
     #----------------------------------------------------------------#
@@ -170,11 +180,13 @@ if (len(TRIMMING_TOOLS) != 0):
         STRANDS     = config["metadata"]["strands"].split()
 
         TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz.md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
         TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
     else:
         sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
 
+    MD5 = RAW_MD5 + TRIM_MD5
     QC = RAW_QC + TRIM_QC
 
 #----------------------------------------------------------------#
@@ -193,6 +205,7 @@ rule all:
 	"""
 	input: \
 #            TRIMMING,
+            MD5,
             QC,
             GRAPHICS
 	params: qsub=config["qsub"]
