@@ -69,7 +69,8 @@ rule sickle:
     output:
         forward = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[0] + ".fastq" + gzip_ext,
         reverse = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[1] + ".fastq" + gzip_ext,
-        single = config["dir"]["fastq"] + "/{samples}/{samples}_sickle.fastq" + gzip_ext
+        single = config["dir"]["fastq"] + "/{samples}/{samples}_sickle.fastq" + gzip_ext,
+        stats = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_stats.txt"
     params:
         qual_threshold = config["sickle"]["qual_threshold"],
         length_threshold = config["sickle"]["length_threshold"],
@@ -85,10 +86,10 @@ rule sickle:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-        sickle pe --pe-file1={input.reads[0]} --pe-file2={input.reads[1]} --qual-type={params.qual_type} --qual-threshold={params.qual_threshold} --length-threshold={params.length_threshold} --output-pe1={output.forward} --output-pe2={output.reverse} --output-single={output.single} {params.gzip_option} 2> {log}
+        sickle pe --pe-file1={input.reads[0]} --pe-file2={input.reads[1]} --qual-type={params.qual_type} --qual-threshold={params.qual_threshold} --length-threshold={params.length_threshold} --output-pe1={output.forward} --output-pe2={output.reverse} --output-single={output.single} {params.gzip_option} 1> {output.stats} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
-    sickle se --fastq-file={input} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-file={output.single} {params.gzip_option} &> {log}
+    sickle se --fastq-file={input} --qual-type={params.qual_type} -q={params.qual_threshold} -l={params.length_threshold} --output-file={output.single} {params.gzip_option}  1> {output.stats} 2> {log}
     touch {output.forward} {output.reverse}
 fi
 """
