@@ -63,7 +63,7 @@ rule cutadapt:
     output:
         forward = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[0] + ".fastq.gz",
         reverse = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[1] + ".fastq.gz",
-        fastq = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq.gz"
+        single = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq.gz"
     params:
         qual_threshold = config["cutadapt"]["qual_threshold"],
         length_threshold = config["cutadapt"]["length_threshold"],
@@ -98,11 +98,11 @@ then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} --paired {input} &> {log}
     mv {params.temp_output_pe_1} {output.forward} 
     mv {params.temp_output_pe_2} {output.reverse} 
-    touch {output.fastq} 
+    touch {output.single} 
 elif [[ "{params.seq_type}" == "se" ]]
 then
     trim_galore --length {params.length_threshold} --quality {params.qual_threshold} -o {params.outdir} {input} &> {log}
-    mv {params.temp_output_se} {output.fastq}
+    mv {params.temp_output_se} {output.single}
     touch {output.forward} {output.reverse}
 fi
 """
