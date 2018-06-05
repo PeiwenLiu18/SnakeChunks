@@ -653,69 +653,168 @@ count.boxplot <- function(count.table,
   }
 }
 
-## Draw a heatmap with the inter-sample correlation matrix. ###########
+################################################################
+## Draw a heatmap with the inter-sample correlation matrix.
 count.correl.heatmap <- function(count.table, 
-                                 main="Correlation between raw counts",
-                                 plot.file=NULL,
-                                 log.transform=TRUE, # Perform a log transformation of the values before plotting
-                                 epsilon=0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
-                                 zlim = NULL,
-                                 grey = FALSE, 
+                                 main = NULL,
+                                 plot.file = NULL,
+                                 score = "cor", ## Supported: PCC (Pearson Correlation Coefficient) or SERE (handled by SARTools)
+                                 cor.method = "pearson", ## Passed to cor()
+                                 log.transform = TRUE, # Perform a log transformation of the values before plotting. Only done for PCC since SERE requires raw counts.
+                                 epsilon = 0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+                                 gray.palette = TRUE,
+                                 plot.values = TRUE,
                                  ...
-                                 ) {
+) {
   
   
-  ## Adapt boxplot size to the number of samples and label sizes
-  margin <- max(nchar(names(count.table)))/3+5
-
-  if (log.transform) {
-    range(count.table)
-    count.table[count.table==0] <- epsilon
-    count.table <- log10(count.table)
-  }
-  count.cor <- as.matrix(cor(count.table))
-  
-  ## Limits for the color scale
-  if (is.null(zlim)) {
-    zlim <- range(count.cor)
-  }
-  
-  ## Use a grayscale color  
-  if (grey) {
-    cols.heatmap <- gray.colors(256, start = 1, end = 0, gamma = 3, alpha = NULL)
+  ## Adapt margins to the number of samples and label sizes
+  sample.names <- names(count.table)
+  if (is.null(sample.names)) {
+    margin <- 5
   } else {
-    ## Define a color palette for heatmaps. I like this Red-Blue palette because 
+    margin <- max(nchar(sample.names))/3+5
+  }
+  
+  ## Compute comparison score
+  if (score == "SERE") {
+    # lane.totals <- colSums(count.table)
+    # SERE.table <- SERE_fun(
+    #   observed = as.matrix(count.table), 
+    #   laneTotals = lane.totals
+    # )
+    library(SARTools)
+    SERE.table <- tabSERE(as.matrix(count.table))
+    SERE.table <- SERE.table/100 ## SARTools returns scores multiplied by 100
+    count.cor <- max(SERE.table) - SERE.table ## Invert SERE to get a similarity rather than dissimilarity score
+    # count.cor <- SERE.table
+  } else if (score == "cor") {
+    if (log.transform) {
+      range(count.table)
+      count.table[count.table==0] <- epsilon
+      count.table <- log10(count.table)
+    }
+    count.cor <- as.matrix(cor(count.table, method=cor.method))
+  } else {
+    stop("count.correl.heatmap(): ", 
+         score, 
+         " is not a valid score. Supported: cor, SERE. ")
+  }
+  
+  ## Define a color palette for heatmaps. 
+  if (gray.palette) {
+    ## Use a grayscale color  
+    cols.heatmap <- gray.colors(100, start = 1, end = 0, gamma = 3, alpha = NULL)
+  } else {
+    ## I like this Red-Blue palette because 
     ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
     ## - it can be seen by people suffering from red–green color blindness.
     cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
-    
-  }
+  } 
   
-  
-
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
     message("Generating plot", plot.file)
     pdf(file=plot.file, width=8, height=boxplot.height)
   }
   
+  # Define main title
+  if (is.null(main)) {
+    if (score == "SERE") {
+      main <- paste(score, "scor")
+    } else {
+      main <- paste(cor.method, " correlation")
+    }
+  }
   
   hm <- heatmap.2(count.cor,  scale="none", trace="none", 
                   #breaks=c(-1, seq(0,1,length.out = 100)),
                   main=main, margins=c(margin,margin),
                   col=cols.heatmap,
-#                  zlim = zlim,
                   cellnote = signif(digits=2, count.cor),
                   ...
-                  )
+  )
   
-
+  
   if (!is.null(plot.file)) {
     silence <- dev.off()
   }
-
+  
   return(count.cor)  
 }
+
+# ## Draw a heatmap with the inter-sample correlation matrix. ###########
+# count.correl.heatmap <- function(count.table, 
+#                                  main="Correlation between raw counts",
+#                                  plot.file=NULL,
+#                                  log.transform=TRUE, # Perform a log transformation of the values before plotting
+#                                  epsilon=0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+#                                  zlim = NULL,
+#                                  grey = FALSE, 
+#                                  plot.values = TRUE, # plot correlation values on the heatmap
+#                                  ...
+#                                  ) {
+#   
+#   
+#   ## Adapt boxplot size to the number of samples and label sizes
+#   margin <- max(nchar(names(count.table)))/3+5
+# 
+#   if (log.transform) {
+#     range(count.table)
+#     count.table[count.table==0] <- epsilon
+#     count.table <- log10(count.table)
+#   }
+#   count.cor <- as.matrix(cor(count.table))
+#   
+#   ## Limits for the color scale
+#   if (is.null(zlim)) {
+#     zlim <- range(count.cor)
+#   }
+#   
+#   ## Use a grayscale color  
+#   if (grey) {
+#     cols.heatmap <- gray.colors(256, start = 1, end = 0, gamma = 3, alpha = NULL)
+#   } else {
+#     ## Define a color palette for heatmaps. I like this Red-Blue palette because 
+#     ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
+#     ## - it can be seen by people suffering from red–green color blindness.
+#     cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
+#     
+#   }
+# 
+#   ## Sample-wise library sizes
+#   if (!is.null(plot.file)) {
+#     message("Generating plot", plot.file)
+#     pdf(file=plot.file, width=8, height=boxplot.height)
+#   }
+#   
+#   
+#   if (plot.values) {
+#     cellnote <- signif(digits=2, count.cor)
+#   } else {
+#     cellnote <- FALSE
+#   }
+#   hm <- heatmap.2(count.cor,  
+#                   scale="none", 
+#                   trace="none", 
+#                   zlim = ,
+#                   #breaks=c(-1, seq(0,1,length.out = 100)),
+#                   main=main, 
+#                   margins=c(margin,margin),
+#                   col=cols.heatmap)
+#   
+# #                  zlim = zlim,
+#                   cellnote = cellnote, 
+#                   ...
+#                   )
+#   
+# 
+#   if (!is.null(plot.file)) {
+#     silence <- dev.off()
+#   }
+# 
+#   return(count.cor)  
+# }
 
 ## Generate a set of plots displaying some sample-wise statistics
 sample.description.plots <- function (sample.desc,
