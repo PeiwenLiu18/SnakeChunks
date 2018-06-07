@@ -29,7 +29,7 @@
     reports: "results/reports"
 
   trimming: "cutadapt sickle"
-  mapping: "bowtie2 bowtie subread-align bwa"
+  mapping: "bowtie2 subread-align bwa"
   peakcalling: "macs2 homer spp" # mosaics" # macs14 bPeaks" swembl
   annotation: "intersect" # window closest"
 

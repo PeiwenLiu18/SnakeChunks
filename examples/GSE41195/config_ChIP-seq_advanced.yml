@@ -12,7 +12,7 @@
     size: "4639221"
     fasta_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.dna.chromosome.Chromosome.fa
     gff3_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.chromosome.Chromosome.gff3
-    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf.gz
+    gtf_file: Escherichia_coli_str_k_12_substr_mg1655.ASM584v2.37.gtf
 
   metadata:
     samples: "metadata/samples_ChIP-seq.tab"                            # Required. Has to contain at least an "ID" column. 
@@ -29,16 +29,16 @@
     results: "ChIP-seq/results_advanced"                                # Required. Directory containing all result files that are produced by the pipeline
     snakechunks: "SnakeChunks"                                          # Required. Location of the SnakeChunks library
 
-    samples: "ChIP-seq/results/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
-    peaks: "ChIP-seq/results/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
-    reports: "ChIP-seq/results/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    samples: "ChIP-seq/results_advanced/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
+    peaks: "ChIP-seq/results_advanced/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
+    reports: "ChIP-seq/results_advanced/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
     regulondb: "data/RegulonDB"
 
 ################################################################
 ## WORKFLOW DESIGN
 ##
   trimming: "sickle"                                                    # Available options > sickle, cutadapt
-  mapping: "subread-align"                                              # Available options > bwa, bowtie, bowtie2, subread-align
+  mapping: "subread-align"                                              # Available options > bwa, bowtie2, subread-align...
   peakcalling: "homer macs2 spp"                                        # Available options > homer, macs2, spp
 
 ################################################################
@@ -46,10 +46,6 @@
 ##
 ## Parameters used by rules & programs.
 ## If nothing is mentionned  below, all programs will use their default parameters.
-  cutadapt:
-    qual_threshold: "20"                                                # Optional (def. 20)
-    length_threshold: "20"                                              # Optional (def. 20)
-
   sickle:
     qual_threshold: "25"                                                # Optional (def. 20)
     length_threshold: "25"                                              # Optional (def. 20)
@@ -62,11 +58,11 @@
     other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
   homer: 
-    style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
-    F: "2"                                                              # Optional (def. 4)
-    L: "2"                                                              # Optional (def. 4)
-    P: "0.01"                                                           # Optional (def. 0.0001)
-    fdr: "0.01"                                                         # Optional (def. 0.001)
+    style: "factor"                                                     # Optional (def. factor), can be factor, histone... , groseq, tss, dnase, super, mC (beware of output filenames)
+    F: "4"                                                              # Optional (def. 4)
+    L: "4"                                                              # Optional (def. 4)
+    P: "0.0001"                                                           # Optional (def. 0.0001)
+    fdr: "0.001"                                                         # Optional (def. 0.001)
 
   spp: 
     fdr: "0.01"                                                         # Optional (def. 0.05)

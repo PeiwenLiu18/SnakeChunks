@@ -28,7 +28,7 @@
     diffexpr: "results/diffexpr"
     reports: "results/reports"
 
-  trimming: ""
+  trimming: "cutadapt"
   mapping: "tophat"
   read_counts: "featureCounts"
   infer_transcripts: "cufflinks"

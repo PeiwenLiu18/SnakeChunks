@@ -38,7 +38,7 @@
 ## WORKFLOW DESIGN
 ##
   trimming: "cutadapt"
-  mapping: "bwa"
+  mapping: "bowtie2"
   peakcalling: "homer macs2"
 
 ################################################################
@@ -51,16 +51,17 @@
     length_threshold: "20"                                              # Optional (def. 20)
 
   macs2: 
-    qval: "0.001"                                                       # Optional (def. 0.05)
+    qval: "0.05"                                                       # Optional (def. 0.05)
     keep_dup: "all"                                                     # Optional (def. 1)
     mfold_min: "2"                                                      # Optional (def. 5)
     mfold_max: "50"                                                     # Optional (def. 50)
     other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
   homer: 
-    style: "factor"                                                     # Optional (def. factor), can be factor, histone... , groseq, tss, dnase, super, mC (beware of output filenames)
+    style: "factor"                                                     # Optional (def. factor), can be factor, histone, groseq, tss, dnase, super, mC (beware of output filenames)
     F: "2"                                                              # Optional (def. 4)
     L: "2"                                                              # Optional (def. 4)
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
+
 

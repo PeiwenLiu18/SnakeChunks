@@ -37,8 +37,9 @@
 ## WORKFLOW DESIGN
 ##
   trimming: "cutadapt"
-  mapping: "bwa"
-  peakcalling: "homer macs2"
+  mapping_chip: "bowtie2"
+  mapping_rna: "bwa"
+  peakcalling: "macs2"
   read_counts: "featureCounts"
   diffexpr: "DESeq2"
 
