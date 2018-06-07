@@ -1,7 +1,11 @@
 ---
 name: igvtools
 channels:
+  - conda-forge
+  - defaults
+  - r
   - bioconda
 dependencies:
-  - igvtools
+  - igv=2.4.9
+  - igvtools=2.3.93
 ...
