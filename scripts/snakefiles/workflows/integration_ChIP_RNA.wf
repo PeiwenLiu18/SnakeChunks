@@ -81,13 +81,15 @@ include: os.path.join(RULES, "tophat.rules")
 
 ## Workflow design ##
 
-trimming = "cutadapt"
-mapping = "bwa"
-peakcalling = "macs2"
-read_counts = "featureCounts"
-diffexpr = "DESeq2"
+trimming = config["trimming"]
+mapping_chip = config["mapping_chip"]
+mapping_rna = config["mapping_rna"]
+peakcalling = config["peakcalling"]
+read_counts = config["read_counts"]
+diffexpr = config["diffexpr"]
+TF=config["metadata"]["TF"]
 
-prefix = trimming + "_" + mapping
+#prefix = config["trimming"] + "_" + config["mapping"]
 
 ## Directories
 
@@ -121,15 +123,15 @@ rule all:
 
 rule gene_comparison:
     input:
-        chip_genes = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{prefix}}_{{peakcaller}}_gene_list.txt", zip, treat=chip_treatment, control=chip_control), peakcaller=peakcalling, prefix=prefix),
-        rna_genes = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, prefix=prefix, read_counts=read_counts),
+        chip_genes = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{trimming}}_{{mapping_chip}}_{{peakcaller}}_gene_list.txt", zip, treat=chip_treatment, control=chip_control), peakcaller=peakcalling, trimming=trimming, mapping_chip=mapping_chip),
+        rna_genes = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{trimming}}_{{mapping_rna}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts),
         regulondb_tus = REGULON_DIR + "/TUSet.txt",
         regulondb_sites = REGULON_DIR + "/BindingSiteSet.txt",
         regulondb_gene_product = REGULON_DIR + "/GeneProductSet.txt"       
     params:
         outdir = INTEGRATION_DIR,
         image_format = venn_format,
-        TF = "FNR"
+        TF = TF
     output: 
         venn = VENN,
         gene_table = TABLE,
