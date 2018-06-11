@@ -16,14 +16,14 @@ Usage:
 1. Run in command line mode
 
     snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
-        --configfile path/to/specific/config_file.yml \
+        --configfile metadata/your_config_file.yml \
         [targets]
 
 2. Send tasks to qsub job scheduler
 
     snakemake -p -c "qsub {params.qsub}" -j 12 \
         -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
-        --configfile path/to/specific/config_file.yml \
+        --configfile metadata/your_config_file.yml \
         [targets]
 
 Author: Claire Rioualen, Jacques van Helden
