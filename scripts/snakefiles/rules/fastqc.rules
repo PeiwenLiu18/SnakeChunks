@@ -51,13 +51,12 @@ rule fastqc:
 #    output: "{reads}_fastqc/{sample}.html"
     params:
         options = config["fastqc"]["other_options"], \
-#        outdir = "{reads}_fastqc", \
         outdir = "{reads}_{ext}_fastqc", \
         qsub = config["qsub"] \
-            + " -e {reads}_fastqc/{sample}_fastqc_qsub.err"\
-            + " -o {reads}_fastqc/{sample}_fastqc_qsub.out"
-    log: "{reads}_fastqc/{sample}_fastqc.log"
-    benchmark: "{reads}_fastqc/{sample}_fastqc_benchmark.txt"
+            + " -e {reads}_{ext}_fastqc/{sample}_{ext}fastqc_qsub.err"\
+            + " -o {reads}_{ext}fastqc/{sample}_{ext}fastqc_qsub.out"
+    log: "{reads}_{ext}_fastqc/{sample}_{ext}_fastqc.log"
+    benchmark: "{reads}_{ext}_fastqc/{sample}_{ext}_fastqc_benchmark.txt"
     conda:  "../envs/fastqc.yaml"
 #    shell:"fastqc --outdir {params.outdir} --format fastq {input} {params.options} 2> {log} "
 #    shell:"fastqc --outdir {params.outdir} --format {wildcards.ext} {input} {params.options} 2> {log} "
