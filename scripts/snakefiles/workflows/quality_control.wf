@@ -193,7 +193,7 @@ else:
 # Reporting
 #----------------------------------------------------------------#
 
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{img_format}", graph=["dag", "rulegraph"], img_format=["png"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/quality_control_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
 
 #================================================================#
 #                        Rule all                                #
