@@ -43,10 +43,11 @@ rule fastqc:
 
     Contributors: Claire Rioualen, Lucie Khamvongsa, Jacques van Helden
     """
-    input: "{reads}.fastq.gz"
-#    input: "{reads}.{ext,(bam|fastq|fastq.gz)}"
-#    input: fastqc_inputs
-    output: "{reads}_fastqc/{sample}_fastqc.html"
+#    input: "{reads}.fastq.gz"
+    input: "{reads}.{ext,(bam|fastq|fastq.gz)}"
+#    output: "{reads}_fastqc/{sample}_fastqc.html"
+    output: "{reads}_{ext}_fastqc/{sample}_{ext}_fastqc.html"
+#    output: "{reads}_fastqc/{sample}_fastqc.html"
 #    output: "{reads}_fastqc/{sample}.html"
     params:
         options = config["fastqc"]["other_options"], \
