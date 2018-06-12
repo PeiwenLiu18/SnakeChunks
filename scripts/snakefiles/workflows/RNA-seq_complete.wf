@@ -15,11 +15,14 @@ Under construction:
 Parameters are specified in a yaml-formatted configuration file.
 
 Usage:
-    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/rna-seq_workflow_pe.py --configfile SnakeChunks/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml
+    snakemake -p \
+        -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq_complete.wf \
+        --configfile metadata/config_RNA-seq.yml \
+        [targets]
 
     snakemake -p  -c "qsub {params.qsub}" -j 12 \
-        -s SnakeChunks/scripts/snakefiles/workflows/rna-seq_workflow_pe.py \
-        --configfile SnakeChunks/examples/RNA-seq_GSE41190/RNA-seq_GSE41190.yml \
+        -s SnakeChunks/scripts/snakefiles/workflows/RNA-seq_complete.wf \
+        --configfile metadata/config_RNA-seq.yml \
         [targets]
 
 Sequencing type: 	paired end
@@ -243,7 +246,7 @@ if not ("diffexpr" in config.keys()):
 
 #INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
 
-#MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
 
 BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -288,7 +291,7 @@ INFER_TRANSCRIPTS = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{infer_tr
 
 
 ## Graphics & reports
-GRAPHICS = expand(REPORTS_DIR + "/flowcharts/RNA-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png"])
+GRAPHICS = expand(REPORTS_DIR + "/flowcharts/RNA-seq_{graph}.{ext}", graph=["dag", "rulegraph"], ext=["png", "pdf", "svg"])
 
 #================================================================#
 #                        Rule all                                #
@@ -300,11 +303,12 @@ rule all:
 	"""
 	input: 
 #            mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
-#            MAPPING, # Mapped reads
+            MAPPING, # Mapped reads
+#            MAPPING_QC, # Quality control of the mapped reads
             BAM_BAI, # Index files for BAM files
             BAM_STATS, # Statistics about each BAM file
             ALL_COVERAGE, # Coverage files
-#            FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
+            FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
             ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
 #            SARTOOLS_TARGETFILE,
             DEG_LIST, # Lists of differentially expressed genes
