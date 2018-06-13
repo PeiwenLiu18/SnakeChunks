@@ -121,17 +121,18 @@ if (SEQ_TYPE == "pe"):
 # Single-end
 #----------------------------------------------------------------#
 
+gz_ext = ".gz"
 if (SEQ_TYPE == "se"):
-    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}.fastq.gz.md5sum", samples=SAMPLE_IDS)
-    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastqc/{samples}_fastqc.html", samples=SAMPLE_IDS)
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}.fastq" + gz_ext + ".md5sum", samples=SAMPLE_IDS)
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq" + gz_ext + "_fastqc/{samples}_fastqc.html", samples=SAMPLE_IDS)
 
 #----------------------------------------------------------------#
 # Paired-ends
 #----------------------------------------------------------------#
 
 elif (SEQ_TYPE == "pe"):
-    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}.fastq.gz.md5sum", samples=SAMPLE_IDS, strand=STRANDS)
-    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastqc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}.fastq" + gz_ext + "md5sum", samples=SAMPLE_IDS, strand=STRANDS)
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq" + gz_ext + "_fastqc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
 
 
 else:
@@ -164,9 +165,9 @@ else:
 
     if (SEQ_TYPE == "se"):
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz.md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq" + gz_ext, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq" + gz_ext + "md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq" + gz_ext + "_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
     #----------------------------------------------------------------#
     # Paired-ends
@@ -179,9 +180,9 @@ else:
 
         STRANDS     = config["metadata"]["strands"].split()
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz.md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq" + gz_ext, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq" + gz_ext + "md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq" + gz_ext + "_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
     else:
         sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
@@ -206,7 +207,7 @@ rule all:
 	input: \
 #            TRIMMING,
             MD5,
-            QC,
-            GRAPHICS
+            QC#,
+#            GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
