@@ -163,7 +163,7 @@ else:
 INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
 
 MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_bam_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
 
 BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
