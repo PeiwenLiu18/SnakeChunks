@@ -13,14 +13,14 @@ Usage:
 
 1. Run in command line mode
 
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/chip-seq_workflow_SE.py 
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/chip-seq_workflow_SE.py 
         --configfile path/to/specific/config_file.yml \
         [targets]
 
 2. Send tasks to qsub job scheduler
 
     snakemake -p -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/chip-seq_workflow_SE.py \
+        -s SnakeChunks/scripts/snakefiles/workflows/chip-seq_workflow_SE.py \
         --configfile path/to/specific/config_file.yml \
         [targets]
 

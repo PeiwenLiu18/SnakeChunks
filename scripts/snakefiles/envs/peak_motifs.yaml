@@ -1,11 +1,10 @@
 ---
-name: subread
+name: peak-motifs
 channels:
   - conda-forge
   - defaults
   - r
   - bioconda
 dependencies:
-  - samtools=1.8
-  - subread=1.6.1
+  - suds-jurko
 ...

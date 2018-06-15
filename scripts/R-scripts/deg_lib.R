@@ -174,17 +174,26 @@ complete.deg.table <- function(deg.table,
   col.descriptions["sign"] <- "Sign of the regulation (1= up, -1 = down)"
   
   ## Label the genes passing the FDR, E-value and fold-change thresholds
-  threshold.type <- c("pvalue"="upper", "padj"="upper", "evalue"="upper", "FC"="lower")
-  selection.columns <- paste(sep="", names(thresholds), "_", thresholds)
-  names(selection.columns) <- names(thresholds)
-  for (s in names(thresholds)) {
+  threshold.type <- c(
+    "pvalue"="upper", 
+    "padj"="upper", 
+    "evalue"="upper", 
+    "FC"="lower")
+  thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
+  selection.columns <- paste(sep="", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
+  names(selection.columns) <- thresholds.to.apply
+  for (s in thresholds.to.apply) {
     if (threshold.type[s] == "upper") {
       selected <- deg.table[, s] < thresholds[s]
     } else {
       selected <- deg.table[, s] > thresholds[s]
     }
+    selected[is.na(selected)] <- FALSE
+    #table(selected)
     deg.table[, selection.columns[s]] <- selected*1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
+    message("\tApplied ", threshold.type[s], " threshold on ", s, "\t", thresholds[s], 
+            "; remaining features: ",  sum(selected))
   }
   ## Select genes passing all thresholds
   deg.table[,"DEG"] <- 
@@ -566,6 +575,7 @@ calc.stats.per.sample <- function(sample.descriptions,
       "max" = apply(count.table, 2, max, na.rm=TRUE) ## Max counts per gene
     )
   )
+  rownames(stats.per.sample) <- colnames(all.counts)
   stats.per.sample$max.sum.ratio <- stats.per.sample$max / stats.per.sample$sum
   stats.per.sample$median.mean.ratio <- stats.per.sample$media / stats.per.sample$mean
   stats.per.sample$Mreads <- round(stats.per.sample$sum/1e6, digits = 1)
@@ -585,9 +595,23 @@ libsize.barplot <- function(stats.per.sample,
                             main="Read library sizes (libsum per sample)",
                             plot.file=NULL, 
                             ...) {
+  ## Get sample IDs
+  if (is.null(stats.per.sample$ID)) {
+    sample.ids <- as.vector(rownames(stats.per.sample))
+  } else {
+    sample.ids <- as.vector(stats.per.sample$ID)
+  }
+  
+  
+  ## Check if sample descriptions contain label column. If not, use ID.
+  if (is.null(stats.per.sample$label)) {
+    sample.labels <- sample.ids
+  } else {
+    sample.labels <- stats.per.sample$label
+  }
   
   ## Adapt boxplot size to the number of samples and label sizes
-  boxplot.lmargin <- max(nchar(sample.desc$label))/3+5
+  boxplot.lmargin <- max(nchar(sample.labels))/3+5
   boxplot.height <- length(sample.ids)/3+2
   
   ## Sample-wise library sizes
@@ -597,13 +621,14 @@ libsize.barplot <- function(stats.per.sample,
   }
   
   par(mar=c(5,boxplot.lmargin,4,1)) ## adapt axes
-  bplt <- barplot(stats.per.sample$Mreads, names.arg = stats.per.sample$label, 
+  bplt <- barplot(stats.per.sample$Mreads, 
+                  names.arg = sample.labels, 
                   main=main,
                   horiz = TRUE, las=1,
                   xlab="libsum (Million reads per sample)",
                   col=stats.per.sample$color, ...)
   grid(col="white", lty="solid",ny = 0)
-  text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt,pos=2, font=2)
+  text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt, pos=2, font=2)
   if (!is.null(plot.file)) {
     silence <- dev.off()
   }
@@ -637,56 +662,188 @@ count.boxplot <- function(count.table,
   }
 }
 
-## Draw a heatmap with the inter-sample correlation matrix. ###########
+################################################################
+## Draw a heatmap with the inter-sample correlation matrix.
 count.correl.heatmap <- function(count.table, 
-                                 main="Correlation between raw counts",
-                                 plot.file=NULL,
-                                 log.transform=FALSE, # Perform a log transformation of the values before plotting
-                                 epsilon=0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+                                 main = NULL,
+                                 plot.file = NULL,
+                                 score = "cor", ## Supported: PCC (Pearson Correlation Coefficient) or SERE (handled by SARTools)
+                                 cor.method = "pearson", ## Passed to cor()
+                                 log.transform = TRUE, # Perform a log transformation of the values before plotting. Only done for PCC since SERE requires raw counts.
+                                 epsilon = 0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+                                 zlim = NULL,
+                                 levels = 100,
+                                 gray.palette = TRUE,
+                                 gamma = 1, # Gamma parameter passed to gray.colors()
+                                 plot.values = TRUE,
                                  ...
-                                 ) {
+) {
   
+  ## Suppress rows with NA values
+  count.table <- na.omit(count.table) 
+  # range(count.table)
   
-  ## Adapt boxplot size to the number of samples and label sizes
-  margin <- max(nchar(names(count.table)))/3+5
-
-  if (log.transform) {
-    range(count.table)
-    count.table[count.table==0] <- epsilon
-    count.table <- log10(count.table)
+  ## Adapt margins to the number of samples and label sizes
+  sample.names <- names(count.table)
+  if (is.null(sample.names)) {
+    margin <- 5
+  } else {
+    margin <- max(nchar(sample.names))/3+5
   }
-  count.cor <- as.matrix(cor(count.table))
   
-  ## Define a color palette for heatmaps. I like this Red-Blue palette because 
-  ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
-  ## - it can be seen by people suffering from red–green color blindness.
-  cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
+  ## Compute comparison score
+  if (score == "SERE") {
+    # lane.totals <- colSums(count.table)
+    # SERE.table <- SERE_fun(
+    #   observed = as.matrix(count.table), 
+    #   laneTotals = lane.totals
+    # )
+    library(SARTools)
+    SERE.table <- tabSERE(as.matrix(count.table))
+    SERE.table <- SERE.table/100 ## SARTools returns scores multiplied by 100
+    count.cor <- max(SERE.table) - SERE.table ## Invert SERE to get a similarity rather than dissimilarity score
+    # count.cor <- SERE.table
+  } else if (score == "cor") {
+    if (log.transform) {
+      # count.table[count.table == 0] <- epsilon ## add epsilon to 
+      count.table <- log2(count.table + epsilon)
+    }
+    count.cor <- as.matrix(cor(count.table, method=cor.method))
+  } else {
+    stop("count.correl.heatmap(): ", 
+         score, 
+         " is not a valid score. Supported: cor, SERE. ")
+  }
+  # count.range <- range(count.table)
   
-  ## Use a grayscale color  
-#
-  cols.heatmap <- gray.colors(100, start = 1, end = 0, gamma = 3, alpha = NULL)
-
+  ## Define a color palette for heatmaps. 
+  if (gray.palette) {
+    ## Use a grayscale color  
+    cols.heatmap <- gray.colors(n = levels, start = 1, end = 0, gamma = gamma)
+  } else {
+    ## I like this Red-Blue palette because 
+    ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
+    ## - it can be seen by people suffering from red–green color blindness.
+    cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(levels))
+  } 
+  
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
     message("Generating plot", plot.file)
     pdf(file=plot.file, width=8, height=boxplot.height)
   }
   
-  hm <- heatmap.2(count.cor,  scale="none", trace="none", 
-                  #breaks=c(-1, seq(0,1,length.out = 100)),
-                  main=main, margins=c(margin,margin),
-                  col=cols.heatmap,
-                  cellnote = signif(digits=2, count.cor),
-                  ...
-                  )
+  # Define main title
+  if (is.null(main)) {
+    if (score == "cor") {
+      main <- paste(cor.method, " correlation")
+    } else if (score == "SERE") {
+      main <- paste(score, "scor")
+    } else {
+      main <- paste(score)
+    }
+  }
   
-
+  if (is.null(zlim)) {
+    zlim <- range(count.cor)
+  }
+  breaks <- seq(from=zlim[1], to = zlim[2], length.out = levels + 1)
+  
+  if (plot.values) {
+    hm <- heatmap.2(count.cor,  scale="none", trace="none", 
+                    #breaks=c(-1, seq(0,1,length.out = 100)),
+                    main=main, margins=c(margin,margin),
+                    col=cols.heatmap, breaks = breaks,
+                    cellnote = signif(digits=2, count.cor),
+    ...)
+  } else {
+    hm <- heatmap.2(count.cor,  scale="none", trace="none", 
+                    #breaks=c(-1, seq(0,1,length.out = 100)),
+                    main=main, margins=c(margin,margin),
+                    col=cols.heatmap, breaks = breaks,
+                    ...)
+  }
+  
+  
   if (!is.null(plot.file)) {
     silence <- dev.off()
   }
-
+  
   return(count.cor)  
 }
+
+# ## Draw a heatmap with the inter-sample correlation matrix. ###########
+# count.correl.heatmap <- function(count.table, 
+#                                  main="Correlation between raw counts",
+#                                  plot.file=NULL,
+#                                  log.transform=TRUE, # Perform a log transformation of the values before plotting
+#                                  epsilon=0.1, # Add an epsilon to zero values before log transformation, in order to -Inf values
+#                                  zlim = NULL,
+#                                  grey = FALSE, 
+#                                  plot.values = TRUE, # plot correlation values on the heatmap
+#                                  ...
+#                                  ) {
+#   
+#   
+#   ## Adapt boxplot size to the number of samples and label sizes
+#   margin <- max(nchar(names(count.table)))/3+5
+# 
+#   if (log.transform) {
+#     range(count.table)
+#     count.table[count.table==0] <- epsilon
+#     count.table <- log10(count.table)
+#   }
+#   count.cor <- as.matrix(cor(count.table))
+#   
+#   ## Limits for the color scale
+#   if (is.null(zlim)) {
+#     zlim <- range(count.cor)
+#   }
+#   
+#   ## Use a grayscale color  
+#   if (grey) {
+#     cols.heatmap <- gray.colors(256, start = 1, end = 0, gamma = 3, alpha = NULL)
+#   } else {
+#     ## Define a color palette for heatmaps. I like this Red-Blue palette because 
+#     ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
+#     ## - it can be seen by people suffering from red–green color blindness.
+#     cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
+#     
+#   }
+# 
+#   ## Sample-wise library sizes
+#   if (!is.null(plot.file)) {
+#     message("Generating plot", plot.file)
+#     pdf(file=plot.file, width=8, height=boxplot.height)
+#   }
+#   
+#   
+#   if (plot.values) {
+#     cellnote <- signif(digits=2, count.cor)
+#   } else {
+#     cellnote <- FALSE
+#   }
+#   hm <- heatmap.2(count.cor,  
+#                   scale="none", 
+#                   trace="none", 
+#                   zlim = ,
+#                   #breaks=c(-1, seq(0,1,length.out = 100)),
+#                   main=main, 
+#                   margins=c(margin,margin),
+#                   col=cols.heatmap)
+#   
+# #                  zlim = zlim,
+#                   cellnote = cellnote, 
+#                   ...
+#                   )
+#   
+# 
+#   if (!is.null(plot.file)) {
+#     silence <- dev.off()
+#   }
+# 
+#   return(count.cor)  
+# }
 
 ## Generate a set of plots displaying some sample-wise statistics
 sample.description.plots <- function (sample.desc,
@@ -815,10 +972,26 @@ sample.description.plots <- function (sample.desc,
 }
 
 ################################################################
+#' @title init.deg.table
+#' @param count.table table with the counts per reads. This table is used to get feature IDs 
+#' (gene IDs, gene names, ...) from row names, and thereby ensure consistency between rows 
+#' of the count tables and the summary of differential expression.
+#' @param gene.info optional table with detailed information about each feature (gene).
 ## Initiate a result table with the CPMs and derived statistics
-init.deg.table <- function(cmps) {
-  verbose("\t\tInitializing result table for one differential analysis (two-sample comparison).", 2)
-  all.gene.ids <- row.names(cpms)
+init.deg.table <- function(count.table, gene.info = NULL) {
+  message("\tInitializing result table for one differential analysis (two-sample comparison).")
+  all.gene.ids <- row.names(count.table)
+  #message("\t\tFeatures (genes): " \t, )
+  
+  if (is.null(gene.info)) {
+    gene.info <- data.frame(
+      "id" = all.gene.ids, 
+      "name" = all.gene.ids, 
+      "entrez.id" = "",
+      "description" = paste("gene_id:", all.gene.ids)
+    )
+  }
+  
   result.table <- data.frame("gene_id" = all.gene.ids,
                              "name"=gene.info[all.gene.ids,"name"])
   row.names(result.table) <- all.gene.ids
@@ -894,12 +1067,12 @@ deseq2.analysis <- function(dir.figures=NULL) {
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
   deseq2.result.table <- complete.deg.table(
-    deseq2.result.table, 
-    paste(sep="_", "DESeq2", prefix["comparison"]),
+    deg.table = deseq2.result.table, 
+    table.name = paste(sep="_", "DESeq2", prefix["comparison"]),
     sort.column = "padj",
     thresholds=thresholds,
     round.digits = 3,
-    dir.figures=dir.figures)
+    dir.figures = dir.figures)
   return(deseq2.result.table)
 }  
 

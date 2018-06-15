@@ -5,7 +5,7 @@ This is a prototype of combined workflow using Snakemake's subworkflow feature.
 It requires to use Snakemake 3.8.1+
 
 Command to run the combined workflow is currently:
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile gene-regulation/examples/Combined_ChIP-seq_RNA-seq --nolock
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile SnakeChunks/examples/Combined_ChIP-seq_RNA-seq --nolock
 
 Author:
     Claire Rioualen
@@ -51,7 +51,7 @@ This is a prototype of combined workflow using Snakemake's subworkflow feature.
 It requires to use Snakemake 3.8.1+
 
 Command to run the combined workflow is currently:
-    snakemake -s gene-regulation/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile gene-regulation/examples/Combined_ChIP-seq_RNA-seq --nolock
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/combined_ChIP-seq_RNA-seq.py -p --configfile SnakeChunks/examples/Combined_ChIP-seq_RNA-seq --nolock
 
 Author:
     Claire Rioualen

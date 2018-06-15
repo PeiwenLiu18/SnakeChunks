@@ -26,6 +26,13 @@ if not "threads" in config["bowtie2"].keys():
 if not "max_mismatches" in config["bowtie2"].keys():
     config["bowtie2"]["max_mismatches"] = "0"
 
+# Define mapping mode. Supported options: --local OR --end-to-end
+if not "mode" in config["bowtie2"].keys():
+    config["bowtie2"]["mode"] = "--local"
+
+if not "other_options" in config["bowtie2"].keys():
+    config["bowtie2"]["other_options"] = ""
+
 if not "fastq" in config["dir"].keys():
     sys.exit("You must define a location for the fastq files.")
 
@@ -67,8 +74,10 @@ rule bowtie2:
     Optional parameters:
         config["bowtie2"]["threads"]
         config["bowtie2"]["max_mismatches"]
+        config["bowtie2"]["mode"]               Supported: --local (default), --end-to-end
+        config["bowtie2"]["other_options"]
 
-    Contributors: Claire Rioualen
+    Contributors: Claire Rioualen & Jacques van Helden
     """
     input:
         reads = bowtie2_inputs, 
@@ -77,10 +86,12 @@ rule bowtie2:
         bam = sample_dir + "/{samples}/{prefix}_bowtie2.bam"
     params:
         threads = config["bowtie2"]["threads"], 
+        mode = config["bowtie2"]["mode"], 
         sam = sample_dir + "/{samples}/{prefix}_bowtie2.sam", 
         unsorted_bam = sample_dir + "/{samples}/{prefix}_bowtie2_unsorted.bam", ## put it as temp() output?
         max_mismatches = config["bowtie2"]["max_mismatches"], 
         seq_type = config["metadata"]["seq_type"],
+        other_options = config["bowtie2"]["other_options"], 
         qsub = config["qsub"] \
           + " -e " + sample_dir + "/{samples}/{prefix}_bowtie2_qsub.err" \
           + " -o " + sample_dir + "/{samples}/{prefix}_bowtie2_qsub.out"
@@ -90,10 +101,10 @@ rule bowtie2:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-    bowtie2 -x {input.index} -1 {input.reads[0]} -2 {input.reads[1]} -S {params.sam} --phred33 -N {params.max_mismatches} --threads {params.threads} 2> {log}
+    bowtie2 -x {input.index} -1 {input.reads[0]} -2 {input.reads[1]} -S {params.sam} {params.mode} --phred33 -N {params.max_mismatches} --threads {params.threads} {params.other_options} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
-    bowtie2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 -N {params.max_mismatches} 2> {log}
+    bowtie2 -x {input.index} -U {input.reads} -S {params.sam} {params.mode} --threads {params.threads} --phred33 -N {params.max_mismatches} {params.other_options} 2> {log}
 fi
 samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
 rm {params.sam}
@@ -107,6 +118,3 @@ rm {params.unsorted_bam}
 #            shell("bowtie2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 -N {params.max_mismatches} 2> {log}")
 #        shell("samtools view -b -S {params.sam} > {output.bam}")
 #        shell("rm {params.sam}")
-
-
-

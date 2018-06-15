@@ -29,7 +29,9 @@ rule genome_coverage_bedgraph:
 
     Contributors: Jacques van Helden, Claire Rioualen
     """
-    input: reads = "{reads}.bam", chrom_size = chrom_size
+    input:
+       reads = "{reads}.bam",
+       chrom_size = chrom_size
     output: "{reads}.bedgraph"
     params: qsub = config["qsub"] + " -e {reads}_genomecov_bedgraph_qsub.err -o {reads}_genomecov_bedgraph_qsub.out"
     log:  "{reads}_genomecov_bedgraph.log"

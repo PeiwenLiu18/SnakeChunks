@@ -15,15 +15,15 @@ Usage:
 
 1. Run in command line mode
 
-    snakemake -p -s gene-regulation/scripts/snakefiles/workflows/mapping.wf \
-        --configfile path/to/specific/config_file.yml \
+    snakemake -p -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
+        --configfile metadata/your_config_file.yml \
         [targets]
 
 2. Send tasks to qsub job scheduler
 
     snakemake -p -c "qsub {params.qsub}" -j 12 \
-        -s gene-regulation/scripts/snakefiles/workflows/mapping.wf \
-        --configfile path/to/specific/config_file.yml \
+        -s SnakeChunks/scripts/snakefiles/workflows/mapping.wf \
+        --configfile metadata/your_config_file.yml \
         [targets]
 
 Author: Claire Rioualen, Jacques van Helden
@@ -163,7 +163,7 @@ else:
 INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
 
 MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
-#MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_fastqc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING_QC      = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_qc/{samples}_{prefix}_fastqc.html", samples=SAMPLE_IDS, prefix=PREFIX)
 
 BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -204,7 +204,7 @@ rule all:
 	"""
 	input: \
             MAPPING,
-#            MAPPING_QC,
+            MAPPING_QC,
             BAM_STATS,
             BAM_BAI,
 #            GENOME_INDEX,
