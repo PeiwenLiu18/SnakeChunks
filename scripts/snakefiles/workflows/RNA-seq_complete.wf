@@ -186,14 +186,14 @@ if not ("diffexpr" in config.keys()):
 ##----------------------------------------------------------------#
 
 #if (SEQ_TYPE == "se"):
-#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq_fastqc/{samples}_fastqc.html", samples=SAMPLE_IDS)
+#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq_qc/{samples}_fastqc.html", samples=SAMPLE_IDS)
 
 ##----------------------------------------------------------------#
 ## Paired-ends
 ##----------------------------------------------------------------#
 
 #elif (SEQ_TYPE == "pe"):
-#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq_fastqc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
+#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq_qc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
 
 
 #else:
@@ -219,7 +219,7 @@ if not ("diffexpr" in config.keys()):
 #    if (SEQ_TYPE == "se"):
 
 #        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq_fastqc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq.gz_qc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
 #    #----------------------------------------------------------------#
 #    # Paired-ends
@@ -233,7 +233,7 @@ if not ("diffexpr" in config.keys()):
 #        STRANDS     = config["metadata"]["strands"].split()
 
 #        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq_fastqc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq.gz_qc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
 #    else:
 #        sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
