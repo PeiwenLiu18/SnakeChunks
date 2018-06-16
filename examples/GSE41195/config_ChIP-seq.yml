@@ -38,7 +38,7 @@
 ## WORKFLOW DESIGN
 ##
   trimming: "cutadapt"
-  mapping: "bwa"
+  mapping: "bowtie2"
   peakcalling: "homer macs2"
 
 ################################################################

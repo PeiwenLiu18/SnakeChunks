@@ -34,7 +34,7 @@
     reports: "RNA-seq/results/reports"
 
   trimming: "cutadapt"
-  mapping: "bwa"
+  mapping: "bowtie2"
   read_counts: "featureCounts"
   diffexpr: "DESeq2"
 
