@@ -2,6 +2,9 @@
 if not "qsub" in config.keys():
     sys.exit("The parameter qsub must be defined in the config file")
 
+if not "metadata" in config.keys():
+    sys.exit("Configuration file does not contain metadata parameters.")
+
 if not "seq_type" in config["metadata"].keys():
     sys.exit("Sequencing type (single or paired ends) must be defined in the config file")
 
