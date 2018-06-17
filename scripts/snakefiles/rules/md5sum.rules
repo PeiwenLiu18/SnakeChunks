@@ -1,3 +1,7 @@
+# Set defaults params
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
 rule md5sum:
     """Compute the md5sum signature for a given file, which enables to
     check the consistency of its content after transfer. 
@@ -11,13 +15,13 @@ rule md5sum:
     compute one md5sum file for each, and assign the takss to 20 jobs
     in the scheduler.
 
-    find fastq/ -name '*.fastq'  \
+    find . -name '*.fastq.gz'  \
        | awk '{print $1".md5sum"}' \
        | xargs snakemake  -j 20 -p \
            -s SnakeChunks/scripts/snakefiles/rules/md5sum.rules \
-           --configfile metadata/Glossina_palpalis.yml
+           --configfile metadata/config.yml
 
-    Required parameters:
+    Required parameters (should be specified in the config file):
         config["qsub"]
 
     Contributors: Jacques van Helden
