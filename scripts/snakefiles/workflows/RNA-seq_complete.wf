@@ -140,6 +140,7 @@ include: os.path.join(RULES, "genome_coverage_bedgraph_strands.rules")
 include: os.path.join(RULES, "get_chrom_sizes.rules")
 include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "index_bam.rules")
+include: os.path.join(RULES, "md5sum.rules")
 include: os.path.join(RULES, "subread_align.rules")
 include: os.path.join(RULES, "subread_featureCounts_all.rules")
 include: os.path.join(RULES, "subread_featureCounts.rules")
@@ -154,15 +155,32 @@ include: os.path.join(RULES, "tophat.rules")
 # Workflow design (TODO)
 #----------------------------------------------------------------#
 
-if not ("trimming" in config.keys()):
-    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
+## Check metadata options
+if not "metadata" in config.keys():
+    sys.exit("Configuration file does not contain metadata parameters.")
 
-TRIMMING_TOOLS = config["trimming"].split()
+## Check whether input fastq files are compressed or not
+if  "input_format" in config["metadata"].keys():
+    input_format = config["metadata"]["input_format"]
+else:
+    input_format = "fastq.gz"
 
+##----------------------------------------------------------------#
+## Check read mapping options
+##----------------------------------------------------------------#
 if not ("mapping" in config.keys()):
     sys.exit("The parameter config['mapping'] should be specified in the config file.")
 
 MAPPING_TOOLS = config["mapping"].split()
+
+
+##----------------------------------------------------------------#
+## Check trimming option
+##----------------------------------------------------------------#
+if not ("trimming" in config.keys()):
+    sys.exit("The parameter config['trimming'] should be specified in the config file. Empty quotes can be used to avoid trimming.")
+
+TRIMMING_TOOLS = config["trimming"].split()
 
 if TRIMMING_TOOLS:
     PREFIX = expand("{trimmer}_{aligner}", aligner=MAPPING_TOOLS, trimmer=TRIMMING_TOOLS)
@@ -171,6 +189,7 @@ else:
 
 if not ("diffexpr" in config.keys()):
     sys.exit("The parameter config['diffexpr'] should be specified in the config file.")
+
 
 ##----------------------------------------------------------------#
 ## FastQC
@@ -185,60 +204,61 @@ if not ("diffexpr" in config.keys()):
 ## Single-end
 ##----------------------------------------------------------------#
 
-#if (SEQ_TYPE == "se"):
-#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq_qc/{samples}_fastqc.html", samples=SAMPLE_IDS)
+if (SEQ_TYPE == "se"):
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}." + input_format + ".md5sum", samples=SAMPLE_IDS)
+    RAW_QC  = expand(FASTQ_DIR + "/{samples}/{samples}_" + input_format + "_qc/{samples}_fastqc.html", samples=SAMPLE_IDS)
 
 ##----------------------------------------------------------------#
 ## Paired-ends
 ##----------------------------------------------------------------#
 
-#elif (SEQ_TYPE == "pe"):
-#    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq_qc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
+elif (SEQ_TYPE == "pe"):
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}." + input_format + ".md5sum", samples=SAMPLE_IDS, strand=STRANDS)
+    RAW_QC  = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_" + input_format + "_qc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
 
+else:
+    sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
 
-#else:
-#    sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
-
-#QC = RAW_QC
+QC = RAW_QC
+MD5 = RAW_MD5
 
 ##----------------------------------------------------------------#
 ## Trimming
 ##----------------------------------------------------------------#
 
-#if not ("trimming" in config.keys()):
-#    sys.exit("The parameter config['tools']['trimming'] should be specified in the config file. Empty quotes equal to no trimming.")
 
-#TRIMMING_TOOLS = config["trimming"].split()
+if (len(TRIMMING_TOOLS) != 0):
 
-#if (len(TRIMMING_TOOLS) != 0):
+    #----------------------------------------------------------------#
+    # Single-end
+    #----------------------------------------------------------------#
 
-#    #----------------------------------------------------------------#
-#    # Single-end
-#    #----------------------------------------------------------------#
+    if (SEQ_TYPE == "se"):
 
-#    if (SEQ_TYPE == "se"):
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}." + input_format, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}." + input_format + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_" + input_format + "_qc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
-#        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq.gz_qc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+    #----------------------------------------------------------------#
+    # Paired-ends
+    #----------------------------------------------------------------#
 
-#    #----------------------------------------------------------------#
-#    # Paired-ends
-#    #----------------------------------------------------------------#
+    elif (SEQ_TYPE == "pe"):
 
-#    elif (SEQ_TYPE == "pe"):
+        if not (("metadata" in config.keys()) and ("strands" in config["metadata"].keys())):
+            sys.exit("The strands suffixes (parameter config['metadata']['strands']) should be specified in the config file for a paired ends analysis.")
 
-#        if not (("metadata" in config.keys()) and ("strands" in config["metadata"].keys())):
-#            sys.exit("The strands suffixes (parameter config['metadata']['strands']) should be specified in the config file for a paired ends analysis.")
+        STRANDS     = config["metadata"]["strands"].split()
 
-#        STRANDS     = config["metadata"]["strands"].split()
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}." + input_format, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}." + input_format + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_" + input_format + "_qc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
-#        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq.gz", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-#        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq.gz_qc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+    else:
+        sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
 
-#    else:
-#        sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
-
-#    QC = RAW_QC + TRIM_QC
+    QC  = RAW_QC + TRIM_QC
+    MD5 = RAW_MD5 + TRIM_MD5
 
 ##----------------------------------------------------------------#
 ## Alignment
@@ -246,7 +266,9 @@ if not ("diffexpr" in config.keys()):
 
 #INDEX = expand(GENOME_DIR + "/{aligner}/" + config["genome"]["fasta_file"], aligner=MAPPING_TOOLS)
 
-MAPPING         = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING_MD5   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.md5sum", samples=SAMPLE_IDS, prefix=PREFIX)
+MAPPING_QC    = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_qc", samples=SAMPLE_IDS, prefix=PREFIX)
 
 BAM_BAI  = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}.bam.bai", samples=SAMPLE_IDS, prefix=PREFIX)
 BAM_STATS       = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_bam_stats.txt", samples=SAMPLE_IDS, prefix=PREFIX)
@@ -302,8 +324,10 @@ rule all:
 	Run analyses.
 	"""
 	input: 
-#            mapping_wf(expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_sorted_pos.bam", samples=SAMPLE_IDS, prefix=PREFIX)),
+            QC, # quality of the raw reads
+            MD5, # md5sum for the raw (and trimmed) reads
             MAPPING, # Mapped reads
+            MAPPING_MD5, # md5sum for the mapped reads
 #            MAPPING_QC, # Quality control of the mapped reads
             BAM_BAI, # Index files for BAM files
             BAM_STATS, # Statistics about each BAM file
