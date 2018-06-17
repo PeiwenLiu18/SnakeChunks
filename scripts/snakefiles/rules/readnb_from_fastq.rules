@@ -15,3 +15,16 @@ rule readnb_from_fastq:
     params: qsub = config["qsub"] + " -e {file}_readnb_qsub.err -o {file}_readnb_qsub.out"
     shell: "grep '^@' {input} | wc -l > {output}"
 
+rule readnb_from_fastq:
+    """Count number of reads in a fastq-formatted file (unaligned reads).
+    
+    Required parameters:
+        config["qsub"]
+
+    Contributors: Jacques van Helden
+    """
+    input: "{file}.fastq.gz"
+    output: "{file}_fastq.gz_readnb.txt"
+    params: qsub = config["qsub"] + " -e {file}_readnb_qsub.err -o {file}_readnb_qsub.out"
+    shell: "zgrep '^@' {input} | wc -l > {output}"
+
