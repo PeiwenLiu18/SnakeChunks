@@ -14,6 +14,13 @@ if not "sickle" in config.keys():
 if not "qual_threshold" in config["sickle"].keys():
     config["sickle"]["qual_threshold"] = "20"
 
+## Check whether input fastq files are compressed or not
+if  "input_format" in config["metadata"].keys():
+    input_ext = "." + config["metadata"]["input_format"]
+else:
+    input_ext = ".fastq.gz"
+
+## Compress or not the output fastq file (trimmed reads)
 gzip_option = "--gzip-output"
 gzip_ext = ".gz"
 if  "gzip_output" in config["sickle"].keys():
@@ -42,16 +49,18 @@ elif (seq_type == "se"):
 # Define input files
 def sickle_inputs(wildcards):
     if (seq_type == "pe"):
-        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}.fastq.gz", strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}" + input_ext, strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{samples}.fastq.gz", samples=wildcards.samples, fastq_dir=fastq_dir)[0]
+        reads = expand("{fastq_dir}/{samples}/{samples}" + input_ext, samples=wildcards.samples, fastq_dir=fastq_dir)[0]
     else:
         sys.exit("Error: invalid seq_type parameter. Must be 'se' or 'pe'")
     return reads
 
 rule sickle:
-    """
-    Trimming raw reads with sickle.
+    """ Trimming raw reads with sickle. This rule takes as input one or
+    several raw compressed fastq-formatted read files (extension
+    fastq.gz), and produce fastq-formatted files, which are by default
+    compressed (by activating fastqc option --gzip-output). 
 
     Required parameters:
         config["qsub"]
@@ -62,8 +71,9 @@ rule sickle:
         config["sickle"]["length_threshold"]
         config["sickle"]["qual_type"]
         config["metadata"]["strands"]
+        config["sickle"]["gzip_output"] (default: True). If False, the output fastq files (trimmed reads) are not compressed.
 
-    Contributors: Claire Rioualen, Lucie Khamvongsa
+    Contributors: Claire Rioualen, Lucie Khamvongsa & Jacques van Helden
     """
     input: reads = sickle_inputs
     output:
