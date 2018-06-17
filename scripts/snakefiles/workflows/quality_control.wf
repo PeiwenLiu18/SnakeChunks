@@ -77,6 +77,13 @@ include: os.path.join(RULES, "bbduk.rules")
 #                      Workflow setup
 #================================================================#
 
+## Check whether input fastq files are compressed or not
+if  "input_format" in config["metadata"].keys():
+    input_format = config["metadata"]["input_format"]
+else:
+    input_format = "fastq.gz"
+
+
 # Check that directories are properly defined
 if not ("fastq" in config["dir"].keys()):
     sys.exit("The parameter config['dir']['fastq'] should be specified in the config file.")
@@ -112,33 +119,29 @@ if (SEQ_TYPE == "pe"):
 # FastQC
 #----------------------------------------------------------------#
 
-#input_format = "fastq"
-#if ("input_format" in config["metadata"].keys())):
-#    input_format =  config["metadata"]["input_format"]
-
 
 #----------------------------------------------------------------#
 # Single-end
 #----------------------------------------------------------------#
 
-gz_ext = ".gz"
 if (SEQ_TYPE == "se"):
-    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}.fastq" + gz_ext + ".md5sum", samples=SAMPLE_IDS)
-    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_fastq" + gz_ext + "_qc/{samples}_fastqc.html", samples=SAMPLE_IDS)
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}." + input_format + ".md5sum", samples=SAMPLE_IDS)
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_" + input_format + "_qc/{samples}_fastqc.html", samples=SAMPLE_IDS)
 
 #----------------------------------------------------------------#
 # Paired-ends
 #----------------------------------------------------------------#
 
 elif (SEQ_TYPE == "pe"):
-    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}.fastq" + gz_ext + ".md5sum", samples=SAMPLE_IDS, strand=STRANDS)
-    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_fastq" + gz_ext + "_qc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
+    RAW_MD5 = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}." + input_format + ".md5sum", samples=SAMPLE_IDS, strand=STRANDS)
+    RAW_QC = expand(FASTQ_DIR + "/{samples}/{samples}_{strand}_" + input_format + "_qc/{samples}_{strand}_fastqc.html", samples=SAMPLE_IDS, strand=STRANDS)
 
 
 else:
     sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
 
 QC = RAW_QC
+MD5 = RAW_MD5
 
 #----------------------------------------------------------------#
 # Trimming
@@ -155,9 +158,7 @@ if (len(TRIMMING_TOOLS) == 0):
     TRIMMING = ""
     TRIM_MD5 = ""
     TRIM_QC = ""
-    MD5 = RAW_MD5
-    QC = RAW_QC
-    
+
 else:
     #----------------------------------------------------------------#
     # Single-end
@@ -165,9 +166,9 @@ else:
 
     if (SEQ_TYPE == "se"):
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq" + gz_ext, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}.fastq" + gz_ext + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
-        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_fastq" + gz_ext + "_qc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}." + input_format, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}." + input_format + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_" + input_format + "_qc/{samples}_{trimmer}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS)
 
     #----------------------------------------------------------------#
     # Paired-ends
@@ -180,9 +181,9 @@ else:
 
         STRANDS     = config["metadata"]["strands"].split()
 
-        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq" + gz_ext, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}.fastq" + gz_ext + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
-        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_fastq" + gz_ext + "_qc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIMMING    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}." + input_format, samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_MD5    = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}." + input_format + ".md5sum", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
+        TRIM_QC     = expand(FASTQ_DIR + "/{samples}/{samples}_{trimmer}_{strand}_" + input_format + "_qc/{samples}_{trimmer}_{strand}_fastqc.html", samples=SAMPLE_IDS, trimmer=TRIMMING_TOOLS, strand=STRANDS)
 
     else:
         sys.exit("Error: invalid 'seq_type parameter'. Must be 'se' or 'pe'")
