@@ -20,7 +20,7 @@
     configfile: "metadata/config_RNA-seq.yml"                          # required for flowcharts generation; maybe this should be revised
     seq_type: "pe"                                                                                  # required
     strands: "1 2"
-    input_format: "fastq.gz"                                            # if not mentioned, will be 'fastq' by default
+    input_format: "fastq.gz"                                            # Optional. If not specified, will be "fastq.gz" by default.
 
   dir:
     reads_source: "data"                                                # Raw data (sra)

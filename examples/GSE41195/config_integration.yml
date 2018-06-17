@@ -19,7 +19,7 @@
     design: "metadata/design_ChIP-seq.tab"                              # Required. Has to contain at least ids of pairs of samples to be compared
     configfile: "metadata/config_integration.yml"                          # Required for flowcharts generation; maybe this should be revised
     seq_type: "se"                                                      # Required
-    input_format: "fastq.gz"                                            # Optional. If not provided, will be "fastq".
+    input_format: "fastq.gz"                                            # Optional. If not specified, will be "fastq.gz" by default.
     TF: "FNR"                                                           # List of transcription factors of interest. Required for RegulonDB comparison. 
 
   dir:
