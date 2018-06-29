@@ -1,0 +1,46 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+if not "version" in config["genome"].keys():
+    sys.exit("Genome version must be defined in the config file")
+
+if not "fasta_file" in config["genome"].keys():
+    sys.exit("Fasta file must be defined in the config file")
+
+if not "genome" in config["dir"].keys():
+    sys.exit("Genome dir must be defined in the 'dir' section of the config file")
+
+hisat2_dir = os.path.join(config["dir"]["genome"], "hisat2")
+
+# Rule
+rule hisat2_index:
+    """Rule for the creation of Bowtie 2 index. Has to be done only once.  The
+    output file is used to test whether the index already exists
+    when aligning.
+
+    Required parameters:
+        config["qsub"]
+        config["dir"]["genome"]
+        config["genome"]["fasta_file"]
+
+    Optional parameters:
+
+    Contributors: Claire Rioualen
+    """
+    input: os.path.join(config["dir"]["genome"], config["genome"]["fasta_file"])
+    output: os.path.join(hisat2_dir, config["genome"]["fasta_file"])
+    params:
+        dir = hisat2_dir, \
+        qsub = config["qsub"] \
+          + " -e " + hisat2_dir + "index_qsub.err" \
+          + " -o " + hisat2_dir + "index_qsub.out"
+    log: hisat2_dir + "/index.log"
+    benchmark: hisat2_dir + "/index_benchmark.txt"
+    conda:  "../envs/hisat2.yaml"
+    shell: """
+mkdir -p {params.dir}
+cp {input} {params.dir}
+hisat2-build  {output}  {output} &> {log}
+"""
+

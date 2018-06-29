@@ -1,0 +1,118 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+if not "version" in config["genome"].keys():
+    sys.exit("Genome version must be defined in the config file")
+
+if not "fasta_file" in config["genome"].keys():
+    sys.exit("Fasta_file must be defined in the config file")
+
+if not "genome" in config["dir"].keys():
+    sys.exit("Genome dir must be defined in the dir section of the config file")
+
+if not "seq_type" in config["metadata"].keys():
+    sys.exit("Sequencing type (single or paired ends) must be defined in the config file")
+
+if config["metadata"]["seq_type"] == "pe" and not "strands" in config["metadata"].keys():
+    sys.exit("The param metadata/strands must be defined when analysing paired end data")
+
+if not "hisat2" in config.keys():
+    config["hisat2"] = {}
+
+if not "threads" in config["hisat2"].keys():
+    config["hisat2"]["threads"] = "1"
+
+if not "max_mismatches" in config["hisat2"].keys():
+    config["hisat2"]["max_mismatches"] = "6"
+
+if not "min_mismatches" in config["hisat2"].keys():
+    config["hisat2"]["min_mismatches"] = "2"
+
+if not "other_options" in config["hisat2"].keys():
+    config["hisat2"]["other_options"] = ""
+
+if not "fastq" in config["dir"].keys():
+    sys.exit("You must define a location for the fastq files.")
+
+if not "samples" in config["dir"].keys():
+    sys.exit("You must define a location for the sample files.")
+
+fastq_dir = config["dir"]["fastq"]
+sample_dir = config["dir"]["samples"]
+seq_type = config["metadata"]["seq_type"]
+
+# Define input files
+def hisat2_inputs(wildcards):
+#    if not "input_format" in config["metadata"].keys():
+#        ext = "fastq"
+#    else:
+#        ext = config["metadata"]["input_format"]
+    seq_type = config["metadata"]["seq_type"]
+    if (seq_type == "pe"):
+        reads = expand("{fastq_dir}/{samples}/{prefix}_{strand}.fastq.gz", strand=config["metadata"]["strands"].split(), samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)
+    elif (seq_type == "se"):
+        reads = expand("{fastq_dir}/{samples}/{prefix}.fastq.gz", samples=wildcards.samples, fastq_dir=fastq_dir, prefix=wildcards.prefix)[0]
+    else:
+        sys.exit("Error: invalid sequencing type parameter. Must be 'se' or 'pe'")
+    return reads
+
+# Rule
+rule hisat2:
+    """Read mapping using hisat2. 
+    Requires the indexing to have previously been done (using the
+    rule hisat2_index).
+
+    Required parameters:
+        config["genome"]["version"]
+        config["genome"]["fasta_file"]
+        config["qsub"]
+        config["dir"]["fastq"]
+        config["dir"]["samples"]
+
+    Optional parameters:
+        config["hisat2"]["threads"]
+        config["hisat2"]["max_mismatches"]
+#	config["hisat2"]["min_mismatches"]
+        config["hisat2"]["other_options"]
+
+    Contributors: Claire Rioualen & Jacques van Helden
+    """
+    input:
+        reads = hisat2_inputs, 
+        index = os.path.join(config["dir"]["genome"], "hisat2", config["genome"]["fasta_file"])
+    output:
+        bam = sample_dir + "/{samples}/{prefix}_hisat2.bam"
+    params:
+        threads = config["hisat2"]["threads"], 
+        sam = sample_dir + "/{samples}/{prefix}_hisat2.sam", 
+        unsorted_bam = sample_dir + "/{samples}/{prefix}_hisat2_unsorted.bam", ## put it as temp() output?
+        max_mismatches = config["hisat2"]["max_mismatches"], 
+        seq_type = config["metadata"]["seq_type"],
+        other_options = config["hisat2"]["other_options"], 
+        qsub = config["qsub"] \
+          + " -e " + sample_dir + "/{samples}/{prefix}_hisat2_qsub.err" \
+          + " -o " + sample_dir + "/{samples}/{prefix}_hisat2_qsub.out"
+    log: sample_dir + "/{samples}/{prefix}_hisat2.log"
+    benchmark: sample_dir + "/{samples}/{prefix}_hisat2_benchmark.txt"
+    conda:  "../envs/hisat2.yaml"
+    shell:"""
+if [[ "{params.seq_type}" == "pe" ]]
+then
+    hisat2 -x {input.index} -1 {input.reads[0]} -2 {input.reads[1]} -S {params.sam} --phred33 --mp {params.max_mismatches} --threads {params.threads} {params.other_options} 2> {log}
+elif [[ "{params.seq_type}" == "se" ]]
+then
+    hisat2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 --mp {params.max_mismatches} {params.other_options} 2> {log}
+fi
+samtools view -b -S {params.sam} > {params.unsorted_bam} 2> {log}
+rm {params.sam}
+samtools sort  {params.unsorted_bam} -o {output} 2> {log}
+rm {params.unsorted_bam}
+"""
+#    run:
+#        if (seq_type == "pe"):
+#            shell("hisat2 -x {input.index} -1 " + input.reads[0] + " -2 " + input.reads[1] + " -S {params.sam} --phred33 --mp {params.max_mismatches} --threads {params.threads} 2> {log}")
+#        elif (seq_type == "se"):
+#            shell("hisat2 -x {input.index} -U {input.reads} -S {params.sam} --threads {params.threads} --phred33 --mp {params.max_mismatches} 2> {log}")
+#        shell("samtools view -b -S {params.sam} > {output.bam}")
+#        shell("rm {params.sam}")
