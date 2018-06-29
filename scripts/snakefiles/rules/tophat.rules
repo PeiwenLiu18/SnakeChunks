@@ -96,7 +96,7 @@ rule tophat:
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
 then
-    tophat --num-threads {params.threads} --read-mismatches {params.max_mismatches} --output-dir {params.outdir} {input.index} " + input.reads[0] + " " + input.reads[1] + " 2> {log}
+    tophat --num-threads {params.threads} --read-mismatches {params.max_mismatches} --output-dir {params.outdir} {input.index} {input.reads[0]} {input.reads[1]} 2> {log}
 elif [[ "{params.seq_type}" == "se" ]]
 then
     tophat --num-threads {params.threads} --read-mismatches {params.max_mismatches} --output-dir {params.outdir} {input.index} {input.reads} 2> {log}
