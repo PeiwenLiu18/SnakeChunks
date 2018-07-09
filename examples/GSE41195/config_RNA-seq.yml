@@ -54,11 +54,21 @@
     strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
     multi_mapping: ""
 
+  sickle:
+    qual_threshold: 20                                                # Quality threshold. Default 20
+    length_threshold: 20                                              # Minimal output read length. Default 20
+
+  cutadapt:
+    qual_threshold: 20                                                # Quality threshold. Default 20
+    length_threshold: 20                                              # Minimal output read length. Default 20
+
+  bwa:
+    threads: 10             # Number of threads (parallel computing) for bwa
+    
   DESeq2:
     pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
     alpha: 0.05                                                         # Default 0.05
     rowsum_filter: 10                                                   # Default 10
-
 #    featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
 #    varInt: "group"
 #    condRef: "WT"
