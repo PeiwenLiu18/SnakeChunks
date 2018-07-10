@@ -70,7 +70,7 @@ rule subread_featureCounts_all:
     output: 
         featureCounts_output = diffexpr_dir + "/{preprocess}_featureCounts_all.tab",
 #        featureCounts_output = diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_featureCounts_all.tab",
-        count_table = diffexpr_dir + "/{preprocess}_featureCounts_all.txt"          ## _" + config["subread-featureCounts"]["feature_type"] + "
+        count_table = diffexpr_dir + "/{preprocess}_featureCounts_all.tsv"          ## _" + config["subread-featureCounts"]["feature_type"] + "
     params:
         attr_type = config["subread-featureCounts"]["attr_type"], 
         feature_type = config["subread-featureCounts"]["feature_type"], 
