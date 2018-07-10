@@ -41,7 +41,8 @@ rule sartools_targetfile:
     """
     input: 
         count_files = targetfiles_inputs
-    output: diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_SARTools_targetfile.txt"
+    output: 
+	"{diffexpr_dir}/{test}_vs_{ref}/{preprocess}_SARTools_targetfile.txt"
     params:
         qsub = config["qsub"]\
             + " -e " + diffexpr_dir + "/{test}_vs_{ref}/{preprocess}_targetfile_qsub.err"\
