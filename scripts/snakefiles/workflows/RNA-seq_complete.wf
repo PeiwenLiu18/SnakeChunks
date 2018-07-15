@@ -134,6 +134,7 @@ include: os.path.join(RULES, "cufflinks.rules")
 include: os.path.join(RULES, "DESeq2.rules")
 include: os.path.join(RULES, "dot_graph.rules")
 include: os.path.join(RULES, "dot_to_image.rules")
+include: os.path.join(RULES, "edgeR.rules")
 include: os.path.join(RULES, "fastqc.rules")
 include: os.path.join(RULES, "genome_coverage_bedgraph.rules")
 include: os.path.join(RULES, "genome_coverage_bedgraph_strands.rules")
@@ -141,7 +142,10 @@ include: os.path.join(RULES, "get_chrom_sizes.rules")
 include: os.path.join(RULES, "gzip.rules")
 include: os.path.join(RULES, "index_bam.rules")
 include: os.path.join(RULES, "md5sum.rules")
-include: os.path.join(RULES, "subread_align.rules")
+include: os.path.join(RULES, "sartools_targetfile.rules")
+include: os.path.join(RULES, "sartools_DESeq2.rules")
+#include: os.path.join(RULES, "sartools_edgeR.rules")
+#include: os.path.join(RULES, "subread_align.rules")
 include: os.path.join(RULES, "subread_featureCounts_all.rules")
 include: os.path.join(RULES, "subread_featureCounts.rules")
 include: os.path.join(RULES, "subread_index.rules")
@@ -283,7 +287,10 @@ ALL_COVERAGE    = GENOME_COV_TDF, GENOME_COV_PLUS, GENOME_COV_MINUS
 
 COUNTING_TOOLS = config["read_counts"].split()
 FEATURE_COUNTS_PER_SAMPLE   = expand(SAMPLE_DIR + "/{samples}/{samples}_{prefix}_{read_counts}.tab", samples=SAMPLE_IDS, prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
-ALL_FEATURE_COUNTS          = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_all.txt", zip, test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
+
+##  CHANGE (2018-07-09, JvH ): ALL_FEATURE_COUNTS is only computed once for all samples -> should not be 
+# ALL_FEATURE_COUNTS          = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_all.txt", zip, test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
+ALL_FEATURE_COUNTS          = expand(DEG_DIR + "/{prefix}_{read_counts}_all.txt", prefix=PREFIX, read_counts=COUNTING_TOOLS) ##, feature_type=} , feature=config["subread-featureCounts"]["feature_type"])
 
 #----------------------------------------------------------------#
 # DEG analysis
@@ -320,8 +327,8 @@ rule all:
 	Run analyses.
 	"""
 	input: 
-            QC, # quality of the raw reads
-            MD5, # md5sum for the raw (and trimmed) reads
+#            QC, # quality of the raw reads
+#            MD5, # md5sum for the raw (and trimmed) reads
             MAPPING, # Mapped reads
             MAPPING_MD5, # md5sum for the mapped reads
             MAPPING_QC, # Quality control of the mapped reads
@@ -329,13 +336,12 @@ rule all:
             BAM_STATS, # Statistics about each BAM file
             ALL_COVERAGE, # Coverage files
             FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
-            ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
+            ALL_FEATURE_COUNTS#, ## Counts per feature (gene, transcript, depending on options), one table with all samples
 #            SARTOOLS_TARGETFILE,
-            DEG_LIST, # Lists of differentially expressed genes
-            DEG_FIGURES,
+#            DEG_LIST, # Lists of differentially expressed genes
+#            DEG_FIGURES,
 #            DEG,
 #            INFER_TRANSCRIPTS,
-            GRAPHICS
+#            GRAPHICS
 	params: qsub=config["qsub"]
 	shell: "echo Job done    `date '+%Y-%m-%d %H:%M'`"
-

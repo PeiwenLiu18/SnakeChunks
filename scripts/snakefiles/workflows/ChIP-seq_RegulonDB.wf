@@ -241,7 +241,6 @@ rule all:
            REGULONDB_TF_SITES,
             PEAKS,
             PEAKS_VS_TFBS,
-#            FORMAT_PEAKS,
             GET_FASTA,
 #            GENOMIC_FEAT,
             GENE_LIST,

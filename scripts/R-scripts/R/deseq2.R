@@ -15,7 +15,7 @@
 message("Running DESeq2 analysis to detect differentially expressed genes")
 
 ## Load required librarires
-message("\tLoadin DESeq2 library")
+message("\tLoading DESeq2 library")
 library("DESeq2", quietly=TRUE, verbose=FALSE)
 
 

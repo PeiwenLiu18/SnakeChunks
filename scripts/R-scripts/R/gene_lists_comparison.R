@@ -46,27 +46,25 @@ names(gene.table) <- c("gene_id", "gene_name", "bnumber", "gene_left", "gene_rig
                        "product", "evidence", "PIMDs", "evidence_level")
 # View(gene.table)
 
-#### Load TFBS ####
 # Columns:
 # (1) Transcription Factor (TF) identifier assigned by RegulonDB
 # (2) TF name
-# (3) Confornation name
-# (4) TF binding site (TF-bs) identifier assigned by RegulonDB 
-# (5) TF-bs left end position in the genome 
-# (6) TF-bs right end position in the genome
-# (7) DNA strand where the  TF-bs is located
-# (8) TF-Gene interaction identifier assigned by RegulonDB (related to the "TF gene interactions" file) 
-# (9) Transcription unit regulated by the TF
-# (10) Gene expression effect caused by the TF bound to the  TF-bs (+ activation, - repression, +- dual, ? unknown)
-# (11) Promoter name
-# (12) Center position of TF-bs, relative to Transcription Start Site
-# (13) TF-bs sequence (upper case)
-# (14) Evidence that supports the existence of the TF-bs
-# (15) Evidence confidence level (Confirmed, Strong, Weak)
+# (3) TF binding site (TF-bs) identifier assigned by RegulonDB 
+# (4) TF-bs left end position in the genome 
+# (5) TF-bs right end position in the genome
+# (6) DNA strand where the  TF-bs is located
+# (7) TF-Gene interaction identifier assigned by RegulonDB (related to the "TF gene interactions" file) 
+# (8) Transcription unit regulated by the TF
+# (9) Gene expression effect caused by the TF bound to the  TF-bs (+ activation, - repression, +- dual, ? unknown)
+# (10) Promoter name
+# (11) Center position of TF-bs, relative to Transcription Start Site
+# (12) TF-bs sequence (upper case)
+# (13) Evidence that supports the existence of the TF-bs
+# (14) Evidence confidence level (Confirmed, Strong, Weak)
 TFBS <- read.delim(file = parameters[["TFBS"]], 
                          comment.char = "#",
                          quote = NULL)
-names(TFBS) <- c("TF_id", "TF_name", "conformation", "TFBS_id", "TFBS_left", "TFBS_right", "strand", 
+names(TFBS) <- c("TF_id", "TF_name", "TFBS_id", "TFBS_left", "TFBS_right", "strand", 
                  "interaction_id", "TU_name", "effect", "promoter_name", "TFBS_center", "TFBS_sequence", 
                  "evidence", "conf_level")
 # View(TFBS)

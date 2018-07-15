@@ -77,14 +77,14 @@ rule sartools_DESeq2:
     Contributors: Claire Rioualen
     """
     input: 
-        targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}SARTools_targetfile.txt"
+        targetFile = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}_SARTools_targetfile.txt"
     output: 
         report = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_report.html",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.tab"
     params:
         rscript = "../../R-scripts/R/sartools_deseq2.R",
         wd = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2",
-        targetFile = "{preprocess,.*}SARTools_targetfile.txt",
+        targetFile = "{preprocess,.*}_SARTools_targetfile.txt",
         rawDir = "../../../../..",
         projectName = "{test}_vs_{ref}_{preprocess,.*}DESeq2",
         author = config["author"],
