@@ -29,9 +29,9 @@
     results: "ChIP-seq/results_advanced"                                # Required. Directory containing all result files that are produced by the pipeline
     snakechunks: "SnakeChunks"                                          # Required. Location of the SnakeChunks library
 
-    samples: "ChIP-seq/results_advanced/samples"                                 # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
-    peaks: "ChIP-seq/results_advanced/peaks"                                     # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
-    reports: "ChIP-seq/results_advanced/reports"                                 # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
+    samples: "ChIP-seq/results_advanced/samples"                        # Optional. will hold sample treatment (trimming, alignment, QC...).    If not mentioned, will be config["dir"]["results"]
+    peaks: "ChIP-seq/results_advanced/peaks"                            # Optional. will hold the results of differential expression analysis. If not mentioned, will be config["dir"]["results"]
+    reports: "ChIP-seq/results_advanced/reports"                        # Optional. will hold reports and graphics.                             If not mentioned, will be config["dir"]["results"]
     regulondb: "data/RegulonDB"
 
 ################################################################
@@ -61,9 +61,9 @@
     style: "factor"                                                     # Optional (def. factor), can be factor, histone... , groseq, tss, dnase, super, mC (beware of output filenames)
     F: "4"                                                              # Optional (def. 4)
     L: "4"                                                              # Optional (def. 4)
-    P: "0.0001"                                                           # Optional (def. 0.0001)
-    fdr: "0.001"                                                         # Optional (def. 0.001)
+    P: "0.0001"                                                         # Optional (def. 0.0001)
+    fdr: "0.001"                                                        # False Discovery Rate. Optional (def. 0.001)
 
   spp: 
-    fdr: "0.01"                                                         # Optional (def. 0.05)
+    fdr: "0.01"                                                         # False Discovery Rate. Optional (def. 0.05)
 
