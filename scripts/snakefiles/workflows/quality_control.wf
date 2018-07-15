@@ -152,7 +152,7 @@ if not ("trimming" in config.keys()):
 
 TRIMMING_TOOLS = config["trimming"].split()
 
-print(TRIMMING_TOOLS)
+# print(TRIMMING_TOOLS)
 
 if (len(TRIMMING_TOOLS) == 0):
     TRIMMING = ""
