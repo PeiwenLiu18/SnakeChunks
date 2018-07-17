@@ -11,6 +11,9 @@ if not "fasta_file" in config["genome"].keys():
 if not "genome" in config["dir"].keys():
     sys.exit("Genome dir must be defined in the 'dir' section of the config file")
 
+if not "bowtie2" in config.keys():
+    config["bowtie2"] = {}
+
 if not "threads" in config["bowtie2"].keys():
     config["bowtie2"]["threads"] = "1"
 

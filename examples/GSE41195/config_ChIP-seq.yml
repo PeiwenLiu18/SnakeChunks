@@ -50,8 +50,13 @@
     qual_threshold: "20"                                                # Optional (def. 20)
     length_threshold: "20"                                              # Optional (def. 20)
 
+  bowtie2:
+    threads: "2"                                                        # Number of threads
+    mode: "--local"                                                     # Alignent mode. Supported: "--local" or "--end-to-end"
+    other_options: "--very-fast"                                        # supplementary options. We should evaluate if we do not convert them to fully documented options
+    
   macs2: 
-    qval: "0.05"                                                       # Optional (def. 0.05)
+    qval: "0.05"                                                        # Optional (def. 0.05)
     keep_dup: "all"                                                     # Optional (def. 1)
     mfold_min: "2"                                                      # Optional (def. 5)
     mfold_max: "50"                                                     # Optional (def. 50)
