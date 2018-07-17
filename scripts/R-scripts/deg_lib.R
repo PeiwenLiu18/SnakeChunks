@@ -1116,3 +1116,6 @@ edger.analysis <- function(dir.figures=NULL) {
   # View(edger.result.table)
   return (edger.result.table)
 }
+
+
+
