@@ -3,6 +3,7 @@ name: venn
 channels:
   - conda-forge
 dependencies:
+  - pcre
   - cairo=1.14.10
   - r-venndiagram=1.6.16
 ...
