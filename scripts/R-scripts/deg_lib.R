@@ -2,8 +2,8 @@
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #' @param required.libraries a vector contianing the names of required CRAN libraries, which will be installed with install.packages()
 #' @param required.bioconductor a vector containing the required BioConductor libraries, which will be installed with biocLite
-CheckRequiredLibraries <- function (required.libraries, 
-                                    required.bioconductor = NULL) {
+CheckRequiredLibraries <- function(required.libraries, 
+                                   required.bioconductor = NULL) {
   for (lib in required.libraries) {
     if (!require(lib, character.only = TRUE)) {
       install.packages(lib)
@@ -979,13 +979,16 @@ sample.description.plots <- function (sample.desc,
 #' @param count.table table with the counts per reads. This table is used to get feature IDs 
 #' (gene IDs, gene names, ...) from row names, and thereby ensure consistency between rows 
 #' of the count tables and the summary of differential expression.
-#' @param gene.info optional table with detailed information about each feature (gene).
 #' @param samples1 vector with  sample IDs of the test condition. Must be a subset of the data table column names.
 #' @param samples2 vector with sample IDs of the control condition. Must be a subset of the data table column names.
+#' @param gene.info optional table with detailed information about each feature (gene).
+#' @param stats=FALSE add columns with statistics (mean, quartiles, var, ...) for the whole count table and for the respective sample groups
+#' @return a data frame with one row per feature and some descriptive columns + optional table-wise and group-wise statistics.
 init.deg.table <- function(count.table, 
                            samples1,
                            samples2,
-                           gene.info = NULL) {
+                           gene.info = NULL,
+                           stats = FALSE) {
   message("\tInitializing result table for one differential analysis (two-sample comparison).")
   all.gene.ids <- row.names(count.table)
   #message("\t\tFeatures (genes): " \t, )
@@ -1028,67 +1031,92 @@ init.deg.table <- function(count.table,
   result.table$undetected <- rowSums(count.table > 1) < min.rep
   # table(result.table$undetected)
   # dim(count.table)
-  message("\tComputing group-wise count statistics")
-  result.table$mean <- apply(count.table,1, mean)
-  result.table$mean1 <- apply(as.data.frame(count.table[,samples1]),1, mean)
-  result.table$mean2 <- apply(as.data.frame(count.table[,samples2]),1, mean)
-  result.table$A = log2(result.table$mean1*result.table$mean2)/2
-  result.table$M = log2(result.table$mean1/result.table$mean2)
-  result.table$min <-  apply(count.table,1, min)
-  result.table$min1 <- apply(as.data.frame(count.table[,samples1]),1, min)
-  result.table$perc25 <- apply(count.table,1, quantile, probs = 0.75)
-  result.table$perc25.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
-  result.table$perc25.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
-  result.table$median <- apply(count.table,1, median)
-  result.table$median1 <- apply(as.data.frame(count.table[,samples1]),1, median)
-  result.table$median2 <- apply(as.data.frame(count.table[,samples2]),1, median)
-  result.table$perc75 <- apply(count.table,1, quantile, probs = 0.75)
-  result.table$perc75.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
-  result.table$perc75.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
-  result.table$perc95 <- apply(count.table,1, quantile, probs = 0.75)
-  result.table$perc95.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.95)
-  result.table$perc95.1 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.95)
-  result.table$min2 <- apply(as.data.frame(count.table[,samples2]),1, min)
-  result.table$max <-  apply(count.table,1, max)
-  result.table$max1 <- apply(as.data.frame(count.table[,samples1]),1, max)
-  result.table$max2 <- apply(as.data.frame(count.table[,samples2]),1, max)
-  result.table$sd <-  apply(count.table,1, sd)
-  result.table$sd1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
-  result.table$sd2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
-  result.table$var <-  apply(count.table,1, var)
-  result.table$var1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
-  result.table$var2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
+  
+  if (stats) {
+    message("\tComputing group-wise count statistics")
+    result.table$mean <- apply(count.table,1, mean)
+    result.table$mean1 <- apply(as.data.frame(count.table[,samples1]),1, mean)
+    result.table$mean2 <- apply(as.data.frame(count.table[,samples2]),1, mean)
+    result.table$M = log2(result.table$mean1/result.table$mean2)
+    result.table$min <-  apply(count.table,1, min)
+    result.table$min1 <- apply(as.data.frame(count.table[,samples1]),1, min)
+    result.table$perc25 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc25.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
+    result.table$perc25.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
+    result.table$median <- apply(count.table,1, median)
+    result.table$median1 <- apply(as.data.frame(count.table[,samples1]),1, median)
+    result.table$median2 <- apply(as.data.frame(count.table[,samples2]),1, median)
+    result.table$perc75 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc75.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
+    result.table$perc75.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
+    result.table$perc95 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc95.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.95)
+    result.table$perc95.1 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.95)
+    result.table$min2 <- apply(as.data.frame(count.table[,samples2]),1, min)
+    result.table$max <-  apply(count.table,1, max)
+    result.table$max1 <- apply(as.data.frame(count.table[,samples1]),1, max)
+    result.table$max2 <- apply(as.data.frame(count.table[,samples2]),1, max)
+    result.table$sd <-  apply(count.table,1, sd)
+    result.table$sd1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
+    result.table$sd2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
+    result.table$var <-  apply(count.table,1, var)
+    result.table$var1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
+    result.table$var2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
+  }
   return(result.table)
 }
 
 ################################################################
-## DESeq2 analysis
-## 
-## Detect differentially expressed genes (DEG) using the package DESeq2, 
-## and add a few custom columns (e-value, ...) to the result table. 
-deseq2.analysis <- function(dir.figures=NULL) {
-  verbose("\t\tDESeq2 analysis", 2)
+#' @title DESeq2 analysis
+#' @author Jacques van Helden 
+#' @description  Detect differentially expressed genes (DEG) using the package DESeq2, 
+#' and add a few custom columns (e-value, ...) to the result table. 
+#' @param counts a count table sent to DESeq2. Must contain raw counts (not normalized). 
+#' @param condition a vector with the condition associated to each sample. The length of this vector must equal the number of columns of the count table. 
+#' @param ref.condition=NULL reference condition for the differential analysis
+#' @param comparison.prefix a string with the prefix for output files
+#' @param title=comparison.prefix main title for the plots
+#' @param dir.figures=NULL optional directory to save figures
+#' @param ... additional parameters are passed to DESeq2::DESeq() function
+deseq2.analysis <- function(
+  counts,
+  condition,
+  ref.condition=NULL,
+  comparison.prefix,
+  title = comparison.prefix,
+  dir.figures=NULL,
+  ...) {
   
-  ## Path prefix to save DESeq2 result files
-  prefix["DESeq2_file"] <- paste(sep = "", prefix["comparison_file"], "_", suffix.DESeq2)
-  prefix["DESeq2_figure"] <- paste(sep = "", prefix["comparison_figure"], "_", suffix.DESeq2)
+  require(DESeq2)
   
-  ## Create a DESeqDataSet object from the count table + conditions
-  condition <- as.factor(as.vector(current.sample.conditions))
+  message("\tDESeq2 analysis\t", comparison.prefix)
+  
+  ## Check that the length of conditions equals the number of columns of the count table
+  if (length(condition) != ncol(counts)) {
+    stop("deseq2.analysis\tNumber of columns of count table (", ncol(counts), ") differs from length of condition (", length(condition), ").")
+  }
+
+  
+  ## Create a DESeqDataSet object from the count table + condition
   deseq2.dds <- DESeqDataSetFromMatrix(
-    countData = current.counts, 
-    colData = DataFrame(condition),
-    ~ condition)
-  
+    countData = counts, 
+    colData = data.frame(condition),
+    design = ~ condition)
   
   ## Indicate that second condition is the reference condition. 
   ## If not done, the conditions are considered by alphabetical order, 
   ## which may be misleading to interpret the log2 fold changes. 
-  deseq2.dds$condition <- relevel(deseq2.dds$condition, ref=cond2) 
-  
+  if (!is.null(ref.condition)) {
+    if (!(ref.condition %in% condition)) {
+      stop("deseq2.analysis\treference condition (", ref.condition, ") does not exist in sample conditions (",
+           paste(collapse = ", ", unique(condition)), ")")
+    }
+    deseq2.dds$condition <- relevel(deseq2.dds$condition, ref = ref.condition) 
+  }
+    
   ## Run the differential analysis
   deseq2.dds <- DESeq(deseq2.dds)      ## Differential analysis with negbin distrib
-  deseq2.res <- results(deseq2.dds, independentFiltering=FALSE, pAdjustMethod = "BH")  ## Collect the result table
+  deseq2.res <- results(deseq2.dds, independentFiltering = FALSE, pAdjustMethod = "BH")  ## Collect the result table
   
   deseq2.result.table <- data.frame(
     "gene.id" = row.names(deseq2.res),
@@ -1096,55 +1124,102 @@ deseq2.analysis <- function(dir.figures=NULL) {
     "log2FC" = deseq2.res$log2FoldChange,
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
+  
+  ## Add complementary statistics on the DEG table
   deseq2.result.table <- complete.deg.table(
     deg.table = deseq2.result.table, 
-    table.name = paste(sep = "_", "DESeq2", prefix["comparison"]),
+    table.name = paste(sep = "_", "DESeq2", comparison.prefix),
     sort.column = "padj",
-    thresholds=thresholds,
+    thresholds = thresholds,
     round.digits = 3,
     dir.figures = dir.figures)
-  return(deseq2.result.table)
+  
+  result <- list(
+    dds = deseq2.dds,
+    result.table = deseq2.result.table
+  )
+  
+  return(result)
 }  
 
-edger.analysis <- function(dir.figures=NULL) {
-  verbose("\t\tedgeR analysis", 2)
+################################################################
+#' @title edgeR analysis
+#' @author Jacques van Helden 
+#' @description  Detect differentially expressed genes (DEG) using the package edgeR, 
+#' and add a few custom columns (e-value, ...) to the result table. 
+#' @param counts a count table sent to edgeR Must contain raw counts (not normalized). 
+#' @param condition a vector with the condition associated to each sample. The length of this vector must equal the number of columns of the count table. 
+#' @param ref.condition=NULL reference condition for the differential analysis
+#' @param comparison.prefix a string with the prefix for output files
+#' @param title=comparison.prefix main title for the plots
+#' @param dir.figures=NULL optional directory to save figures
+#' @param norm.method="RLE" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
+#' @param ... additional parameters are passed to edgeR::exactTest() function
+edger.analysis <- function(counts,
+                           condition,
+                           ref.condition=NULL,
+                           comparison.prefix,
+                           title = comparison.prefix,
+                           dir.figures=NULL,
+                           norm.method = "RLE",
+                           ...) {
   
-  prefix["edgeR_file"] <- paste(sep = "", prefix["comparison_file"], "_", suffix.edgeR)
-  prefix["edgeR_figure"] <- paste(sep = "", prefix["comparison_figure"], "_", suffix.edgeR)
+  require(edgeR)
+  
+  message("\tedgeR analysis\t", comparison.prefix, "\tnormalisation method: ", norm.method)
+  
+  ## Check that the length of conditions equals the number of columns of the count table
+  if (length(condition) != ncol(counts)) {
+    stop("edgeR.analysis\tNumber of columns of count table (", ncol(counts), ") differs from length of condition (", length(condition), ").")
+  }
+  
   
   ## Convert the count table in a DGEList structure and compute its parameters.
-  d <- DGEList(counts=current.counts, group=sample.conditions[names(current.counts)])
-  d$samples$group <- relevel(d$samples$group, ref=cond2) ## Ensure that condition 2 is considered as the reference
-  d <- calcNormFactors(d, method="RLE")                 ## Compute normalizing factors
-  d <- estimateCommonDisp(d, verbose=FALSE)             ## Estimate common dispersion
-  d <- estimateTagwiseDisp(d, verbose=FALSE)            ## Estimate tagwise dispersion
+  # d <- DGEList(counts = current.counts, group = sample.conditions[names(current.counts)])
+  # d$samples$group <- relevel(d$samples$group, ref = ref.condition) ## Ensure that condition 2 is considered as the reference
+  # d <- calcNormFactors(d, method="RLE")                 ## Compute normalizing factors
+  # d <- estimateCommonDisp(d, verbose=FALSE)             ## Estimate common dispersion
+  # d <- estimateTagwiseDisp(d, verbose=FALSE)            ## Estimate tagwise dispersion
+  d <- DGEList(counts = counts, group = condition)
+  d$samples$group <- relevel(d$samples$group, ref = ref.condition) ## Ensure that condition 2 is considered as the reference
+  d <- calcNormFactors(d, method = norm.method)                 ## Compute normalizing factors
+  d <- estimateCommonDisp(d, verbose = FALSE)             ## Estimate common dispersion
+  d <- estimateTagwiseDisp(d, verbose = FALSE)            ## Estimate tagwise dispersion
   
   ################################################################
   ## Detect differentially expressed genes by applying the exact 
   ## negative binomial test from edgeR package.
-  edger.de <- exactTest(d, pair=c(cond2, cond1))      ## Run the exact negative binomial test
+  edger.de <- exactTest(d, pair = c(cond2, cond1), ...)      ## Run the exact negative binomial test
   
   ## Sort genes by increasing p-values, i.e. by decreasing significance
-  edger.tt <- topTags(edger.de, n=nrow(d), sort.by = "PValue")
+  edger.tt <- topTags(edger.de, n = nrow(d), sort.by = "PValue")
   
   ## Complete the analysis of edgeR result table
   edger.result.table <- data.frame("gene.id" = row.names(edger.tt$table),
-                                   "mean"=edger.tt$table$logCPM,
-                                   "log2FC"=edger.tt$table$logFC,
-                                   "pvalue"=edger.tt$table$PValue,
-                                   "padj"=edger.tt$table$FDR)
+                                   "mean" = edger.tt$table$logCPM,
+                                   "log2FC" = edger.tt$table$logFC,
+                                   "pvalue" = edger.tt$table$PValue,
+                                   "padj" = edger.tt$table$FDR)
   edger.result.table <- complete.deg.table(
     deg.table = edger.result.table, 
     table.name = paste(sep = "_", "edgeR", prefix["comparison"]),
     sort.column = "padj",
-    thresholds=thresholds,
+    thresholds = thresholds,
     round.digits = 3,
-    dir.figures=dir.figures)
+    dir.figures = dir.figures)
   # dim(edger.result.table)
   # dim(edger.result.table)
   # names(edger.result.table)
   # View(edger.result.table)
-  return (edger.result.table)
+  
+  result <- list(
+    edger.d = d,
+    edger.de = edger.de,
+    edger.tt = edger.tt,
+    result.table = edger.result.table
+  )
+  
+  return (result)
 }
 
 
