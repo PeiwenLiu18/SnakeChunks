@@ -336,9 +336,9 @@ rule all:
             BAM_STATS, # Statistics about each BAM file
             ALL_COVERAGE, # Coverage files
             FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
-            ALL_FEATURE_COUNTS#, ## Counts per feature (gene, transcript, depending on options), one table with all samples
+            ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
 #            SARTOOLS_TARGETFILE,
-#            DEG_LIST, # Lists of differentially expressed genes
+            DEG_LIST #, # Lists of differentially expressed genes
 #            DEG_FIGURES,
 #            DEG,
 #            INFER_TRANSCRIPTS,

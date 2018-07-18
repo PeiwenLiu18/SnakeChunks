@@ -41,7 +41,8 @@ rule DESeq2:
     Author: Claire Rioualen
     """
     input: 
-        count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
+        count_file = "{diffexpr_dir}/{preprocess,.*}all.tsv"
+#        count_file = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}all.txt"
     output: 
         gene_table = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_all_genes.tsv",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.txt",
