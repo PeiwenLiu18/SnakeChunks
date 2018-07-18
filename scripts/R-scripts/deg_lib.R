@@ -2,7 +2,8 @@
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #' @param required.libraries a vector contianing the names of required CRAN libraries, which will be installed with install.packages()
 #' @param required.bioconductor a vector containing the required BioConductor libraries, which will be installed with biocLite
-CheckRequiredLibraries <- function (required.libraries, required.bioconductor=NULL) {
+CheckRequiredLibraries <- function(required.libraries, 
+                                   required.bioconductor = NULL) {
   for (lib in required.libraries) {
     if (!require(lib, character.only = TRUE)) {
       install.packages(lib)
@@ -56,8 +57,8 @@ LoadDEGparam <- function (yamlFile) {
 #'
 #' @export
 verbose <- function(message.content,
-                    level=1,
-                    print.date=TRUE) {
+                    level = 1,
+                    print.date = TRUE) {
   if (!exists("verbosity")) {
     verbosity <- 1
   }
@@ -113,15 +114,15 @@ verbose <- function(message.content,
 #'     "pvalue" = deseq2.res$pvalue,
 #'     "padj" = deseq2.res$padj)
 #' deseq2.result.table <- complete.deg.table(deseq2.result.table, 
-#'     table.name="DESeq2", sort.column="padj")
+#'     table.name="DESeq2", sort.column = "padj")
 #'
 #' @export
 complete.deg.table <- function(deg.table,
                                table.name,
                                sort.column = "none",
-                               thresholds=thresholds,
+                               thresholds = thresholds,
                                round.digits = 3,
-                               dir.figures=NULL) {
+                               dir.figures = NULL) {
   
   # names(deg.table)
   verbose(paste("Analysing", table.name, "result table with", nrow(deg.table), "rows"), 1)
@@ -140,10 +141,10 @@ complete.deg.table <- function(deg.table,
   row.names(deg.table) <- deg.table$gene.id
   
   ## Sort DEG table if required
-  sort.decreasing <- c("mean"=TRUE, 
-                       "padj"=FALSE, 
-                       "pvalue"=FALSE, 
-                       "log2FC"=TRUE)
+  sort.decreasing <- c("mean" = TRUE, 
+                       "padj" = FALSE, 
+                       "pvalue" = FALSE, 
+                       "log2FC" = TRUE)
   if (sort.column != "none") {
     verbose(paste("\tSorting DEG table by", sort.column), 2)    
     deg.table <- deg.table[order(deg.table[,sort.column], 
@@ -175,12 +176,12 @@ complete.deg.table <- function(deg.table,
   
   ## Label the genes passing the FDR, E-value and fold-change thresholds
   threshold.type <- c(
-    "pvalue"="upper", 
-    "padj"="upper", 
-    "evalue"="upper", 
-    "FC"="lower")
+    "pvalue" = "upper", 
+    "padj" = "upper", 
+    "evalue" = "upper", 
+    "FC" = "lower")
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
-  selection.columns <- paste(sep="", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
+  selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
   for (s in thresholds.to.apply) {
     if (threshold.type[s] == "upper") {
@@ -209,7 +210,7 @@ complete.deg.table <- function(deg.table,
     for (col in setdiff(names(deg.table), selection.columns)) {
       if (is.numeric(deg.table[,col])) {
         verbose(paste("Rounding", col), 2)
-        deg.table[,col] <- signif(digits=3, deg.table[,col])
+        deg.table[,col] <- signif(digits = 3, deg.table[,col])
       }    
     }
   }
@@ -222,17 +223,17 @@ complete.deg.table <- function(deg.table,
     ## Draw Venn diagram with number of genes declared significant 
     ## according to the selection criteria (threshold fields).
     selection.venn.counts <- vennCounts(deg.table[,selection.columns])
-    pdf(file=file.path(dir.figures, paste(sep = "", table.name, "selection_Venn.pdf")))
-    vennDiagram(selection.venn.counts, cex=1, main=paste(table.name, "selected genes"))  
+    pdf(file = file.path(dir.figures, paste(sep = "", table.name, "selection_Venn.pdf")))
+    vennDiagram(selection.venn.counts, cex = 1, main = paste(table.name, "selected genes"))  
     silence <- dev.off()
   
     ## Histogram of the nominal p-values
-    pdf(file=file.path(dir.figures, paste(sep = "", table.name, "_pval_hist.pdf")), width=7, height=5)
-    hist(deg.table$pvalue, breaks=seq(from=0, to=1, by=0.05),
-         xlab="Nominal p-value",
-         ylab="Number of genes",
-         main=paste(table.name, "pvalue distribution"),
-         col="#BBBBBB")
+    pdf(file = file.path(dir.figures, paste(sep = "", table.name, "_pval_hist.pdf")), width = 7, height = 5)
+    hist(deg.table$pvalue, breaks = seq(from = 0, to = 1, by = 0.05),
+         xlab = "Nominal p-value",
+         ylab = "Number of genes",
+         main = paste(table.name, "pvalue distribution"),
+         col = "#BBBBBB")
     silence <- dev.off()
   }
   return(deg.table)
@@ -269,22 +270,22 @@ functional.enrichment <- function(geneset,
                                   allgenes,
                                   db,
                                   organism.names,
-                                  ontology="BP",
+                                  ontology = "BP",
                                   thresholds = thresholds,
-                                  select.positives=TRUE,
+                                  select.positives = TRUE,
                                   run.GOstats = TRUE,
                                   run.clusterProfiler = FALSE,
                                   plot.adjust = TRUE) {
   #library("ALL")
-  verbose(paste(sep="", "Go over-representation analysis. ",
+  verbose(paste(sep = "", "Go over-representation analysis. ",
                 length(geneset), " input genes (among ", length(allgenes), ")"), 2)
   
   ## Prepare the result
   result <- list()
   result$ngenes.test <- length(geneset)
   result$ngenes.all <- length(allgenes)
-  result$db = db
-  result$ontology = ontology
+  result$db <- db
+  result$ontology <- ontology
   result$thresholds <- thresholds
   result$select.positives <- select.positives
   
@@ -299,10 +300,10 @@ functional.enrichment <- function(geneset,
   library("annotate")
   library(db, character.only = TRUE)
   envir <- c(
-    db=db,
+    db = db,
     prefix = sub(db, pattern = ".db", replacement = ""))
   for (suffix in c("GO", "ENTREZID")) {
-    envir[suffix] <- paste(sep="", envir["prefix"],suffix)
+    envir[suffix] <- paste(sep = "", envir["prefix"],suffix)
   }
   
   ############## Run over-representation analysis with GOstats 
@@ -310,8 +311,8 @@ functional.enrichment <- function(geneset,
     library("GOstats")
     
     ## Get go annotations per gene
-    go.annot.geneset <- mget(geneset, envir=get(envir["GO"]))
-    go.annot.allgenes <- mget(allgenes, envir=get(envir["GO"]))
+    go.annot.geneset <- mget(geneset, envir = get(envir["GO"]))
+    go.annot.allgenes <- mget(allgenes, envir = get(envir["GO"]))
     result.per.gene$nb.go.annot <- as.vector(unlist(lapply(go.annot.allgenes, length)  ))
     
     ## Compute number of genes with at least one annotation in GO. 
@@ -324,13 +325,13 @@ functional.enrichment <- function(geneset,
     
     ## Define parameters for GOstats analysis
     gostats.params <- new("GOHyperGParams",
-                          geneIds=geneset,
-                          universeGeneIds=allgenes,
-                          annotation=db,
-                          ontology=ontology,
-                          pvalueCutoff=1,
-                          conditional=FALSE,
-                          testDirection="over")
+                          geneIds = geneset,
+                          universeGeneIds = allgenes,
+                          annotation = db,
+                          ontology = ontology,
+                          pvalueCutoff = 1,
+                          conditional = FALSE,
+                          testDirection = "over")
 
     ## Run over-representation hypergeometric test with GOstats
     over.result <- hyperGTest(gostats.params)
@@ -342,14 +343,14 @@ functional.enrichment <- function(geneset,
     ## Collect the statistics for all the tested GO classes.
     ## For this we set the p-value threshold to 1.1, so we select
     ## all classes, even non-significant!
-    go.enrich.table <- summary(over.result, pvalue=2)
+    go.enrich.table <- summary(over.result, pvalue = 2)
     go.enrich.table$expectedCounts = expectedCounts(over.result)
     
     go.enrich.table <- complete.enrich.table(go.enrich.table,
-                                             pvalue.column="Pvalue",
-                                             thresholds=thresholds, 
-                                             select.positives=select.positives,
-                                             plot.adjust=plot.adjust)    
+                                             pvalue.column = "Pvalue",
+                                             thresholds = thresholds, 
+                                             select.positives = select.positives,
+                                             plot.adjust = plot.adjust)    
     
     ## Add  GO table to the result
     result$go.bp.table <- go.enrich.table
@@ -362,11 +363,11 @@ functional.enrichment <- function(geneset,
     n <- N -m ## Number of "non-marked" genes, i.e. not belonging to the considered GO class
     k <- length(over.result@geneIds) ## Number of test genes with at least one annotation in the selected ontology
     Pvalue.check <- 
-      phyper(q = go.enrich.table$Count -1, m=m, n=n, k = k, lower=FALSE)
-    #   plot(go.enrich.table[,pvalue.column], Pvalue.check, log="xy")
+      phyper(q = go.enrich.table$Count -1, m = m, n = n, k  =  k, lower = FALSE)
+    #   plot(go.enrich.table[,pvalue.column], Pvalue.check, log = "xy")
     ExpCount.check <- m * k/N
     # plot(go.enrich.table$ExpCount, ExpCount.check)
-    #   abline(a=0, b=1)
+    #   abline(a = 0, b = 1)
     
     # View(go.enrich.table)
     # names(go.enrich.table)
@@ -395,10 +396,10 @@ functional.enrichment <- function(geneset,
       
       ego.table <- complete.enrich.table(
         ego.table,
-        pvalue.column="pvalue",
-        thresholds=thresholds, 
-        select.positives=select.positives,
-        plot=TRUE)
+        pvalue.column = "pvalue",
+        thresholds = thresholds, 
+        select.positives = select.positives,
+        plot = TRUE)
       
       ## Add  GO table to the result
       result$clusterProfiler.bp.table <- ego.table
@@ -408,7 +409,7 @@ functional.enrichment <- function(geneset,
   ## Att the results per gene to the result object
   result$result.per.gene <- result.per.gene
   
-  # plot(hist(go.enrich.table[,pvalue.column], breaks=20))
+  # plot(hist(go.enrich.table[,pvalue.column], breaks = 20))
   #dim(go.enrich.table)
   # View(go.enrich.table)
   # print(over.result.cond)
@@ -433,9 +434,9 @@ functional.enrichment <- function(geneset,
 #' @export
 complete.enrich.table <- function(enrich.table, 
                                   pvalue.column = "Pvalue",
-                                  thresholds=c("evalue"=1, "qvalue"=0.05),
-                                  nb.tests=nrow(enrich.table),
-                                  select.positives=FALSE,
+                                  thresholds = c("evalue" = 1, "qvalue" = 0.05),
+                                  nb.tests = nrow(enrich.table),
+                                  select.positives = FALSE,
                                   plot.adjust = TRUE
                                   ) {
   
@@ -453,7 +454,7 @@ complete.enrich.table <- function(enrich.table,
   
   ## Sort enrichment table by increasing p-values
   enrich.table$pvalue.rank <- rank(enrich.table[,pvalue.column])  
-  enrich.table <- enrich.table[order(enrich.table[,pvalue.column], decreasing=FALSE),]
+  enrich.table <- enrich.table[order(enrich.table[,pvalue.column], decreasing = FALSE),]
 
   ## q-value according to Benjamini-Hochberg method, which does not consider the prior proportions of null and non-null hypotheses
   enrich.table$qvalue <- enrich.table[,pvalue.column] * nb.tests/enrich.table$pvalue.rank
@@ -462,47 +463,47 @@ complete.enrich.table <- function(enrich.table,
   ## Compute the q-value according to Benjamini-Hochberg method
   
   ## Tag significant genes according to zero, one or more cutoff values
-  upper.thresholds <- c("evalue"=TRUE, "qvalue"=TRUE, "pvalue"=TRUE, "intersect"=FALSE)
+  upper.thresholds <- c("evalue" = TRUE, "qvalue" = TRUE, "pvalue" = TRUE, "intersect" = FALSE)
   for (s in names(thresholds)) {
     if (is.numeric(thresholds[s])) {
-      selection.column <- paste(sep="_", s, thresholds[s])
+      selection.column <- paste(sep = "_", s, thresholds[s])
       if (upper.thresholds[s]) {
         enrich.table[, selection.column] <- 1*(enrich.table[,s] < thresholds[s])
       } else {
         enrich.table[, selection.column] <- 1*(enrich.table[,s] > thresholds[s])
       }
       sum(enrich.table[, selection.column])
-      verbose(paste(sep="", "\t",
+      verbose(paste(sep = "", "\t",
                     sum(enrich.table[selection.column]), "/", nb.tests, " tests passed ",
-                    s, " threshold=", thresholds[s]), 2)
+                    s, " threshold = ", thresholds[s]), 2)
       enrich.table$positive <- enrich.table$positive * enrich.table[,selection.column]
-      verbose(paste(sep="", "\t", sum(enrich.table$positive), "/", nb.tests, " positive tests"), 3)    
+      verbose(paste(sep = "", "\t", sum(enrich.table$positive), "/", nb.tests, " positive tests"), 3)    
     }
   }  
   
   ## Plot the different multiple testing corrections
   if (plot.adjust) {
-    threshold.colors <- c("qvalue"="darkgreen", "evalue"="blue", "positive"="red")
-    plot(enrich.table[,c("pvalue","evalue")], log="xy", panel.first=grid(lty="solid", col="#BBBBBB"),
-         xlab="p-value", ylab="Multiple testing corrections",
-         ylim=c(min(enrich.table$pvalue), max(enrich.table$evalue)),
-         pch=1, col=threshold.colors["evalue"])
-    abline(h=1, lwd=1)
-    abline(h=thresholds, col=threshold.colors[names(thresholds)], lwd=1)  ## Mark thresholds
-    abline(a=0, b=1)
-    points(enrich.table[,c("pvalue","qvalue")], pch=20, 
-           col=threshold.colors["qvalue"])
-    points(enrich.table[enrich.table["positive"]==1,c("pvalue","qvalue")], pch=3, 
-           col=threshold.colors["positive"], lwd=2)
+    threshold.colors <- c("qvalue" = "darkgreen", "evalue" = "blue", "positive" = "red")
+    plot(enrich.table[,c("pvalue","evalue")], log = "xy", panel.first = grid(lty = "solid", col = "#BBBBBB"),
+         xlab = "p-value", ylab = "Multiple testing corrections",
+         ylim = c(min(enrich.table$pvalue), max(enrich.table$evalue)),
+         pch = 1, col = threshold.colors["evalue"])
+    abline(h = 1, lwd = 1)
+    abline(h = thresholds, col = threshold.colors[names(thresholds)], lwd = 1)  ## Mark thresholds
+    abline(a = 0, b = 1)
+    points(enrich.table[,c("pvalue","qvalue")], pch = 20, 
+           col = threshold.colors["qvalue"])
+    points(enrich.table[enrich.table["positive"] == 1,c("pvalue","qvalue")], pch = 3, 
+           col = threshold.colors["positive"], lwd = 2)
     
     ## Count number of selected genes by different criteria
-    selection.columns <- paste(sep="_", names(thresholds), thresholds)
+    selection.columns <- paste(sep = "_", names(thresholds), thresholds)
     selection.columns <- append(selection.columns, "positive")
     selected.numbers <- apply(enrich.table[,selection.columns], 2, sum)
     legend("topleft", 
-           legend=paste(selected.numbers, selection.columns), 
-           col=threshold.colors[c(names(thresholds), "positive")], 
-           pch=c(1, 20, 3))
+           legend = paste(selected.numbers, selection.columns), 
+           col = threshold.colors[c(names(thresholds), "positive")], 
+           pch = c(1, 20, 3))
   }  
   ## Select only the GO classes passing the e-value
   if (select.positives) {
@@ -510,7 +511,7 @@ complete.enrich.table <- function(enrich.table,
     verbose(paste("\tGO over-representation. Returning", 
                   sum(enrich.table$evalue.selection), "significant associations."), 2)
   } else {
-    verbose(paste(sep="", "\tGO over-representation. Returning table with all associations (", 
+    verbose(paste(sep = "", "\tGO over-representation. Returning table with all associations (", 
                   nrow(enrich.table), " among which ",
                   sum(enrich.table$positive), " significant)."), 2)
   }
@@ -545,7 +546,7 @@ complete.enrich.table <- function(enrich.table,
 #'
 #' @export
 rnaseq.volcanoPlot <- function(deg.table,
-                               alpha=0.05,
+                               alpha = 0.05,
                                effect.size.col = "log2FC",
                                control.type = "p.value",
                                ...) {
@@ -562,17 +563,18 @@ calc.stats.per.sample <- function(sample.descriptions,
   stats.per.sample <- cbind(  
     sample.desc[names(count.table), ],
     data.frame(
-      "zeros" = apply(count.table == 0, 2, sum, na.rm=TRUE), ## Number of genes with 0 counts
-      "detected" = apply(count.table > 0, 2, sum, na.rm=TRUE), ## Number of genes counted at least once
-      "sum" = apply(count.table, 2, sum, na.rm=TRUE), ## Sum of all counts for the sample
-      "mean" = apply(count.table, 2, mean, na.rm=TRUE), ## Mean counts per gene
-      "min" = apply(count.table, 2, min, na.rm=TRUE), ## Min counts per gene 
-      "perc05" = apply(count.table, 2, quantile, probs=0.05, na.rm=TRUE), ## 5th percentile
-      "perc25" = apply(count.table, 2, quantile, probs=0.25, na.rm=TRUE), ## 25th percentile
-      "median" = apply(count.table, 2, median, na.rm=TRUE), ## median (percentile 50)
-      "perc75" = apply(count.table, 2, quantile, probs=0.75, na.rm=TRUE), ## percentile 75
-      "perc95" = apply(count.table, 2, quantile, probs=0.95, na.rm=TRUE), ## percentile 95
-      "max" = apply(count.table, 2, max, na.rm=TRUE) ## Max counts per gene
+      "zeros" = apply(count.table == 0, 2, sum, na.rm = TRUE), ## Number of genes with 0 counts
+      "detected" = apply(count.table > 0, 2, sum, na.rm = TRUE), ## Number of genes counted at least once
+      "sum" = apply(count.table, 2, sum, na.rm = TRUE), ## Sum of all counts for the sample
+      "mean" = apply(count.table, 2, mean, na.rm = TRUE), ## Mean counts per gene
+      "min" = apply(count.table, 2, min, na.rm = TRUE), ## Min counts per gene 
+      "perc05" = apply(count.table, 2, quantile, probs = 0.05, na.rm = TRUE), ## 5th percentile
+      "perc25" = apply(count.table, 2, quantile, probs = 0.25, na.rm = TRUE), ## 25th percentile
+      "median" = apply(count.table, 2, median, na.rm = TRUE), ## median (percentile 50)
+      "perc75" = apply(count.table, 2, quantile, probs = 0.75, na.rm = TRUE), ## percentile 75
+      "perc90" = apply(count.table, 2, quantile, probs = 0.90, na.rm = TRUE), ## percentile 95
+      "perc95" = apply(count.table, 2, quantile, probs = 0.95, na.rm = TRUE), ## percentile 95
+      "max" = apply(count.table, 2, max, na.rm = TRUE) ## Max counts per gene
     )
   )
   rownames(stats.per.sample) <- colnames(all.counts)
@@ -583,7 +585,7 @@ calc.stats.per.sample <- function(sample.descriptions,
   ## Count number and the fraction of samples with counts below the mean. 
   ## This shows the impact of very large counts: in some samples, 
   ## 85% of the samples have a value below the mean (i.e. the mean is at the percentile 85 !)
-  stats.per.sample$below.mean <- apply(t(count.table) < stats.per.sample$mean, 1, sum, na.rm=TRUE)
+  stats.per.sample$below.mean <- apply(t(count.table) < stats.per.sample$mean, 1, sum, na.rm = TRUE)
   stats.per.sample$fract.below.mean <- stats.per.sample$below.mean/nrow(count.table)
   # View(stats.per.sample)
   
@@ -592,8 +594,8 @@ calc.stats.per.sample <- function(sample.descriptions,
 
 ########## Draw a barplot with the number of reads per sample 
 libsize.barplot <- function(stats.per.sample, 
-                            main="Read library sizes (libsum per sample)",
-                            plot.file=NULL, 
+                            main = "Read library sizes (libsum per sample)",
+                            plot.file = NULL, 
                             ...) {
   ## Get sample IDs
   if (is.null(stats.per.sample$ID)) {
@@ -617,17 +619,17 @@ libsize.barplot <- function(stats.per.sample,
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
     message("Generating plot", plot.file)
-    pdf(file=plot.file, width=8, height=boxplot.height)
+    pdf(file = plot.file, width = 8, height = boxplot.height)
   }
   
-  par(mar=c(5,boxplot.lmargin,4,1)) ## adapt axes
+  par(mar = c(5,boxplot.lmargin,4,1)) ## adapt axes
   bplt <- barplot(stats.per.sample$Mreads, 
                   names.arg = sample.labels, 
-                  main=main,
-                  horiz = TRUE, las=1,
-                  xlab="libsum (Million reads per sample)",
-                  col=stats.per.sample$color, ...)
-  grid(col="white", lty="solid",ny = 0)
+                  main = main,
+                  horiz = TRUE, las = 1,
+                  xlab = "libsum (Million reads per sample)",
+                  col = stats.per.sample$color, ...)
+  grid(col = "white", lty = "solid", ny = 0)
   text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt, pos=2, font=2)
   if (!is.null(plot.file)) {
     silence <- dev.off()
@@ -893,7 +895,7 @@ sample.description.plots <- function (sample.desc,
   par(mar=c(4.1,5.1,4.1,1.1))
 
   ## Draw sample correlation heatmaps for the raw read counts
-  plot.files["sample_correl_heatmap_counts"] <- paste(sep="", prefix["general.file"],"_sample_correl_heatmap_counts.pdf")
+  plot.files["sample_correl_heatmap_counts"] <- paste(sep = "", prefix["general.file"],"_sample_correl_heatmap_counts.pdf")
   count.correl.heatmap(count.table, plot.file=plot.files["sample_correl_heatmap_counts"])
 #   hm <- heatmap.2(,  scale="none", trace="none", 
 #                   main="Correlation between raw counts", margins=c(8,8),
@@ -902,7 +904,7 @@ sample.description.plots <- function (sample.desc,
   ## Draw sample correlation heatmaps for CPM. Actually it gives exactly the 
   ## same result as correlation between raw counts, since the correlation has a 
   ## standardizing effect. 
-  # pdf(file=paste(sep="", prefix["general.file"],"_sample_correl_heatmap_cpms.pdf"))
+  # pdf(file=paste(sep = "", prefix["general.file"],"_sample_correl_heatmap_cpms.pdf"))
   # hm <- heatmap.2(as.matrix(cor(cpms)),  scale="none", trace="none", 
   #                 main="Correlation between CPM",
   #                 col=cols.heatmap) #, breaks=seq(-1,1,2/length(cols.heatmap)))
@@ -910,7 +912,7 @@ sample.description.plots <- function (sample.desc,
   
   ## Plot the first versus second components of samples
   cpms.pc <- prcomp(t(cpms))
-  plot.file <- paste(sep="", prefix["general.file"],"_CPM_PC1-PC2.pdf")
+  plot.file <- paste(sep = "", prefix["general.file"],"_CPM_PC1-PC2.pdf")
   plot.files["CPM_PC1-PC2"] <- plot.file
   message("Generating plot", plot.file)
   pdf(file=plot.file)
@@ -972,17 +974,26 @@ sample.description.plots <- function (sample.desc,
 }
 
 ################################################################
-#' @title init.deg.table
+#' @title Initiate a result table with the input counts and derived statistics. 
+#' @description Initiate a result table with the input counts and derived statistics for the whole data table + for the two sample sets selected for differential analysis. 
 #' @param count.table table with the counts per reads. This table is used to get feature IDs 
 #' (gene IDs, gene names, ...) from row names, and thereby ensure consistency between rows 
 #' of the count tables and the summary of differential expression.
+#' @param samples1 vector with  sample IDs of the test condition. Must be a subset of the data table column names.
+#' @param samples2 vector with sample IDs of the control condition. Must be a subset of the data table column names.
 #' @param gene.info optional table with detailed information about each feature (gene).
-## Initiate a result table with the CPMs and derived statistics
-init.deg.table <- function(count.table, gene.info = NULL) {
+#' @param stats=FALSE add columns with statistics (mean, quartiles, var, ...) for the whole count table and for the respective sample groups
+#' @return a data frame with one row per feature and some descriptive columns + optional table-wise and group-wise statistics.
+init.deg.table <- function(count.table, 
+                           samples1,
+                           samples2,
+                           gene.info = NULL,
+                           stats = FALSE) {
   message("\tInitializing result table for one differential analysis (two-sample comparison).")
   all.gene.ids <- row.names(count.table)
   #message("\t\tFeatures (genes): " \t, )
   
+  ## Build a minimal gene info table if not provided
   if (is.null(gene.info)) {
     gene.info <- data.frame(
       "id" = all.gene.ids, 
@@ -992,73 +1003,120 @@ init.deg.table <- function(count.table, gene.info = NULL) {
     )
   }
   
+  ## Check consistency betwen test/control sample IDs and column names of the data table
+  if (length(setdiff(samples1, colnames(count.table))) > 0) {
+    stop("Test sample IDs absent from count table column names: ",
+         paste(collapse = ", ", setdiff(samples1, colnames(count.table))))
+  }
+  
+  if (length(setdiff(samples2, colnames(count.table))) > 0) {
+    stop("Control sample IDs absent from count table column names: ",
+         paste(collapse = ", ", setdiff(samples2, colnames(count.table))))
+  }
+  
+  ## Build result table
   result.table <- data.frame("gene_id" = all.gene.ids,
-                             "name"=gene.info[all.gene.ids,"name"])
+                             "name" = gene.info[all.gene.ids,"name"])
   row.names(result.table) <- all.gene.ids
   result.table$entrez.id <- gene.info[all.gene.ids,"entrez.id"]
   result.table$description <- gene.info[all.gene.ids,"description"]
   
-  result.table <- cbind(result.table, counts=current.counts) ## Include the original counts in the big result table
-  result.table <- cbind(result.table, cpm=current.cpms) ## Include CPMs in the big result table
+  result.table <- cbind(result.table, count.table) ## Include the original counts in the big result table
+  # View(result.table)
+#  result.table <- cbind(result.table, cpm = current.cpms) ## Include CPMs in the big result table
   
   ## Tag genes detected in less than min.rep samples, which is defined as 
   ## the minimal number of replicates per condition.
   min.rep <- min(length(samples1), length(samples2))
-  result.table$undetected <- rowSums(current.counts > 1) < min.rep
+  result.table$undetected <- rowSums(count.table > 1) < min.rep
   # table(result.table$undetected)
-  # dim(current.counts)
+  # dim(count.table)
   
-  result.table$cpm.mean <- apply(cpms,1, mean)
-  result.table$cpm1.mean <- apply(as.data.frame(cpms[,samples1]),1, mean)
-  result.table$cpm2.mean <- apply(as.data.frame(cpms[,samples2]),1, mean)
-  result.table$A = log2(result.table$cpm1.mean*result.table$cpm2.mean)/2
-  result.table$M = log2(result.table$cpm1.mean/result.table$cpm2.mean)
-  result.table$cpm.median <- apply(cpms,1, median)
-  result.table$cpm1.median <- apply(as.data.frame(cpms[,samples1]),1, median)
-  result.table$cpm2.median <- apply(as.data.frame(cpms[,samples2]),1, median)
-  result.table$cpm.min <-  apply(cpms,1, min)
-  result.table$cpm1.min <- apply(as.data.frame(cpms[,samples1]),1, min)
-  result.table$cpm2.min <- apply(as.data.frame(cpms[,samples2]),1, min)
-  result.table$cpm.max <-  apply(cpms,1, max)
-  result.table$cpm1.max <- apply(as.data.frame(cpms[,samples1]),1, max)
-  result.table$cpm2.max <- apply(as.data.frame(cpms[,samples2]),1, max)
-  result.table$cpm.sd <-  apply(cpms,1, sd)
-  result.table$cpm1.sd <- apply(as.data.frame(cpms[,samples1]),1, sd)
-  result.table$cpm2.sd <- apply(as.data.frame(cpms[,samples2]),1, sd)
-  result.table$cpm.var <-  apply(cpms,1, var)
-  result.table$cpm1.var <- apply(as.data.frame(cpms[,samples1]),1, sd)
-  result.table$cpm2.var <- apply(as.data.frame(cpms[,samples2]),1, sd)
+  if (stats) {
+    message("\tComputing group-wise count statistics")
+    result.table$mean <- apply(count.table,1, mean)
+    result.table$mean1 <- apply(as.data.frame(count.table[,samples1]),1, mean)
+    result.table$mean2 <- apply(as.data.frame(count.table[,samples2]),1, mean)
+    result.table$M = log2(result.table$mean1/result.table$mean2)
+    result.table$min <-  apply(count.table,1, min)
+    result.table$min1 <- apply(as.data.frame(count.table[,samples1]),1, min)
+    result.table$perc25 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc25.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
+    result.table$perc25.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
+    result.table$median <- apply(count.table,1, median)
+    result.table$median1 <- apply(as.data.frame(count.table[,samples1]),1, median)
+    result.table$median2 <- apply(as.data.frame(count.table[,samples2]),1, median)
+    result.table$perc75 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc75.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
+    result.table$perc75.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
+    result.table$perc95 <- apply(count.table,1, quantile, probs = 0.75)
+    result.table$perc95.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.95)
+    result.table$perc95.1 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.95)
+    result.table$min2 <- apply(as.data.frame(count.table[,samples2]),1, min)
+    result.table$max <-  apply(count.table,1, max)
+    result.table$max1 <- apply(as.data.frame(count.table[,samples1]),1, max)
+    result.table$max2 <- apply(as.data.frame(count.table[,samples2]),1, max)
+    result.table$sd <-  apply(count.table,1, sd)
+    result.table$sd1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
+    result.table$sd2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
+    result.table$var <-  apply(count.table,1, var)
+    result.table$var1 <- apply(as.data.frame(count.table[,samples1]),1, sd)
+    result.table$var2 <- apply(as.data.frame(count.table[,samples2]),1, sd)
+  }
   return(result.table)
 }
 
 ################################################################
-## DESeq2 analysis
-## 
-## Detect differentially expressed genes (DEG) using the package DESeq2, 
-## and add a few custom columns (e-value, ...) to the result table. 
-deseq2.analysis <- function(dir.figures=NULL) {
-  verbose("\t\tDESeq2 analysis", 2)
+#' @title DESeq2 analysis
+#' @author Jacques van Helden 
+#' @description  Detect differentially expressed genes (DEG) using the package DESeq2, 
+#' and add a few custom columns (e-value, ...) to the result table. 
+#' @param counts a count table sent to DESeq2. Must contain raw counts (not normalized). 
+#' @param condition a vector with the condition associated to each sample. The length of this vector must equal the number of columns of the count table. 
+#' @param ref.condition=NULL reference condition for the differential analysis
+#' @param comparison.prefix a string with the prefix for output files
+#' @param title=comparison.prefix main title for the plots
+#' @param dir.figures=NULL optional directory to save figures
+#' @param ... additional parameters are passed to DESeq2::DESeq() function
+deseq2.analysis <- function(
+  counts,
+  condition,
+  ref.condition=NULL,
+  comparison.prefix,
+  title = comparison.prefix,
+  dir.figures=NULL,
+  ...) {
   
-  ## Path prefix to save DESeq2 result files
-  prefix["DESeq2_file"] <- paste(sep="", prefix["comparison_file"], "_", suffix.DESeq2)
-  prefix["DESeq2_figure"] <- paste(sep="", prefix["comparison_figure"], "_", suffix.DESeq2)
+  require(DESeq2)
   
-  ## Create a DESeqDataSet object from the count table + conditions
-  condition <- as.factor(as.vector(current.sample.conditions))
+  message("\tDESeq2 analysis\t", comparison.prefix)
+  
+  ## Check that the length of conditions equals the number of columns of the count table
+  if (length(condition) != ncol(counts)) {
+    stop("deseq2.analysis\tNumber of columns of count table (", ncol(counts), ") differs from length of condition (", length(condition), ").")
+  }
+
+  
+  ## Create a DESeqDataSet object from the count table + condition
   deseq2.dds <- DESeqDataSetFromMatrix(
-    countData = current.counts, 
-    colData = DataFrame(condition),
-    ~ condition)
-  
+    countData = counts, 
+    colData = data.frame(condition),
+    design = ~ condition)
   
   ## Indicate that second condition is the reference condition. 
   ## If not done, the conditions are considered by alphabetical order, 
   ## which may be misleading to interpret the log2 fold changes. 
-  deseq2.dds$condition <- relevel(deseq2.dds$condition, ref=cond2) 
-  
+  if (!is.null(ref.condition)) {
+    if (!(ref.condition %in% condition)) {
+      stop("deseq2.analysis\treference condition (", ref.condition, ") does not exist in sample conditions (",
+           paste(collapse = ", ", unique(condition)), ")")
+    }
+    deseq2.dds$condition <- relevel(deseq2.dds$condition, ref = ref.condition) 
+  }
+    
   ## Run the differential analysis
   deseq2.dds <- DESeq(deseq2.dds)      ## Differential analysis with negbin distrib
-  deseq2.res <- results(deseq2.dds, independentFiltering=FALSE, pAdjustMethod = "BH")  ## Collect the result table
+  deseq2.res <- results(deseq2.dds, independentFiltering = FALSE, pAdjustMethod = "BH")  ## Collect the result table
   
   deseq2.result.table <- data.frame(
     "gene.id" = row.names(deseq2.res),
@@ -1066,53 +1124,103 @@ deseq2.analysis <- function(dir.figures=NULL) {
     "log2FC" = deseq2.res$log2FoldChange,
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
+  
+  ## Add complementary statistics on the DEG table
   deseq2.result.table <- complete.deg.table(
     deg.table = deseq2.result.table, 
-    table.name = paste(sep="_", "DESeq2", prefix["comparison"]),
+    table.name = paste(sep = "_", "DESeq2", comparison.prefix),
     sort.column = "padj",
-    thresholds=thresholds,
+    thresholds = thresholds,
     round.digits = 3,
     dir.figures = dir.figures)
-  return(deseq2.result.table)
+  
+  result <- list(
+    dds = deseq2.dds,
+    result.table = deseq2.result.table
+  )
+  
+  return(result)
 }  
 
-edger.analysis <- function(dir.figures=NULL) {
-  verbose("\t\tedgeR analysis", 2)
+################################################################
+#' @title edgeR analysis
+#' @author Jacques van Helden 
+#' @description  Detect differentially expressed genes (DEG) using the package edgeR, 
+#' and add a few custom columns (e-value, ...) to the result table. 
+#' @param counts a count table sent to edgeR Must contain raw counts (not normalized). 
+#' @param condition a vector with the condition associated to each sample. The length of this vector must equal the number of columns of the count table. 
+#' @param ref.condition=NULL reference condition for the differential analysis
+#' @param comparison.prefix a string with the prefix for output files
+#' @param title=comparison.prefix main title for the plots
+#' @param dir.figures=NULL optional directory to save figures
+#' @param norm.method="RLE" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
+#' @param ... additional parameters are passed to edgeR::exactTest() function
+edger.analysis <- function(counts,
+                           condition,
+                           ref.condition=NULL,
+                           comparison.prefix,
+                           title = comparison.prefix,
+                           dir.figures=NULL,
+                           norm.method = "RLE",
+                           ...) {
   
-  prefix["edgeR_file"] <- paste(sep="", prefix["comparison_file"], "_", suffix.edgeR)
-  prefix["edgeR_figure"] <- paste(sep="", prefix["comparison_figure"], "_", suffix.edgeR)
+  require(edgeR)
+  
+  message("\tedgeR analysis\t", comparison.prefix, "\tnormalisation method: ", norm.method)
+  
+  ## Check that the length of conditions equals the number of columns of the count table
+  if (length(condition) != ncol(counts)) {
+    stop("edgeR.analysis\tNumber of columns of count table (", ncol(counts), ") differs from length of condition (", length(condition), ").")
+  }
+  
   
   ## Convert the count table in a DGEList structure and compute its parameters.
-  d <- DGEList(counts=current.counts, group=sample.conditions[names(current.counts)])
-  d$samples$group <- relevel(d$samples$group, ref=cond2) ## Ensure that condition 2 is considered as the reference
-  d <- calcNormFactors(d, method="RLE")                 ## Compute normalizing factors
-  d <- estimateCommonDisp(d, verbose=FALSE)             ## Estimate common dispersion
-  d <- estimateTagwiseDisp(d, verbose=FALSE)            ## Estimate tagwise dispersion
+  # d <- DGEList(counts = current.counts, group = sample.conditions[names(current.counts)])
+  # d$samples$group <- relevel(d$samples$group, ref = ref.condition) ## Ensure that condition 2 is considered as the reference
+  # d <- calcNormFactors(d, method="RLE")                 ## Compute normalizing factors
+  # d <- estimateCommonDisp(d, verbose=FALSE)             ## Estimate common dispersion
+  # d <- estimateTagwiseDisp(d, verbose=FALSE)            ## Estimate tagwise dispersion
+  d <- DGEList(counts = counts, group = condition)
+  d$samples$group <- relevel(d$samples$group, ref = ref.condition) ## Ensure that condition 2 is considered as the reference
+  d <- calcNormFactors(d, method = norm.method)                 ## Compute normalizing factors
+  d <- estimateCommonDisp(d, verbose = FALSE)             ## Estimate common dispersion
+  d <- estimateTagwiseDisp(d, verbose = FALSE)            ## Estimate tagwise dispersion
   
   ################################################################
   ## Detect differentially expressed genes by applying the exact 
   ## negative binomial test from edgeR package.
-  edger.de <- exactTest(d, pair=c(cond2, cond1))      ## Run the exact negative binomial test
+  edger.de <- exactTest(d, pair = c(cond2, cond1), ...)      ## Run the exact negative binomial test
   
   ## Sort genes by increasing p-values, i.e. by decreasing significance
-  edger.tt <- topTags(edger.de, n=nrow(d), sort.by = "PValue")
+  edger.tt <- topTags(edger.de, n = nrow(d), sort.by = "PValue")
   
   ## Complete the analysis of edgeR result table
   edger.result.table <- data.frame("gene.id" = row.names(edger.tt$table),
-                                   "mean"=edger.tt$table$logCPM,
-                                   "log2FC"=edger.tt$table$logFC,
-                                   "pvalue"=edger.tt$table$PValue,
-                                   "padj"=edger.tt$table$FDR)
+                                   "mean" = edger.tt$table$logCPM,
+                                   "log2FC" = edger.tt$table$logFC,
+                                   "pvalue" = edger.tt$table$PValue,
+                                   "padj" = edger.tt$table$FDR)
   edger.result.table <- complete.deg.table(
     deg.table = edger.result.table, 
-    table.name = paste(sep="_","edgeR",prefix["comparison"]),
+    table.name = paste(sep = "_", "edgeR", prefix["comparison"]),
     sort.column = "padj",
-    thresholds=thresholds,
+    thresholds = thresholds,
     round.digits = 3,
-    dir.figures=dir.figures)
+    dir.figures = dir.figures)
   # dim(edger.result.table)
   # dim(edger.result.table)
   # names(edger.result.table)
   # View(edger.result.table)
-  return (edger.result.table)
+  
+  result <- list(
+    edger.d = d,
+    edger.de = edger.de,
+    edger.tt = edger.tt,
+    result.table = edger.result.table
+  )
+  
+  return (result)
 }
+
+
+
