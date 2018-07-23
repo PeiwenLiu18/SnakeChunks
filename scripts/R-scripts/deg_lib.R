@@ -26,9 +26,9 @@ CheckRequiredLibraries <- function(required.libraries,
 
 #' @title Load parameters and required libraries
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
-LoadDEGparam <- function (yamlFile) {
+LoadDEGparam <- function(yamlFile) {
   library(yaml)
-  data -> yaml.load_file("vn.yamloo")
+  data <- yaml.load_file(yamlFile)
 }
 
 
@@ -104,6 +104,7 @@ verbose <- function(message.content,
 #' output table. Set to NA to avoid rounding. 
 #'
 #' @param dir.figures=NULL if not NULL, figures will be saved in the specified directory. 
+#' @param verbose=0 level of verbosity
 #' 
 #' @examples
 #'
@@ -120,12 +121,15 @@ verbose <- function(message.content,
 complete.deg.table <- function(deg.table,
                                table.name,
                                sort.column = "none",
-                               thresholds = thresholds,
+                               thresholds = c(),
                                round.digits = 3,
-                               dir.figures = NULL) {
+                               dir.figures = NULL,
+                               verbose = 0) {
   
   # names(deg.table)
-  verbose(paste("Analysing", table.name, "result table with", nrow(deg.table), "rows"), 1)
+  if (verbose >= 1) {
+    message("\tcomplete.deg.table()\tTable name: ", table.name, "\t", nrow(deg.table), " features (rows)")
+  }
 
   col.descriptions <- vector() ## Initialize vector with column descriptions
   
@@ -181,6 +185,9 @@ complete.deg.table <- function(deg.table,
     "evalue" = "upper", 
     "FC" = "lower")
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
+  if (verbose >= 1) {
+    message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
+  }
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
   for (s in thresholds.to.apply) {
@@ -193,12 +200,16 @@ complete.deg.table <- function(deg.table,
     #table(selected)
     deg.table[, selection.columns[s]] <- selected*1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    message("\tApplied ", threshold.type[s], " threshold on ", s, "\t", thresholds[s], 
+    message("\t\tApplied ", threshold.type[s], 
+            " threshold on ", s, "\t", thresholds[s], 
             "; remaining features: ",  sum(selected))
   }
   ## Select genes passing all thresholds
+  if (verbose  >= 2) {
+    message("\t\tSelection columns: ", paste(collapse = ", ", selection.columns))
+  }
   deg.table[,"DEG"] <- 
-    1*(apply(deg.table[,selection.columns],1,sum) == length(thresholds))
+    1*(apply(deg.table[,selection.columns], 1, sum) == length(thresholds.to.apply))
   
   # print(data.frame(col.descriptions))
   
@@ -215,7 +226,7 @@ complete.deg.table <- function(deg.table,
     }
   }
   
-  ################# Export figures   
+  ## Export figures   
   if (!is.null(dir.figures)) {
     verbose(paste("\tSaving figures in directory", dir.figures), 2)
     dir.create(dir.figures, showWarnings = FALSE, recursive = TRUE)
@@ -592,11 +603,19 @@ calc.stats.per.sample <- function(sample.descriptions,
   return(stats.per.sample)
 }
 
-########## Draw a barplot with the number of reads per sample 
+#' @title Draw a barplot with the number of reads per sample 
+#' @author Jacques van Helden
+#' @param stats.per.sample a table with the sample-wise statistics, which ca n be produced by RowStats().
+#' @param main Main title for the plot
+#' @plot.file=NULL Path of a file to store the figure (pdf format). 
 libsize.barplot <- function(stats.per.sample, 
                             main = "Read library sizes (libsum per sample)",
                             plot.file = NULL, 
                             ...) {
+  
+  ## Store original graphical parameters
+  par.ori <- par(no.readonly = TRUE) 
+  
   ## Get sample IDs
   if (is.null(stats.per.sample$ID)) {
     sample.ids <- as.vector(rownames(stats.per.sample))
@@ -613,8 +632,8 @@ libsize.barplot <- function(stats.per.sample,
   }
   
   ## Adapt boxplot size to the number of samples and label sizes
-  boxplot.lmargin <- max(nchar(sample.labels))/3+5
-  boxplot.height <- length(sample.ids)/3+2
+  boxplot.lmargin <- max(nchar(sample.labels))/3 + 5
+  boxplot.height <- length(sample.ids)/3 + 2
   
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
@@ -630,10 +649,12 @@ libsize.barplot <- function(stats.per.sample,
                   xlab = "libsum (Million reads per sample)",
                   col = stats.per.sample$color, ...)
   grid(col = "white", lty = "solid", ny = 0)
-  text(x=pmax(stats.per.sample$Mreads, 3), labels=stats.per.sample$Mreads, y=bplt, pos=2, font=2)
+  text(x = pmax(stats.per.sample$Mreads, 3), 
+       labels = stats.per.sample$Mreads, y = bplt, pos = 2, font = 2)
   if (!is.null(plot.file)) {
-    silence <- dev.off()
+    silence <- dev.off(); rm(silence)
   }
+  par(par.ori)
 }
 
 ########## Draw boxplots with read counts per genes for each sample ################
@@ -1161,7 +1182,7 @@ edger.analysis <- function(counts,
                            comparison.prefix,
                            title = comparison.prefix,
                            dir.figures=NULL,
-                           norm.method = "RLE",
+                           norm.method = "TMM",
                            ...) {
   
   require(edgeR)
@@ -1218,8 +1239,9 @@ edger.analysis <- function(counts,
     edger.tt = edger.tt,
     result.table = edger.result.table
   )
-  
-  return (result)
+
+  par(par.ori)  
+  return(result)
 }
 
 
