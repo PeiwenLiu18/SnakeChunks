@@ -1022,6 +1022,8 @@ init.deg.table <- function(count.table,
       "entrez.id" = "",
       "description" = paste("gene_id:", all.gene.ids)
     )
+  } else {
+    gene.info <- gene.info[all.gene.ids, ] ## Make sure gene.info is in the same order as the count table
   }
   
   ## Check consistency betwen test/control sample IDs and column names of the data table
@@ -1037,10 +1039,10 @@ init.deg.table <- function(count.table,
   
   ## Build result table
   result.table <- data.frame("gene_id" = all.gene.ids,
-                             "name" = gene.info[all.gene.ids,"name"])
+                             "name" = gene.info[,"name"])
   row.names(result.table) <- all.gene.ids
-  result.table$entrez.id <- gene.info[all.gene.ids,"entrez.id"]
-  result.table$description <- gene.info[all.gene.ids,"description"]
+  result.table$entrez.id <- gene.info[,"entrez.id"]
+  result.table$description <- gene.info[,"description"]
   
   result.table <- cbind(result.table, count.table) ## Include the original counts in the big result table
   # View(result.table)
@@ -1061,6 +1063,7 @@ init.deg.table <- function(count.table,
     result.table$M = log2(result.table$mean1/result.table$mean2)
     result.table$min <-  apply(count.table,1, min)
     result.table$min1 <- apply(as.data.frame(count.table[,samples1]),1, min)
+    result.table$min2 <- apply(as.data.frame(count.table[,samples2]),1, min)
     result.table$perc25 <- apply(count.table,1, quantile, probs = 0.75)
     result.table$perc25.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.75)
     result.table$perc25.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
@@ -1072,8 +1075,7 @@ init.deg.table <- function(count.table,
     result.table$perc75.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.75)
     result.table$perc95 <- apply(count.table,1, quantile, probs = 0.75)
     result.table$perc95.1 <- apply(as.data.frame(count.table[,samples1]),1, quantile, probs = 0.95)
-    result.table$perc95.1 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.95)
-    result.table$min2 <- apply(as.data.frame(count.table[,samples2]),1, min)
+    result.table$perc95.2 <- apply(as.data.frame(count.table[,samples2]),1, quantile, probs = 0.95)
     result.table$max <-  apply(count.table,1, max)
     result.table$max1 <- apply(as.data.frame(count.table[,samples1]),1, max)
     result.table$max2 <- apply(as.data.frame(count.table[,samples2]),1, max)
