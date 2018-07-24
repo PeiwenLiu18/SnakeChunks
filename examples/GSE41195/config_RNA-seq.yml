@@ -48,12 +48,6 @@
 ## These are the parameters that are used by rules & programs. 
 ##
 ## If nothing is mentionned  below, all prgrams will use their default parameters. 
-  subread-featureCounts:
-    attr_type: "gene_id"                                                # Default 'gene_id'
-    feature_type: "exon"                                                # Default "exon"
-    strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
-    multi_mapping: ""
-
   sickle:
     qual_threshold: 20                                                # Quality threshold. Default 20
     length_threshold: 20                                              # Minimal output read length. Default 20
@@ -64,7 +58,45 @@
 
   bwa:
     threads: 10             # Number of threads (parallel computing) for bwa
+
+  subread-align:
+    threads: "10"                                                         ## Number of threads
+
+  hisat2:
+    threads: "4"                                                         ## Number of threads
+
+  tophat:
+    threads: "4"                                                         ## Number of threads
+
+  STAR:
+    threads: "4"                                                         ## Number of threads
+
+  bowtie2:
+    threads: "4"                                                         ## Number of threads
+    mode: "--local"                                                         # Alignent mode. Supported: "--local" or "--end-to-end"
+    other_options: "--very-fast --maxins 1500"                                 # supplementary options. We should evaluate if we do not convert them to fully documented options
+
+  subread-featureCounts:
+    attr_type: "gene_id"                                                # Default 'gene_id'
+    feature_type: "exon"                                                # Default "exon"
+    strand_specificity: 1                                               # Strand-specific read counting, 0 (unstranded)(default), 1 (stranded) or 2 (reversely stranded)
+    multi_mapping: ""
+
     
+  DEG:                                                             ## Generic parameters for differential analysis
+    epsilon: 0.1
+    pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
+    alpha: 0.05                                                         # Default 0.05
+    rowsum_filter: 10                                                   # Default 10
+    selection_criterion: "intersection"                                       # Criterion to select DEG. Supported: DESeq2 | edgeR | intersection | union
+    thresholds:                                  ## Thresholds tor fhte detection of differentially expressed genes (apply to DESeq2 and edgeR)
+      min.count: 1  ## Filter out undetected features
+      mean.count: 5  ## Filter out features with very low mean expression level
+      mean.per.condition: 10  ## Filter out features for which not a single condition has a mean count above the threshold
+      padj: 0.05                                 ## Upper threshold on False Discovery Rate (FDR)
+      FC: 1.14                                    ## Lower threshold on the fold-change
+      max.log10.cpm: 8.5                         ## Upper threshold for outliers on log10-transformed counts
+                                                
   DESeq2:
     pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
     alpha: 0.05                                                         # Default 0.05
