@@ -62,7 +62,7 @@
 NormalizeCountTable <- function(counts,
                                 class.labels,
                                 nozero = TRUE,
-                                method = "quantile",
+                                method = "TMM",
                                 quantile = 0.75,
                                 log2 = FALSE,
                                 epsilon = 0.1,
@@ -154,9 +154,6 @@ NormalizeCountTable <- function(counts,
   #### Apply normalization method(s) ####
   method.names <- vector()
   for (m in method) {
-    if (verbose >= 2) {
-      message("\t\tNormalization method\t", m)
-    }
     #### Define method name ####
     if (m == "quantile") {
       if (!exists("quantile")) {
@@ -165,7 +162,15 @@ NormalizeCountTable <- function(counts,
       if (is.null(quantile)) {
         stop("NormalizeSamples()\tquantile-based scaling requires a non-null quantile parameter.")
       }
-      method.name <- paste(sep = "", "q", quantile)
+      if (quantile == 0.25) {
+        method.name <- "Q1"
+      } else if (quantile == 0.75) {
+        method.name <- "Q3"
+      } else if (quantile == 0.5) {
+        method.name <- "median"
+      } else {
+        method.name <- paste(sep = "", "q", quantile)
+      }
     } else {
       method.name <- m
     }
@@ -174,6 +179,10 @@ NormalizeCountTable <- function(counts,
       method.name <- paste(sep = "", method.name, "_log2")
     }
     method.names <- append(method.names, method.name)
+
+    if (verbose >= 2) {
+      message("\t\tNormalization method\t", method.name)
+    }
     
     if (m %in% c("raw", "none")) {
       scaling.factor <- rep(x = 1, length.out = ncol(counts))
@@ -324,7 +333,7 @@ NormalizeCountTable <- function(counts,
     }
     norm.result <- list(
       method = m,
-      method.name = method.name,
+      method.names = method.names,
       size.factor = size.factor,
       scaling.factor = scaling.factor,
       normCounts = normCounts)
