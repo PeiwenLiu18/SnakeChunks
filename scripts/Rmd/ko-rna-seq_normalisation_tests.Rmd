@@ -17,6 +17,8 @@ output:
     toc_depth: 3
   word_document: default
 date: '`r Sys.Date()`'
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE}
@@ -45,8 +47,8 @@ required.libraries <- c("knitr",
                         "xtable",
                         "gplots",
                         "RColorBrewer",
-                        "devtools",
-                        "stats4bioinfo" ## Generic library from Jacques van Helden
+                        "devtools"#,
+#                        "stats4bioinfo" ## Generic library from Jacques van Helden
                         )
 for (lib in required.libraries) {
   message("\tRequired CRAN library\t", lib)
@@ -142,7 +144,12 @@ message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
 
 R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
-R.files <- c("pc_plot.R", "normalise_count_table.R", "row_stats.R", "feature_colors.R", "volcano_plot.R")
+R.files <- c("pc_plot.R", 
+             "normalise_count_table.R", 
+             "row_stats.R", 
+             "feature_colors.R", 
+             "libsize_barplot.R",
+             "volcano_plot.R")
 #source(file.path(R.dir, "normalise_count_table.R"))
 for (f in R.files) {
   message("\tLoading R file ", f)
@@ -285,7 +292,7 @@ kable(t(as.data.frame(thresholds)), col.names = "Threshold",
 
 ## Read the sample description file, which indicates the 
 ## condition associated to each sample ID.
-verbose(paste("Reading sample description file: ", sample.description.file), 2)
+message("Reading sample description file: ", sample.description.file)
 sample.desc <- read.delim(
   file.path(dir.main, sample.description.file), sep = "\t", 
   comment = ";", header = TRUE, row.names = 1)
@@ -324,7 +331,7 @@ sample.desc$color <- cols.conditions[sample.conditions]
 ## Read the design file, which indicates the anlayses to be done.
 ## Each row specifies one differential expression analysis, which 
 ## consists in comparing two conditions. 
-verbose(paste("Reading design file: ", design.file), 2)
+message("Reading design file: ", design.file)
 design <- read.delim(file.path(dir.main, design.file), sep = "\t", 
                      comment = ";", header = T, row.names = NULL)
 comparison.summary <- design ## Initialize a summary table for each DEG analysis
@@ -393,7 +400,7 @@ all.counts <- all.counts[, sample.ids]
 ########################################################################
 ## Treatment of 0 values.
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-verbose(paste("Treating zero-values by adding epsilon =", epsilon), 2)
+message("Treating zero-values by adding epsilon =", epsilon)
 all.counts.epsilon <- all.counts
 all.counts.epsilon[all.counts == 0] <- epsilon
 
@@ -554,7 +561,7 @@ LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.co
 
 
 ```{r normalisation}
-norm.methods <- c("mean", "median", "quantile", "TMM", "DESeq2")
+norm.methods <- c("none", "mean", "median", "quantile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
   counts = all.counts, class.labels = sample.conditions, nozero = TRUE, 
   method = norm.methods, quantile = 0.75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
@@ -581,8 +588,8 @@ plot(size.factors, main = "Sample size factors", col = sample.desc$color)
 ```{r differential_expression_analysis, fig.width=8, fig.height=12}
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
-i <- 2
-#for (i in 1:nrow(design)) {
+i <- 1
+for (i in 1:nrow(design)) {
   prefix <- list() ## list for output file prefixes
 
   deg.results <- list()
@@ -650,10 +657,20 @@ i <- 2
     title = comparison.prefix,
     dir.figures = file.path(dir.main, dir.figures))
   deg.results[["DESeq2"]] <- deseq2.result
+  # names(deg.results[["DESeq2"]])
+  #  attributes(deg.results[["DESeq2"]]$dds)
   # View(deg.results[["DESeq2"]]$result.table)
+  
+  #  head(rownames(deseq2.result$result.table))
+  # head(rownames(result.table))
+  # x <- rownames(result.table)
+  # y <- rownames(deseq2.result$result.table[row.names(result.table),])
+  # sum(x != y)
+  # names(result.table)
   result.table <- cbind(
-    deseq2.result$result.table, 
+    result.table, 
     "DESeq2" = deseq2.result$result.table[row.names(result.table),])
+  # names(result.table)
   # dim(deseq2.result$result.table)
   # dim(deseq2.result$result.table)
   # names(deseq2.result$result.table)
@@ -690,23 +707,40 @@ i <- 2
     deg.results[[edgeR.prefix]] <- edger.result
     
     ## A tricky way to add edgeR with normalisation in column names
-    x <- edger.result$result.table
-    colnames(x) <- paste(sep = "_", edgeR.prefix, colnames(x))
+    edger.to.bind <- edger.result$result.table[row.names(result.table),]
+    colnames(edger.to.bind) <- paste(sep = "_", edgeR.prefix, colnames(edger.to.bind))
+    # names(edger.to.bind)
     # View(x)
+    # x <- rownames(result.table)
+    # y <- rownames(edger.to.bind)
+    # sum(x != y)
+    # names (result.table)
     result.table <- cbind(
       result.table, 
-      x[row.names(result.table),])
+      edger.to.bind)
+    # names (result.table)
+    
     
     ## Export edgeR result table
     edger.result.file <- paste(sep = "_", prefix["comparison_file"], edgeR.prefix)
     comparison.summary[i,"edger"] <- paste(sep = ".", edger.result.file, "tsv")
     message("\tExporting edgeR result table (tab): ", edger.result.file, ".tsv")
     write.table(x = edger.result$result.table,
-                file = file.path(dir.main, paste(sep = ".", edger.result.file, "tsv")), 
+                file = file.path(dir.main, paste(sep = ".", edger.result.file, "tsv")),
                 row.names = FALSE, 
                 sep = "\t", quote = FALSE)
   }
   
+  ## Export full result table (DESeq2 + edgeR with different normalisation methods) 
+  ## in a tab-separated values (tsv) file
+  result.file <- paste(sep = "", 
+                       prefix["comparison_file"], 
+                       "_diffexpr_DESeq2_and_edgeR")
+  # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
+  verbose(paste(sep = "", "\tExporting result table (tsv): ", result.file, ".tsv"), 1)
+  write.table(x = result.table, row.names = FALSE,
+              file = file.path(dir.main, paste(sep="", result.file, ".tsv")), sep = "\t", quote = FALSE)
+
   
   ## Collect results by output statistics
   deg.compa <- list()
@@ -775,8 +809,7 @@ i <- 2
   }
   par(mfrow = c(1,1))
   par(par.ori)
-      
-# }
+}
 ```
 
 
