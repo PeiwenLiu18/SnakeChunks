@@ -530,9 +530,8 @@ complete.enrich.table <- function(enrich.table,
    return(enrich.table)
 }
 
-#' @title Draw an equivalent of the t-test volcano plot for RNA-seq data.  
+#' @title Draw a volcano plot for RNA-seq data.  
 #' 
-#'
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #'
 #' @description Draw an equivalent of the t-test volcano plot for RNA-seq 
@@ -562,7 +561,11 @@ rnaseq.volcanoPlot <- function(deg.table,
                                control.type = "p.value",
                                ...) {
   stop("NOT IMPLEMENTED YET, ASK Jacques.van-Helden@univ-amu.fr")
-  volcanoPlot()
+  VolcanoPlot(deg.table,
+              alpha = 0.05,
+              effect.size.col = "log2FC",
+              control.type = "p.value",
+              ...)
 }
 
 
@@ -1140,6 +1143,10 @@ deseq2.analysis <- function(
   ## Run the differential analysis
   deseq2.dds <- DESeq(deseq2.dds)      ## Differential analysis with negbin distrib
   deseq2.res <- results(deseq2.dds, independentFiltering = FALSE, pAdjustMethod = "BH")  ## Collect the result table
+  
+  # names(deseq2.res)
+  # VolcanoPlot(multitest.table = deseq2.res, effect.size.col = "log2FoldChange", control.type = "padj", alpha = 0.05, effect.threshold = 1.2)
+  # plot(x = deseq2.res$log2FoldChange, y = -log10(deseq2.res$pvalue))
   
   deseq2.result.table <- data.frame(
     "gene.id" = row.names(deseq2.res),
