@@ -1,3 +1,34 @@
+
+## ---- Define the main_parameters -----------------------------------------------------
+
+## Define main parameters to generate this report
+dir.main <- "~/ko-rna-seq/" ## Main directory
+setwd(dir.main)
+message("\tMain directory: ", dir.main)
+
+## Define YAML configuration file
+configFile <- "metadata/config_RNA-seq.yml"
+message("\tConfiguration file: ", configFile)
+
+## Prefix for the count table
+count.prefix <- "bowtie2_featureCounts_all"
+message("\tPrefix for the count table: ", count.prefix)
+
+## Relative path of the main dir starting from the Rmd file
+dir.base <- ".."
+message("\tBase directory: ", dir.base)
+
+## Load configuration file (YAML-formatted)
+if (!exists("configFile")) {
+  ## The prompt does not seem to work with the Rmd documents
+  #   message("Choose the parameter file")
+  #   parameter.file <- file.choose()
+  stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
+}
+parameters <- yaml.load_file(configFile)
+message("\tLoaded parameters from file ", configFile)
+
+
 ## ---- knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
 
 quick.test <- FALSE ## For debug
@@ -14,7 +45,7 @@ knitr::opts_chunk$set(
 ## Load required libraries
 required.libraries <- c("knitr",
                         "yaml",
-                        "pander", 
+                        "pander",
                         # "xlsx",
                         "ascii",
                         "xtable",
@@ -35,9 +66,9 @@ for (lib in required.libraries) {
 #library(RColorBrewer, warn.conflicts = FALSE, quietly=TRUE)
 
 required.bioconductor <- c(
-  "edgeR", 
-  "DESeq2", 
-  "limma", 
+  "edgeR",
+  "DESeq2",
+  "limma",
 #  "SARTools", ## for SERE coefficient
   "GenomicFeatures")
 
@@ -61,46 +92,19 @@ if (!require("SARTools")) {
   install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
 }
 
-## ----main_parameters-----------------------------------------------------
-## Define main parameters to generate this report
-dir.main <- "~/ko-rna-seq/" ## Main directory
-setwd(dir.main)
-message("\tMain directory: ", dir.main)
-
-## Define YAML configuration file
-configFile <- "metadata/config_RNA-seq.yml"
-message("\tConfiguration file: ", configFile)
-
-## Prefix for the count table
-count.prefix <- "bowtie2_featureCounts_all"
-message("\tPrefix for the count table: ", count.prefix)
-
-## Relative path of the main dir starting from the Rmd file
-dir.base <- ".." 
-message("\tBase directory: ", dir.base)
-
-## Load configuration file (YAML-formatted)
-if (!exists("configFile")) {
-  ## The prompt does not seem to work with the Rmd documents
-  #   message("Choose the parameter file")
-  #   parameter.file <- file.choose()
-  stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
-}
-parameters <- yaml.load_file(configFile)
-message("\tLoaded parameters from file ", configFile)
-
-
-## ---- in/outfiles ----
+## ---- Detine in/outfiles ----
 
 ## Prepare a list of input and output files.
-outfiles <- vector()
-infiles <- vector()
+## This will later serve to generate a report.
+infiles <- vector()   ## Input files
+outfiles <- vector()  ## For tab-separated value files
+figfiles <- vector()  ## Store figures
 
 ## ----init_directories----------------------------------------------------
 ## Check SnakeChunks directory
 if (is.null(parameters$dir$snakechunks)) {
   stop("The SnakeChunks directory should be defined in the config file: ", configFile)
-} 
+}
 dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
 message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
@@ -112,14 +116,14 @@ source(deg.lib)
 
 ## Load specific functions
 ##
-## NOTE: these functions are designed to be later included 
+## NOTE: these functions are designed to be later included
 # in an R package (one file per function, roxygen2 doc)
 R.dir <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R")
-R.files <- c("pc_plot.R", 
+R.files <- c("pc_plot.R",
              "filter_count_table.R",
-             "normalise_count_table.R", 
-             "row_stats.R", 
-             "feature_colors.R", 
+             "normalise_count_table.R",
+             "row_stats.R",
+             "feature_colors.R",
              "libsize_barplot.R",
              "volcano_plot.R")
 for (f in R.files) {
@@ -130,7 +134,7 @@ for (f in R.files) {
 ## R markdown (Rmd) directory
 if (is.null(parameters$dir$Rmd)) {
   stop("The Rmd directory should be defined in the config file: ", configFile)
-} 
+}
 dir.Rmd <- parameters$dir$Rmd
 message("\tDirectory for the Rmd report: ", dir.Rmd)
 dir.create(dir.Rmd, showWarnings = FALSE, recursive = TRUE)
@@ -141,7 +145,7 @@ opts_knit$set(base.dir = dir.Rmd) ## Set the working directory for knitr (genera
 ## R markdown (Rmd) directory
 if (is.null(parameters$dir$figures)) {
   stop("The figures directory should be defined in the config file: ", configFile)
-} 
+}
 dir.figures <- parameters$dir$figures
 message("\tDirectory for the generic figures: ", dir.figures)
 dir.create(dir.figures, showWarnings = FALSE, recursive = TRUE)
@@ -165,7 +169,7 @@ if (!exists("export.excel.files")) {
   export.excel.files <- FALSE
 }
 
-## Color palette for heatmaps. I like this Red-Blue palette because 
+## Color palette for heatmaps. I like this Red-Blue palette because
 ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
 ## - it can be seen by people suffering from red–green color blindness.
 if (!exists("cols.heatmap")) {
@@ -200,7 +204,7 @@ if (is.null(parameters$metadata$design)) {
 
 ## Count table
 infiles["counts"] <- file.path(
-  parameters$dir$diffexpr, 
+  parameters$dir$diffexpr,
   paste(sep = "", count.prefix, ".tsv"))
 all.counts.path <- file.path(dir.main, infiles["counts"])
 if (!file.exists(all.counts.path)) {
@@ -221,7 +225,7 @@ if (is.null(parameters$DEG$thresholds)) {
    padj = 0.05,
    FC = 1.2,
    max.log10.cpm = 8.5)
-  
+
 }
 thresholds <- parameters$DEG$thresholds
 
@@ -231,7 +235,7 @@ kable(t(as.data.frame(thresholds)), col.names = "Threshold",
         caption = "Thresholds for the selection of differentially expressed genes. ")
 
 outfiles["threshold"] <- file.path(dir.tsv, "thresholds.tsv")
-write.table(x = t(as.data.frame(thresholds)), 
+write.table(x = t(as.data.frame(thresholds)),
             file = outfiles["threshold"],
             sep = "\t", row.names = TRUE, col.names = FALSE)
 # list.files(dir.tsv)
@@ -240,11 +244,11 @@ write.table(x = t(as.data.frame(thresholds)),
 ## ----read_samples--------------------------------------------------------
 #setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
-## Read the sample description file, which indicates the 
+## Read the sample description file, which indicates the
 ## condition associated to each sample ID.
 message("Reading sample description file: ", infiles["sample descriptions"])
 sample.desc <- read.delim(
-  file.path(dir.main, infiles["sample descriptions"]), sep = "\t", 
+  file.path(dir.main, infiles["sample descriptions"]), sep = "\t",
   comment = ";", header = TRUE, row.names = 1)
 sample.ids <- row.names(sample.desc)
 message("\tNb of samples = ", length(sample.ids))
@@ -278,18 +282,18 @@ kable(sample.desc, caption = "Sample description table")
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Read the design file, which indicates the anlayses to be done.
-## Each row specifies one differential expression analysis, which 
-## consists in comparing two conditions. 
+## Each row specifies one differential expression analysis, which
+## consists in comparing two conditions.
 message("Reading design file: ", infiles["design"])
-design <- read.delim(file.path(dir.main, infiles["design"]), sep = "\t", 
+design <- read.delim(file.path(dir.main, infiles["design"]), sep = "\t",
                      comment = ";", header = T, row.names = NULL)
 message("\tDesign file contains ", nrow(design), " comparisons. ")
 comparison.summary <- design ## Initialize a summary table for each DEG analysis
 comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
 
 ## Print out the design table (pairs of conditions to be compared)
-kable(comparison.summary, 
-      row.names = TRUE, 
+kable(comparison.summary,
+      row.names = TRUE,
       caption = "**Design**. Each row describes one comparison between two conditions.")
 
 
@@ -301,7 +305,7 @@ ori.counts <- read.delim(all.counts.path, row.names = 1, sep = "\t")
 # dim(ori.counts)
 # View(ori.counts)
 
-## Filter out the rows corresponding to non-assigned counts, 
+## Filter out the rows corresponding to non-assigned counts,
 ## e.g. __not_aligned, __ambiguous, __too_low_qAual, __not_aligned
 not.feature <- grep(rownames(ori.counts), pattern = "^__")
 if (length(not.feature) > 0) {
@@ -315,17 +319,17 @@ if (length(not.feature) > 0) {
 if (quick.test) {
   all.counts <- all.counts[sample(x = 1:nrow(all.counts), size = 1000, replace = FALSE),]
 }
-message("\tLoaded counts: ", 
-        nrow(all.counts), " features x ", 
+message("\tLoaded counts: ",
+        nrow(all.counts), " features x ",
         ncol(all.counts), " samples")
 
 ## Check that the header of all.counts match the sample IDs
 ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify sample IDs with no column in the count table
 if (length(ids.not.found) == length(sample.ids)) {
   colnames(all.counts) <- sample.ids
-  ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify 
+  ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify
 } else if (length(ids.not.found) > 0) {
-  stop(length(ids.not.found), " missing columns in count table\t", all.counts.path, 
+  stop(length(ids.not.found), " missing columns in count table\t", all.counts.path,
        "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
 }
 
@@ -343,12 +347,12 @@ if (is.null(parameters$DEG$blacklist)) {
   infiles["black_list"] <- parameters$DEG$blacklist
   message("Loading black-listed features\t", parameters$DEG$blacklist)
   black.list.table <- read.table(
-    infiles["black_list"], sep = "\t", 
-    comment.char = "#", 
+    infiles["black_list"], sep = "\t",
+    comment.char = "#",
     header = FALSE)
   black.listed.features <- as.vector(black.list.table[,1])
   black.listed.not.found <- setdiff(black.listed.features, row.names(all.counts))
-  if (length(black.lised.not.found) > 0) {
+  if (length(black.listed.not.found) > 0) {
     message("Warning: some IDs of the black list do not correspond to features of the count table")
     message("\tNot found IDs", paste(collapse = ", ", head(black.listed.not.found)))
   }
@@ -359,11 +363,11 @@ if (is.null(parameters$DEG$blacklist)) {
 ## (parameters defined in the config file)
 
 counts.filtered <- FilterCountTable(
-  counts = all.counts, 
-  na.omit = TRUE, 
+  counts = all.counts,
+  na.omit = TRUE,
   min.count = thresholds$min.count,
-  mean.count = thresholds$mean.count, 
-  mean.per.condition = threshold$mean.per.condition, 
+  mean.count = thresholds$mean.count,
+  mean.per.condition = threshold$mean.per.condition,
   black.list = black.listed.features)
 
 ##---- Log-transform non-normalized counts ----
@@ -373,7 +377,7 @@ message("\tTreating zero-values by adding epsilon =", epsilon)
 all.counts.epsilon <- all.counts
 all.counts.epsilon[all.counts == 0] <- epsilon
 
-## Log-transformed data for some plots. 
+## Log-transformed data for some plots.
 message("\tComputing log-transformed values")
 all.counts.log10 <- log10(all.counts.epsilon)
 all.counts.log2 <- log2(all.counts.epsilon)
@@ -401,20 +405,20 @@ stats.per.sample.nozero$Mreads <- stats.per.sample.nozero$sum / 1e6
 # View(stats.per.sample.nozero)
 
 ################################################################
-## Compute the counts per million reads 
+## Compute the counts per million reads
 ################################################################
 message("Computing normalized values with edgeR::cpm")
-## Note: the default normalization criterion (scaling by libbrary sum) 
-## is questionable because it is stronly sensitive to outliers 
-## (very highly expressed genes).  A more robust normalisation criterion 
-## is to use the 75th percentile, or the median. We use the median, somewhat arbitrarily, 
+## Note: the default normalization criterion (scaling by libbrary sum)
+## is questionable because it is stronly sensitive to outliers
+## (very highly expressed genes).  A more robust normalisation criterion
+## is to use the 75th percentile, or the median. We use the median, somewhat arbitrarily,
 ## beause it gives a nice alignment on the boxplots.
 stdcounts.libsum <- cpm(all.counts.epsilon)    ## Counts per million reads, normalised by library sum
 stdcounts.perc75 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc75)    ## Counts per million reads, normalised by 75th percentile
 stdcounts.perc95 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc95)    ## Counts per million reads, normalised by 95th percentile
 stdcounts.median <- cpm(all.counts.epsilon, lib.size = stats.per.sample$median)    ## Counts per million reads, normalised by sample-wise median count
 
-## Chose one of the standardization methods to get 
+## Chose one of the standardization methods to get
 #stdcounts <- stdcounts.median ## Choose one normalization factor for the stdcounts used below
 stdcounts <- stdcounts.perc75 ## Choose one normalization factor for the stdcounts used below
 stdcounts.log10 <- log10(stdcounts) ## Log-10 transformed stdcounts, xwith the epsilon for 0 counts
@@ -423,18 +427,18 @@ stdcounts.log2 <- log2(stdcounts) ## Log-10 transformed stdcounts, with the epsi
 ## Export normalized counts (in log2-transformed counts per million reads)
 outfiles["stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts.tsv")
 message("\tExporting standardized counts: ", outfiles["stdcounts"])
-write.table(x = stdcounts, row.names = TRUE, col.names = NA, 
+write.table(x = stdcounts, row.names = TRUE, col.names = NA,
             file = file.path(dir.main, outfiles["stdcounts"]), sep = "\t", quote = FALSE)
 
 outfiles["log2stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts_log2.tsv")
 message("\tExporting log2-transformed standardized counts: ", outfiles["log2stdcounts"])
-write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA, 
+write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA,
             file = outfiles["log2stdcounts"], sep = "\t", quote = FALSE)
 
 
 # ## Detect outliers, i.e. genes with a very high number of reads (hundreds of thousands), most of which result from problems with ribodepletion.
 # if (is.null(thresholds["max.log10.cpm"])) {
-#   outlier.threshold <- 8.5 ## Somewhat arbitrary threshold to discard  
+#   outlier.threshold <- 8.5 ## Somewhat arbitrary threshold to discard
 # } else {
 #   outlier.threshold <- thresholds["max.log10.cpm"]
 # }
@@ -456,41 +460,41 @@ stats.per.sample$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
 sample.summary.file <- paste(sep = "", count.prefix, "_summary_per_sample.tsv")
 sample.summary.file.path <- file.path(dir.main, paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
 message("\tExporting stats per sample\t", sample.summary.file.path)
-write.table(x = stats.per.sample, 
-            row.names = TRUE, col.names = NA, 
+write.table(x = stats.per.sample,
+            row.names = TRUE, col.names = NA,
             file = sample.summary.file.path, sep = "\t", quote = FALSE)
 # sample.summary.file.xlsx <- paste(sep = "", count.prefix, "_summary_per_sample.xlsx")
 # if (export.excel.files) {
 #   message(paste(sep = "", "\tSample summary file: ", sample.summary.file.xlsx))
-#   write.xlsx(x = stats.per.sample, row.names = TRUE, col.names=TRUE, 
+#   write.xlsx(x = stats.per.sample, row.names = TRUE, col.names=TRUE,
 #              file = file.path(dir.main, sample.summary.file.xlsx))
 # }
 
 
 ## ----print_sample_stats--------------------------------------------------
 ## Statistics per sample
-stats.per.sample.to.print <- c("Mreads", 
-                               "sum", 
-                               "min", 
-                               "zeros", 
-                               "non.null", 
-                               "perc05", 
-                               "Q1", 
-                               "mean", 
-                               "median", 
-                               "Q3", 
-                               "perc95", 
-                               "max", 
-                               "max.sum.ratio", 
-                               "median.mean.ratio", 
+stats.per.sample.to.print <- c("Mreads",
+                               "sum",
+                               "min",
+                               "zeros",
+                               "non.null",
+                               "perc05",
+                               "Q1",
+                               "mean",
+                               "median",
+                               "Q3",
+                               "perc95",
+                               "max",
+                               "max.sum.ratio",
+                               "median.mean.ratio",
                                "fract.below.mean")
 # setdiff(stats.per.sample.to.print, names(stats.per.sample))
 
-kable(stats.per.sample[stats.per.sample.to.print], digits = 2, 
+kable(stats.per.sample[stats.per.sample.to.print], digits = 2,
       format.args = list(big.mark = ",", decimal.mark = "."),
       caption = "Sample-wise statistics (zeros included)")
 
-kable(stats.per.sample.nozero[stats.per.sample.to.print], digits = 2, 
+kable(stats.per.sample.nozero[stats.per.sample.to.print], digits = 2,
       format.args = list(big.mark = ",", decimal.mark = "."),
       caption = "Sample-wise statistics (zeros excluded)")
 
@@ -499,18 +503,21 @@ kable(stats.per.sample.nozero[stats.per.sample.to.print], digits = 2,
 par.ori <- par(no.readonly = TRUE) # Store original parameters
 # par(c("mar", "mai"))
 # libsize.barplot(
-#   stats.per.sample, 
-#   plot.file = NULL, 
+#   stats.per.sample,
+#   plot.file = NULL,
 #   main = "Assigned reads per sample (libsum)")
 # par(par.ori) # Restore original parameters
-# 
+#
+figfiles["libsize_barplot"] <- file.path(dir.figures, "libsize_barplot.pdf")
+message("\tLibrary size barplot\t", figfiles["libsize_barplot"])
+pdf(file = figfiles["libsize_barplot"], width = 5, height = 8)
 LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color)
-
+silence <- dev.off(); rm(silcence)
 
 ## ----normalisation-------------------------------------------------------
 norm.methods <- c("none", "mean", "median", "quantile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
-  counts = all.counts, class.labels = sample.conditions, nozero = TRUE, 
+  counts = all.counts, class.labels = sample.conditions, nozero = TRUE,
   method = norm.methods, quantile = 0.75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
   verbose = 2)
 #names(norm.comparison)
@@ -523,8 +530,11 @@ rownames(size.factors) <- sample.ids
 for (m in norm.comparison$method.name) {
   size.factors[,m] <- norm.comparison[[m]]$size.factor
 }
-plot(size.factors, main = "Sample size factors", col = sample.desc$color)
 
+figfiles["size_factors"] <- file.path(dir.figures, "norm_size_factor_comparison.pdf")
+pdf(file = figfiles["size_factors"], width = 8, height = 8)
+plot(size.factors, main = "Sample size factors", col = sample.desc$color)
+silence <- dev.off(); rm(silence)
 
 ## ----differential_expression_analysis, fig.width=8, fig.height=12--------
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
@@ -534,25 +544,25 @@ for (i in 1:nrow(design)) {
   prefix <- list() ## list for output file prefixes
 
   deg.results <- list()
-  
+
   ## Identify samples for the first condition
   cond1 <- as.vector(design[i,1])  ## First condition for the current comparison
   samples1 <- sample.ids[sample.conditions == cond1]
   if (length(samples1) < 2) {
     stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond1))
   }
-  
+
   ## Identify samples for the second condition
   cond2 <- as.vector(design[i,2])  ## Second condition for the current comparison
   samples2 <- sample.ids[sample.conditions == cond2]
   if (length(samples2) < 2) {
     stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond2))
   }
-  
+
 #  stop("HELLO", "\tprefix = ", prefix)
-  
+
   message("\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2)
-  
+
   ## Create a specific result directory for this differential analysis
   comparison.prefix <- comparison.summary$prefixes[i]
   dir.analysis <- file.path(dir.DEG, paste(sep = "", comparison.prefix))
@@ -563,29 +573,29 @@ for (i in 1:nrow(design)) {
   dir.create(path = file.path(dir.main, dir.figures), showWarnings = FALSE, recursive = TRUE)
   prefix["comparison_file"] <- file.path(dir.analysis, comparison.prefix)
   prefix["comparison_figure"] <- file.path(
-    dir.figures, 
+    dir.figures,
     paste(sep = "", comparison.prefix))
 #    paste(sep = "", comparison.prefix, "_",  suffix.deg))
-  
+
 
   ## Select counts for the samples belonging to the two conditions
   current.samples <- c(samples1, samples2)
   current.counts <- data.frame(all.counts[,current.samples])
   # dim(current.counts)  ## For test
   # names(current.counts)
-  
+
   if (sum(!names(current.counts) %in% sample.ids) > 0) {
     stop("Count table contains column names without ID in sample description file.")
   }
-  
+
   ## Define conditions and labels for the samples of the current analysis
   current.conditions <- sample.conditions[current.samples]
   current.labels <- paste(current.conditions, names(current.counts), sep = "_")
-  
-  result.table <- init.deg.table(stdcounts, samples1, samples2, stats = FALSE) 
+
+  result.table <- init.deg.table(stdcounts, samples1, samples2, stats = FALSE)
 # View(result.table)
-    
-  
+
+
   ################################################################
   ## DESeq2 analysis
   ################################################################
@@ -601,7 +611,7 @@ for (i in 1:nrow(design)) {
   # names(deg.results[["DESeq2"]])
   #  attributes(deg.results[["DESeq2"]]$dds)
   # View(deg.results[["DESeq2"]]$result.table)
-  
+
   #  head(rownames(deseq2.result$result.table))
   # head(rownames(result.table))
   # x <- rownames(result.table)
@@ -609,7 +619,7 @@ for (i in 1:nrow(design)) {
   # sum(x != y)
   # names(result.table)
   result.table <- cbind(
-    result.table, 
+    result.table,
     "DESeq2" = deseq2.result$result.table[row.names(result.table),])
   # names(result.table)
   # dim(deseq2.result$result.table)
@@ -617,15 +627,15 @@ for (i in 1:nrow(design)) {
   # names(deseq2.result$result.table)
   # View(deseq2.result$result.table)
   # View(result.table)
-  
-  
+
+
   ## Save the completed DESeq2 result table
   deseq2.result.file <- paste(sep = "_", prefix["comparison_file"], "DESeq2")
   comparison.summary[i,"deseq2"] <- paste(sep = ".", deseq2.result.file, "tsv")
   message("\tExporting DESeq2 result table (tab): ", deseq2.result.file, ".tsv")
   write.table(
-    x = deseq2.result$result.table, row.name    = FALSE, 
-    file = file.path(dir.main, paste(sep = ".", deseq2.result.file, "tsv")), 
+    x = deseq2.result$result.table, row.name    = FALSE,
+    file = file.path(dir.main, paste(sep = ".", deseq2.result.file, "tsv")),
     sep = "\t", quote = FALSE)
 
   ################################################################
@@ -634,9 +644,9 @@ for (i in 1:nrow(design)) {
   # norm.method <- "TMM" ## For quick test and debugging
   edgeR.norm.methods <- c("TMM","RLE","upperquartile","none")
   for (norm.method in edgeR.norm.methods) {
-    
+
     edgeR.prefix <- paste(sep = "_", "edgeR", norm.method)
-    
+
     edger.result <- edger.analysis(
       counts = current.counts,
       condition = current.conditions,
@@ -646,7 +656,7 @@ for (i in 1:nrow(design)) {
       norm.method = norm.method,
       dir.figures = file.path(dir.main, dir.figures))
     deg.results[[edgeR.prefix]] <- edger.result
-    
+
     ## A tricky way to add edgeR with normalisation in column names
     edger.to.bind <- edger.result$result.table[row.names(result.table),]
     colnames(edger.to.bind) <- paste(sep = "_", edgeR.prefix, colnames(edger.to.bind))
@@ -657,32 +667,32 @@ for (i in 1:nrow(design)) {
     # sum(x != y)
     # names (result.table)
     result.table <- cbind(
-      result.table, 
+      result.table,
       edger.to.bind)
     # names (result.table)
-    
-    
+
+
     ## Export edgeR result table
     edger.result.file <- paste(sep = "_", prefix["comparison_file"], edgeR.prefix)
     comparison.summary[i,"edger"] <- paste(sep = ".", edger.result.file, "tsv")
     message("\tExporting edgeR result table (tab): ", edger.result.file, ".tsv")
     write.table(x = edger.result$result.table,
                 file = file.path(dir.main, paste(sep = ".", edger.result.file, "tsv")),
-                row.names = FALSE, 
+                row.names = FALSE,
                 sep = "\t", quote = FALSE)
   }
-  
-  ## Export full result table (DESeq2 + edgeR with different normalisation methods) 
+
+  ## Export full result table (DESeq2 + edgeR with different normalisation methods)
   ## in a tab-separated values (tsv) file
-  result.file <- paste(sep = "", 
-                       prefix["comparison_file"], 
+  result.file <- paste(sep = "",
+                       prefix["comparison_file"],
                        "_diffexpr_DESeq2_and_edgeR")
   # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
   verbose(paste(sep = "", "\tExporting result table (tsv): ", result.file, ".tsv"), 1)
   write.table(x = result.table, row.names = FALSE,
               file = file.path(dir.main, paste(sep="", result.file, ".tsv")), sep = "\t", quote = FALSE)
 
-  
+
   ## Collect results by output statistics
   deg.compa <- list()
   feature.ids <- row.names(current.counts)
@@ -690,35 +700,35 @@ for (i in 1:nrow(design)) {
   for (stat in stats.to.collect) {
     message("Collecting ", stat, " from alternative DEG results. ")
     deg.compa[[stat]] <- data.frame(
-      matrix(nrow = nrow(current.counts), 
+      matrix(nrow = nrow(current.counts),
              ncol = length(names(deg.results))))
     colnames(deg.compa[[stat]]) <- names(deg.results)
     rownames(deg.compa[[stat]]) <- feature.ids
     # deg.name <- "DESeq2"
     for (deg.name in names(deg.results)) {
-      deg.compa[[stat]][feature.ids, deg.name] <-  
+      deg.compa[[stat]][feature.ids, deg.name] <-
         as.vector(deg.results[[deg.name]]$result.table[feature.ids,stat])
     }
 #    View(deg.compa[[stat]])
   }
 
-  
+
   ## Define feature colors according to their level of expression (count means)
   feature.scores <- log2(apply(all.counts.epsilon, 1, median))
-  
+
   # hist(feature.scores, breaks = 100)
 
   # View(deg.compa$padj)
   ## compare DESeq2 and edgeR normalisatio results
-  plot(deg.compa$padj, log = "xy", 
+  plot(deg.compa$padj, log = "xy",
 #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
-       col = FeatureColors(palette.type = "dens", 
+       col = FeatureColors(palette.type = "dens",
                            x = deg.compa$padj[,1], y = deg.compa$padj[,2]),
        main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
 
-  plot(deg.compa$log2FC, 
+  plot(deg.compa$log2FC,
 #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
-       col = FeatureColors(palette.type = "dens", 
+       col = FeatureColors(palette.type = "dens",
                            x = deg.compa$log2FC[,1], y = deg.compa$log2FC[,2]),
        main = paste(sep = "", comparison.prefix, "\nlog2(fold change)"))
 
@@ -736,7 +746,7 @@ for (i in 1:nrow(design)) {
     # names(deg.result.table)
     table(deg.result.table[c("padj_0.05", "FC_1.14", "DEG")])
 
-    # plot(deg.result.table$log2FC, 
+    # plot(deg.result.table$log2FC,
     #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
     # # # View(deg.result.table)
     VolcanoPlot(multitest.table = deg.result.table,
@@ -746,7 +756,7 @@ for (i in 1:nrow(design)) {
                 alpha = parameters$DEG$thresholds$padj,
                 effect.threshold = parameters$DEG$thresholds$FC,
                 legend.corner = "topleft")
-    
+
   }
   par(mfrow = c(1,1))
   par(par.ori)
