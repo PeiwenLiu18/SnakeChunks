@@ -740,7 +740,7 @@ for (i in 1:nrow(design)) {
   verbose(paste(sep = "", "\tExporting result table (tsv): ", result.file, ".tsv"), 1)
   write.table(x = result.table, row.names = FALSE,
               file = file.path(dir.main, paste(sep="", result.file, ".tsv")), sep = "\t", quote = FALSE)
-
+  
   
   ## Collect results by output statistics
   deg.compa <- list()
@@ -811,6 +811,21 @@ for (i in 1:nrow(design)) {
   par(par.ori)
 }
 ```
+
+#```{r}
+### Insert ensembl.name of ensembl.id
+library(biomaRt)
+mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
+result.table$name <- getBM(
+  filters="ensembl_gene_id",
+  attributes=c("external_gene_name"),
+  values=result.table$gene_id,
+  mart=mart)
+
+
+```
+
+
 
 
 ```{r sessioninfo}
