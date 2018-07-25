@@ -1,18 +1,16 @@
-## ----knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
-
+## ---- knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
 
 quick.test <- FALSE ## For debug
 
-
+## I guess these options are not required when running R script without Rmd
 knitr::opts_chunk$set(
   fig.path = "figures/",
-  echo = FALSE, 
-  eval = TRUE, 
-  cache = FALSE, 
-  message = FALSE, 
+  echo = FALSE,
+  eval = TRUE,
+  cache = FALSE,
+  message = FALSE,
   warning = FALSE)
 
-## ----load_R_libs, warning=FALSE------------------------------------------
 ## Load required libraries
 required.libraries <- c("knitr",
                         "yaml",
@@ -36,7 +34,6 @@ for (lib in required.libraries) {
 # library(gplots, warn.conflicts = FALSE, quietly=TRUE) ## Required for heatmaps.2
 #library(RColorBrewer, warn.conflicts = FALSE, quietly=TRUE)
 
-
 required.bioconductor <- c(
   "edgeR", 
   "DESeq2", 
@@ -57,47 +54,47 @@ for (lib in required.bioconductor) {
 }
 
 
-## Install SARTools
+## Install SARTools if required
 message("\tRequired devtools library\t", "SARTools")
 if (!require("SARTools")) {
   library(devtools)
   install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
 }
 
-
 ## ----main_parameters-----------------------------------------------------
 ## Define main parameters to generate this report
 dir.main <- "~/ko-rna-seq/" ## Main directory
 setwd(dir.main)
 message("\tMain directory: ", dir.main)
-dir.base <- ".." ## Relative path of the main dir starting from the Rmd file
+
+## Define YAML configuration file
+configFile <- "metadata/config_RNA-seq.yml"
+message("\tConfiguration file: ", configFile)
+
+## Prefix for the count table
+count.prefix <- "bowtie2_featureCounts_all"
+message("\tPrefix for the count table: ", count.prefix)
+
+## Relative path of the main dir starting from the Rmd file
+dir.base <- ".." 
 message("\tBase directory: ", dir.base)
 
-
 ## Load configuration file (YAML-formatted)
-configFile <- "metadata/config_RNA-seq.yml"
-
 if (!exists("configFile")) {
   ## The prompt does not seem to work with the Rmd documents
   #   message("Choose the parameter file")
   #   parameter.file <- file.choose()
   stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
 }
-
 parameters <- yaml.load_file(configFile)
 message("\tLoaded parameters from file ", configFile)
 
-## parameter.file <- "add_your_path_here"
-# parameter.file <- file.path(dir.main, "Rmd/MN-CLOCK_RNA-seq_parameters.R")
 
-# if (!exists("parameter.file")) {
-#   ## The prompt does not seem to work with the Rmd documents
-#   #   message("Choose the parameter file")
-#   #   parameter.file <- file.choose()
-#   stop("This report requires to specify a variable named parameter.file, containing the path to an R file describing the parameters for this analysis.")
-# }
-# source(file=parameter.file)
-# message("Loaded parameters from file ", parameter.file)
+## ---- in/outfiles ----
+
+## Prepare a list of input and output files.
+outfiles <- vector()
+infiles <- vector()
 
 ## ----init_directories----------------------------------------------------
 ## Check SnakeChunks directory
@@ -105,12 +102,18 @@ if (is.null(parameters$dir$snakechunks)) {
   stop("The SnakeChunks directory should be defined in the config file: ", configFile)
 } 
 dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
-message("\tDirectory for the Rmd report: ", dir.SnakeChunks)
+message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
+
+#### Load R functions ####
 deg.lib <- file.path(dir.SnakeChunks, "scripts/R-scripts/deg_lib.R")
 message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
 
+## Load specific functions
+##
+## NOTE: these functions are designed to be later included 
+# in an R package (one file per function, roxygen2 doc)
 R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
 R.files <- c("pc_plot.R", 
              "normalise_count_table.R", 
@@ -118,12 +121,10 @@ R.files <- c("pc_plot.R",
              "feature_colors.R", 
              "libsize_barplot.R",
              "volcano_plot.R")
-#source(file.path(R.dir, "normalise_count_table.R"))
 for (f in R.files) {
   message("\tLoading R file ", f)
   source(file.path(R.dir, f))
 }
-# TO RESTORE ### source(file.path(R.dir, "pc_plot.R"))
 
 ## R markdown (Rmd) directory
 if (is.null(parameters$dir$Rmd)) {
@@ -149,12 +150,10 @@ dir.DEG <- parameters$dir$diffexpr
 message("\tDirectory for differential expresion: ", dir.DEG)
 dir.create(dir.DEG, showWarnings = FALSE, recursive = TRUE)
 
-
-## ----print_project_info--------------------------------------------------
-
-## TEMPORARILY COMMENTED
-# kable(data.frame(project.info))
-
+## Directory to export result files in tba-separated value (tsv) format
+dir.tsv <- file.path(dir.DEG, "tsv_files")
+message("\tDirectory to export TSV files:\t", dir.tsv)
+dir.create(dir.tsv, showWarnings = FALSE, recursive = TRUE)
 
 ## ----default_parameters--------------------------------------------------
 ## In this chunk, we define a set of default parameters for the display and the analysis. These parameters can be modified but it is not necessary to adapt them to each project.
@@ -174,38 +173,35 @@ if (!exists("cols.heatmap")) {
 
 ## A trick: to enable log-scaled plots for 0 values, I add an epsilon increment
 if (is.null(parameters$DEG$epsilon)) {
- epsilon <- 0.1 # passed to file parameters.R, 2017-03-15
-} else {
-  epsilon <- parameters$DEG$epsilon
+  parameters$DEG$epsilon <- 0.1 # passed to file parameters.R, 2017-03-15
 }
+epsilon <- parameters$DEG$epsilon
 
 ## Default method for the selection of the final list of DEG
 if (is.null(parameters$DEG$selection_criterion)) {
-  DEG.selection.criterion <- "DESeq2"
-} else {
-  DEG.selection.criterion <- parameters$DEG$selection_criterion
+  parameters$DEG$selection_criterion <- "DESeq2"
 }
+DEG.selection.criterion <- parameters$DEG$selection_criterion
 
 ## Sample description file
 if (is.null(parameters$metadata$samples)) {
   stop("The sample file must be defined in the metadata seection of the yaml config file: ", configFile)
 } else {
-  sample.description.file <- parameters$metadata$samples
+  infiles["sample descriptions"] <- parameters$metadata$samples
 }
 
 ## Design file
 if (is.null(parameters$metadata$design)) {
   stop("The design file must be defined in the metadata seection of the yaml config file: ", configFile)
 } else {
-  design.file <- parameters$metadata$design
+  infiles["design"] <- parameters$metadata$design
 }
 
 ## Count table
-count.prefix <- "bowtie2_featureCounts_all"
-all.counts.table <- file.path(
+infiles["counts"] <- file.path(
   parameters$dir$diffexpr, 
   paste(sep = "", count.prefix, ".tsv"))
-all.counts.path <- file.path(dir.main, all.counts.table)
+all.counts.path <- file.path(dir.main, infiles["counts"])
 if (!file.exists(all.counts.path)) {
   stop("Feature count table does not exist: ", all.counts.path)
 } else {
@@ -227,19 +223,30 @@ if (is.null(parameters$DEG$thresholds)) {
   
 }
 thresholds <- parameters$DEG$thresholds
+
+## Print the threshold tables
+## NOTE: I should evaluate what I do with the kable calls
 kable(t(as.data.frame(thresholds)), col.names = "Threshold",
         caption = "Thresholds for the selection of differentially expressed genes. ")
+
+outfiles["threshold"] <- file.path(dir.tsv, "thresholds.tsv")
+write.table(x = t(as.data.frame(thresholds)), 
+            file = outfiles["threshold"],
+            sep = "\t", row.names = TRUE, col.names = FALSE)
+# list.files(dir.tsv)
+# system(paste("open", dir.tsv))
 
 ## ----read_samples--------------------------------------------------------
 #setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Read the sample description file, which indicates the 
 ## condition associated to each sample ID.
-message("Reading sample description file: ", sample.description.file)
+message("Reading sample description file: ", infiles["sample descriptions"])
 sample.desc <- read.delim(
-  file.path(dir.main, sample.description.file), sep = "\t", 
+  file.path(dir.main, infiles["sample descriptions"]), sep = "\t", 
   comment = ";", header = TRUE, row.names = 1)
 sample.ids <- row.names(sample.desc)
+message("\tNb of samples = ", length(sample.ids))
 
 ## Experimental conditions
 sample.conditions <- as.vector(sample.desc[,1]) ## Condition associated to each sample
@@ -254,13 +261,16 @@ conditions <- unique(sample.conditions) ## Set of distinct conditions
 cols.conditions <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
 names(cols.conditions) <- conditions
 # print(cols.conditions)
-
-kable(sample.desc, caption = "Sample description table")
+message("\tNb of conditions = ", length(conditions))
+message("\tConditions = ", paste(collapse = ", ", conditions))
 
 ## Define a color per sample according to its condition
 sample.desc$color <- cols.conditions[sample.conditions]
 # names(cols.samples) <- sample.ids
 # print(cols.samples)
+
+## Print the sapmple descriptons
+kable(sample.desc, caption = "Sample description table")
 
 
 ## ----read_design, warning=FALSE------------------------------------------
@@ -269,9 +279,10 @@ sample.desc$color <- cols.conditions[sample.conditions]
 ## Read the design file, which indicates the anlayses to be done.
 ## Each row specifies one differential expression analysis, which 
 ## consists in comparing two conditions. 
-message("Reading design file: ", design.file)
-design <- read.delim(file.path(dir.main, design.file), sep = "\t", 
+message("Reading design file: ", infiles["design"])
+design <- read.delim(file.path(dir.main, infiles["design"]), sep = "\t", 
                      comment = ";", header = T, row.names = NULL)
+message("\tDesign file contains ", nrow(design), " comparisons. ")
 comparison.summary <- design ## Initialize a summary table for each DEG analysis
 comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
 
@@ -283,10 +294,6 @@ kable(comparison.summary,
 
 
 ## ----load_count_table----------------------------------------------------
-# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
-
-################################################################
-## Read the count table
 message("Loading count table: ", all.counts.path)
 ori.counts <- read.delim(all.counts.path, row.names = 1, sep = "\t")
 # names(ori.counts)
@@ -307,7 +314,7 @@ if (length(not.feature) > 0) {
 if (quick.test) {
   all.counts <- all.counts[sample(x = 1:nrow(all.counts), size = 1000, replace = FALSE),]
 }
-message("Loaded counts: ", 
+message("\tLoaded counts: ", 
         nrow(all.counts), " features x ", 
         ncol(all.counts), " samples")
 
@@ -321,30 +328,61 @@ if (length(ids.not.found) == length(sample.ids)) {
        "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
 }
 
-################################################################
 ## Restrict the count table to the sample IDs found in the sample description file
 all.counts <- all.counts[, sample.ids]
 # names(all.counts)
 # dim(all.counts)
 
-########################################################################
-## Treatment of 0 values.
+##---- Feature filtering ----
+
+## Load list of black-listed features
+if (is.null(parameters$DEG$blacklist)) {
+  black.listed.features <- NULL
+} else {
+  infiles["black_list"] <- parameters$DEG$blacklist
+  message("Loading black-listed features\t", parameters$DEG$blacklist)
+  black.list.table <- read.table(
+    infiles["black_list"], sep = "\t", 
+    comment.char = "#", 
+    header = FALSE)
+  black.listed.features <- as.vector(black.list.table[,1])
+  black.listed.not.found <- setdiff(black.listed.features, row.names(all.counts))
+  if (length(black.lised.not.found) > 0) {
+    message("Warning: some IDs of the black list do not correspond to features of the count table")
+    message("\tNot found IDs", paste(collapse = ", ", head(black.listed.not.found)))
+  }
+}
+
+## Filter out features according to various user-specified criteria
+## (parameters defined in the config file)
+
+counts.filtered <- FilterCountTable(
+  counts = all.counts, 
+  na.omit = TRUE, 
+  min.count = thresholds$min.count,
+  mean.count = thresholds$mean.count, 
+  mean.per.condition = threshold$mean.per.condition, 
+  black.list = black.listed.features)
+
+##---- Log-transform non-normalized counts ----
+
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-message("Treating zero-values by adding epsilon =", epsilon)
+message("\tTreating zero-values by adding epsilon =", epsilon)
 all.counts.epsilon <- all.counts
 all.counts.epsilon[all.counts == 0] <- epsilon
 
 ## Log-transformed data for some plots. 
+message("\tComputing log-transformed values")
 all.counts.log10 <- log10(all.counts.epsilon)
 all.counts.log2 <- log2(all.counts.epsilon)
 
 
 ## ----sample_statistics---------------------------------------------------
-# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ################################################################
 ## Compute sample-wise statistics on mapped counts
 ################################################################
+message("Computing sample-wise statistics")
 #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
 # View(stats.per.sample)
 stats.per.sample <- cbind(sample.desc, RowStats(all.counts))
@@ -352,6 +390,7 @@ stats.per.sample$Mreads <- stats.per.sample$sum / 1e6
 # View(stats.per.sample.all)
 
 ## Compute statistics ommitting zero values
+message("Computing sample-wise statistics for non-zero counts")
 all.counts.nozero <- all.counts
 all.counts.nozero[all.counts.nozero == 0] <- NA
 stats.per.sample.nozero <- cbind(sample.desc, RowStats(all.counts.nozero))
@@ -362,7 +401,7 @@ stats.per.sample.nozero$Mreads <- stats.per.sample.nozero$sum / 1e6
 ################################################################
 ## Compute the counts per million reads 
 ################################################################
-message("Computing standardized counts")
+message("Computing normalized values with edgeR::cpm")
 ## Note: the default normalization criterion (scaling by libbrary sum) 
 ## is questionable because it is stronly sensitive to outliers 
 ## (very highly expressed genes).  A more robust normalisation criterion 
@@ -379,27 +418,26 @@ stdcounts <- stdcounts.perc75 ## Choose one normalization factor for the stdcoun
 stdcounts.log10 <- log10(stdcounts) ## Log-10 transformed stdcounts, xwith the epsilon for 0 counts
 stdcounts.log2 <- log2(stdcounts) ## Log-10 transformed stdcounts, with the epsilon for 0 counts
 
-
 ## Export normalized counts (in log2-transformed counts per million reads)
-stdcounts.file <- paste(sep = "", count.prefix, "_stdcounts.tsv")
-message("\tExporting standardized counts: ", stdcounts.file)
+outfiles["stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts.tsv")
+message("\tExporting standardized counts: ", outfiles["stdcounts"])
 write.table(x = stdcounts, row.names = TRUE, col.names = NA, 
-            file = file.path(dir.main, stdcounts.file), sep = "\t", quote = FALSE)
+            file = file.path(dir.main, outfiles["stdcounts"]), sep = "\t", quote = FALSE)
 
-stdcounts.log2.file <- paste(sep = "", count.prefix, "_stdcounts_log2.tsv")
-message("\tExporting log2-transformed standardized counts: ", stdcounts.log2.file)
+outfiles["log2stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts_log2.tsv")
+message("\tExporting log2-transformed standardized counts: ", outfiles["log2stdcounts"])
 write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA, 
-            file = file.path(dir.main, stdcounts.log2.file), sep = "\t", quote = FALSE)
+            file = outfiles["log2stdcounts"], sep = "\t", quote = FALSE)
 
 
-## Detect outliers, i.e. genes with a very high number of reads (hundreds of thousands), most of which result from problems with ribodepletion.
-if (is.null(thresholds["max.log10.cpm"])) {
-  outlier.threshold <- 8.5 ## Somewhat arbitrary threshold to discard  
-} else {
-  outlier.threshold <- thresholds["max.log10.cpm"]
-}
-outliers <- (apply(stdcounts.log10, 1, max) > outlier.threshold)
-message("\tDetected ", sum(outliers), " outliers with log10(stdcounts) higher than ", outlier.threshold)
+# ## Detect outliers, i.e. genes with a very high number of reads (hundreds of thousands), most of which result from problems with ribodepletion.
+# if (is.null(thresholds["max.log10.cpm"])) {
+#   outlier.threshold <- 8.5 ## Somewhat arbitrary threshold to discard  
+# } else {
+#   outlier.threshold <- thresholds["max.log10.cpm"]
+# }
+# outliers <- (apply(stdcounts.log10, 1, max) > outlier.threshold)
+# message("\tDetected ", sum(outliers), " outliers with log10(stdcounts) higher than ", outlier.threshold)
 # rownames(stdcounts.log10[outliers,])
 # sum(outliers)
 
@@ -444,7 +482,7 @@ stats.per.sample.to.print <- c("Mreads",
                                "max.sum.ratio", 
                                "median.mean.ratio", 
                                "fract.below.mean")
-setdiff(stats.per.sample.to.print, names(stats.per.sample))
+# setdiff(stats.per.sample.to.print, names(stats.per.sample))
 
 kable(stats.per.sample[stats.per.sample.to.print], digits = 2, 
       format.args = list(big.mark = ",", decimal.mark = "."),
