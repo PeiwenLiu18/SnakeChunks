@@ -1,3 +1,5 @@
+
+
 #' @title Run functional enrichment for a given gene set
 #'
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
@@ -25,26 +27,26 @@
 #' @examples
 #'
 #' @export
-functionalEnrichment <- function(geneset,
-                                 allgenes,
-                                 db,
-                                 organism.names,
-                                 ontology="BP",
-                                 thresholds = thresholds,
-                                 select.positives=TRUE,
-                                 run.GOstats = TRUE,
-                                 run.clusterProfiler = FALSE,
-                                 plot.adjust = TRUE) {
+functional.enrichment <- function(geneset,
+                                  allgenes,
+                                  db,
+                                  organism.names,
+                                  ontology = "BP",
+                                  thresholds = thresholds,
+                                  select.positives = TRUE,
+                                  run.GOstats = TRUE,
+                                  run.clusterProfiler = FALSE,
+                                  plot.adjust = TRUE) {
   #library("ALL")
-  verbose(paste(sep="", "Go over-representation analysis. ",
+  verbose(paste(sep = "", "Go over-representation analysis. ",
                 length(geneset), " input genes (among ", length(allgenes), ")"), 2)
 
   ## Prepare the result
   result <- list()
   result$ngenes.test <- length(geneset)
   result$ngenes.all <- length(allgenes)
-  result$db = db
-  result$ontology = ontology
+  result$db <- db
+  result$ontology <- ontology
   result$thresholds <- thresholds
   result$select.positives <- select.positives
 
@@ -59,20 +61,19 @@ functionalEnrichment <- function(geneset,
   library("annotate")
   library(db, character.only = TRUE)
   envir <- c(
-    db=db,
+    db = db,
     prefix = sub(db, pattern = ".db", replacement = ""))
   for (suffix in c("GO", "ENTREZID")) {
-    envir[suffix] <- paste(sep="", envir["prefix"],suffix)
+    envir[suffix] <- paste(sep = "", envir["prefix"],suffix)
   }
 
-  ################################################################
-  ## Run over-representation analysis with GOstats
+  ############## Run over-representation analysis with GOstats
   if (run.GOstats) {
     library("GOstats")
 
     ## Get go annotations per gene
-    go.annot.geneset <- mget(geneset, envir=get(envir["GO"]))
-    go.annot.allgenes <- mget(allgenes, envir=get(envir["GO"]))
+    go.annot.geneset <- mget(geneset, envir = get(envir["GO"]))
+    go.annot.allgenes <- mget(allgenes, envir = get(envir["GO"]))
     result.per.gene$nb.go.annot <- as.vector(unlist(lapply(go.annot.allgenes, length)  ))
 
     ## Compute number of genes with at least one annotation in GO.
@@ -85,13 +86,13 @@ functionalEnrichment <- function(geneset,
 
     ## Define parameters for GOstats analysis
     gostats.params <- new("GOHyperGParams",
-                          geneIds=geneset,
-                          universeGeneIds=allgenes,
-                          annotation=db,
-                          ontology=ontology,
-                          pvalueCutoff=1,
-                          conditional=FALSE,
-                          testDirection="over")
+                          geneIds = geneset,
+                          universeGeneIds = allgenes,
+                          annotation = db,
+                          ontology = ontology,
+                          pvalueCutoff = 1,
+                          conditional = FALSE,
+                          testDirection = "over")
 
     ## Run over-representation hypergeometric test with GOstats
     over.result <- hyperGTest(gostats.params)
@@ -103,14 +104,14 @@ functionalEnrichment <- function(geneset,
     ## Collect the statistics for all the tested GO classes.
     ## For this we set the p-value threshold to 1.1, so we select
     ## all classes, even non-significant!
-    go.enrich.table <- summary(over.result, pvalue=2)
+    go.enrich.table <- summary(over.result, pvalue = 2)
     go.enrich.table$expectedCounts = expectedCounts(over.result)
 
     go.enrich.table <- complete.enrich.table(go.enrich.table,
-                                             pvalue.column="Pvalue",
-                                             thresholds=thresholds,
-                                             select.positives=select.positives,
-                                             plot.adjust=plot.adjust)
+                                             pvalue.column = "Pvalue",
+                                             thresholds = thresholds,
+                                             select.positives = select.positives,
+                                             plot.adjust = plot.adjust)
 
     ## Add  GO table to the result
     result$go.bp.table <- go.enrich.table
@@ -123,11 +124,11 @@ functionalEnrichment <- function(geneset,
     n <- N -m ## Number of "non-marked" genes, i.e. not belonging to the considered GO class
     k <- length(over.result@geneIds) ## Number of test genes with at least one annotation in the selected ontology
     Pvalue.check <-
-      phyper(q = go.enrich.table$Count -1, m=m, n=n, k = k, lower=FALSE)
-    #   plot(go.enrich.table[,pvalue.column], Pvalue.check, log="xy")
+      phyper(q = go.enrich.table$Count -1, m = m, n = n, k  =  k, lower = FALSE)
+    #   plot(go.enrich.table[,pvalue.column], Pvalue.check, log = "xy")
     ExpCount.check <- m * k/N
     # plot(go.enrich.table$ExpCount, ExpCount.check)
-    #   abline(a=0, b=1)
+    #   abline(a = 0, b = 1)
 
     # View(go.enrich.table)
     # names(go.enrich.table)
@@ -156,10 +157,10 @@ functionalEnrichment <- function(geneset,
 
       ego.table <- complete.enrich.table(
         ego.table,
-        pvalue.column="pvalue",
-        thresholds=thresholds,
-        select.positives=select.positives,
-        plot=TRUE)
+        pvalue.column = "pvalue",
+        thresholds = thresholds,
+        select.positives = select.positives,
+        plot = TRUE)
 
       ## Add  GO table to the result
       result$clusterProfiler.bp.table <- ego.table
@@ -169,7 +170,7 @@ functionalEnrichment <- function(geneset,
   ## Att the results per gene to the result object
   result$result.per.gene <- result.per.gene
 
-  # plot(hist(go.enrich.table[,pvalue.column], breaks=20))
+  # plot(hist(go.enrich.table[,pvalue.column], breaks = 20))
   #dim(go.enrich.table)
   # View(go.enrich.table)
   # print(over.result.cond)
