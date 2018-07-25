@@ -116,6 +116,7 @@ source(deg.lib)
 # in an R package (one file per function, roxygen2 doc)
 R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
 R.files <- c("pc_plot.R", 
+             "filter_count_table.R",
              "normalise_count_table.R", 
              "row_stats.R", 
              "feature_colors.R", 
@@ -351,6 +352,7 @@ if (is.null(parameters$DEG$blacklist)) {
     message("Warning: some IDs of the black list do not correspond to features of the count table")
     message("\tNot found IDs", paste(collapse = ", ", head(black.listed.not.found)))
   }
+  black.listed.features <- intersect(black.listed.features, row.names(all.counts))
 }
 
 ## Filter out features according to various user-specified criteria
