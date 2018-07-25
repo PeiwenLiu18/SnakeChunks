@@ -24,9 +24,6 @@ Display messages depending on user-defined verbosity level
 Display messages depending on user-defined verbosity level
 }
 \details{
-First version: 2015-03. 
-Last modification: 2015-03.
-
 First version: 2015-03.
 Last modification: 2015-03.
 }

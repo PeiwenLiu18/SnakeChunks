@@ -34,7 +34,7 @@ getScriptPath <- function() {
 script.dir <- getScriptPath()
 message("\tScript directory: ", script.dir)
 source(file.path(script.dir, "VolcanoPlot.R"))
-# source("SnakeChunks/scripts/R-scripts/R/VolcanoPlot.R")
+# source("SnakeChunks/scripts/RSnakeChunks/R/VolcanoPlot.R")
 
 
 ## Report working directory

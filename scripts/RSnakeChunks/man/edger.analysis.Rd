@@ -25,7 +25,7 @@ edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 \item{norm.method="RLE"}{normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods}
 }
 \description{
-Detect differentially expressed genes (DEG) using the package edgeR, 
+Detect differentially expressed genes (DEG) using the package edgeR,
 and add a few custom columns (e-value, ...) to the result table.
 }
 \author{

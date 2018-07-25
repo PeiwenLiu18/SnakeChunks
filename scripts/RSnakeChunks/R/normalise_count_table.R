@@ -1,7 +1,7 @@
 #' @title scaling RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods)
-#' 
+#'
 #' @author Jacques van Helden and Mustafa AbuElqumsan
-#' 
+#'
 #' @description normalisation of RNA-seq count table.
 #' More precisely this function runs a sample-wise scaling so that all the samples
 #' have the same value for a user-defined scaling parameter.
@@ -9,14 +9,14 @@
 #'
 #' @param counts a data frame with counts per feature, with one feature (gene, transcript) per row and one sample per column.
 #' @param class.labels the class labels associated each sample of the count table. Should be provided in order to adapt it in case samples would be suppressed because they have a scaling factor of 0.
-#' 
-#' @nozero=TRUE If TRUE, zero values are ommitted from the data table before computing the column-wise statistics.
 #'
-#' @param method="quantile" normalization method. Optionally, can be specified as a vector with several methods. 
-#' 
+#' @param nozero=TRUE If TRUE, zero values are ommitted from the data table before computing the column-wise statistics.
+#'
+#' @param method="quantile" normalization method. Optionally, can be specified as a vector with several methods.
+#'
 #' Supported normalization methods: none, sum, mean, median, quantile, TMM, RLE, DESeq2.
 #'
-#' The "raw" methods simply returns the raw counts (no normalization). 
+#' The "raw" methods simply returns the raw counts (no normalization).
 #'
 #' Sum and mean are really not recommended because very sensitive to outliers.
 #' They are implemented only for the sake of comparison.
@@ -44,20 +44,19 @@
 #' @param detailed.sample.stats=FALSE compute detailed sample stats (takes some seconds)
 #'
 #' @return a list with the following elements.
-#' \begin{itemize}
-#'   \item[counts] The original count table
-#'   \item[class.labels] The original class labels 
-#'   \item[parameters]  Normalisation parameters
-#'   \item[norm.result] Normalisation results. If several methods are provided, normcounts is a list with one entry per normalisation method.
-#'
+#' \itemize{
+#'   \item{counts} The original count table
+#'   \item{class.labels} The original class labels
+#'   \item{parameters}  Normalisation parameters
+#'   \item{norm.result} Normalisation results. If several methods are provided, normcounts is a list with one entry per normalisation method.
+#'}
 #' Each normalisation results contains.
-#' \begin{itemize}{
-#'   \item{size.factor} Size factor for each sample. 
+#' \itemize{
+#'   \item{size.factor} Size factor for each sample.
 #'   \item{scaling.factor} Scaling factor for each sample. Scaling.factor equals 1/size.factor
 #'   \item{counts} Normalized counts
 #' }
-#' 
-#' @examples
+#'
 #' @export
 NormalizeCountTable <- function(counts,
                                 class.labels,
@@ -68,13 +67,13 @@ NormalizeCountTable <- function(counts,
                                 epsilon = 0.1,
                                 detailed.sample.stats = FALSE,
                                 verbose = 1) {
-  
+
   ## Initialise return list
   result <- list()
   result$raw.counts <- counts
   result$class.labels <- class.labels
-  
-  
+
+
   ## if required, discard the zero counts before computing size factors
   if (is.null(nozero)) {
     ## By default, nozero parameter is activated
@@ -82,7 +81,7 @@ NormalizeCountTable <- function(counts,
     # View(head(non.null.counts))
   }
   result$nozero <- nozero
-  
+
   ## Include parameters in the result
   result$parameters <- list(
     method = method,
@@ -91,16 +90,16 @@ NormalizeCountTable <- function(counts,
     log2 = log2,
     epsilon = epsilon
   )
-  
+
   #### Measure size of input matrix ####
   result$raw.features <- nrow(counts)
   result$raw.samples <- ncol(counts)
-  
+
   if (verbose >= 1) {
-    message("\t", "Library size normalization\tMethod: ", paste(collapse=", ", method),  
+    message("\t", "Library size normalization\tMethod: ", paste(collapse=", ", method),
             "\tRaw counts: ", result$raw.features, " features x ", result$raw.samples, " samples. ")
-  }  
-  
+  }
+
   #### Compute non-zero counts ####
   counts.nozero <- counts
   counts.nozero[counts  == 0] <- NA
@@ -113,8 +112,8 @@ NormalizeCountTable <- function(counts,
   } else {
     counts.to.norm <- counts ## Use all counts for normalization
   }
-  
-  
+
+
   #### Compute sample-wise statistics ####
   sampleStats <- data.frame(
     zeros = apply(counts == 0, 2, sum),
@@ -127,7 +126,7 @@ NormalizeCountTable <- function(counts,
     sd.all = apply(counts, 2, sd, na.rm = TRUE),
     sd.nozero = apply(counts.nozero, 2, sd, na.rm = TRUE)
   )
-  
+
   # head(sampleStats)
   ## Report number of NA and zero values
   if (verbose >= 2) {
@@ -140,17 +139,17 @@ NormalizeCountTable <- function(counts,
               " NA values. ")
     }
   }
-  
+
   if (detailed.sample.stats) {
     if (verbose >= 2) {
-      message("\t\t", "Computing sample-wise statistics with and without zeros") 
+      message("\t\t", "Computing sample-wise statistics with and without zeros")
     }
     sampleStats$all <- RowStats(counts)
     sampleStats$nozero <- RowStats(counts.nozero)
   }
   result$sampleStats <- sampleStats
   # head(self$sampleStats)
-  
+
   #### Apply normalization method(s) ####
   method.names <- vector()
   for (m in method) {
@@ -183,11 +182,11 @@ NormalizeCountTable <- function(counts,
     if (verbose >= 2) {
       message("\t\tNormalization method\t", method.name)
     }
-    
+
     if (m %in% c("raw", "none")) {
       scaling.factor <- rep(x = 1, length.out = ncol(counts))
       size.factor <-  rep(x = 1, length.out = ncol(counts))
-      
+
     } else if (m %in% c("quantile", "median")) {
         ## Median will be treated as quantile 0.5
       if (m == "median") {
@@ -195,10 +194,10 @@ NormalizeCountTable <- function(counts,
       } else {
         current.quantile <- quantile
       }
-      
+
       quantile.method <- "custom" ## alternative: compute quantiles via edgeR
       if (quantile.method == "edgeR") {
-        
+
         ## Compute quantile-based scaling factor via edgeR
         ## NOTE (2018-07-21) : with single-cell data containing MANY zeros, this returns Inf scaling factors for almost all the samples
         if (verbose >= 3) {
@@ -209,7 +208,7 @@ NormalizeCountTable <- function(counts,
         d <- calcNormFactors(d, method = "upperquartile", p = current.quantile)                 ## Compute normalizing factors
         scaling.factor <- d$samples$norm.factors
         size.factor <- 1/scaling.factor
-        
+
       } else {
         if (verbose >= 3) {
           message("\t\tScaling factor: sample quantile ", current.quantile)
@@ -226,7 +225,7 @@ NormalizeCountTable <- function(counts,
       if (null.scaling > 1) {
         message("\t\tdiscarding ", null.scaling, " samples with null value for quantile ", quantile)
       }
-      
+
     } else if (m %in% c("mean", "libsum", "TC", "sum")) {
       if (verbose >= 3) {
         message("\t\tScaling factor: library size (equivalent for sum, mean, total counts).  ")
@@ -238,8 +237,8 @@ NormalizeCountTable <- function(counts,
       scaling.factor <- scaling.factor / mean(scaling.factor)
       # hist(scaling.factor, breaks = 1000)
       # mean(scaling.factor)
-      
-      
+
+
     } else if (m == "TMM") {
       if (verbose >= 3) {
         message("\t\tRunning edgeR::calcNormFactors(method='TMM').")
@@ -249,7 +248,7 @@ NormalizeCountTable <- function(counts,
       d <- calcNormFactors(d, method = "TMM")                 ## Compute normalizing factors
       scaling.factor <- d$samples$norm.factors
       size.factor <- 1/scaling.factor
-      
+
     } else if (m == "RLE") {
       ## Run edgeR to compute the relative log expression defined by Anders and Huber (2010).
       if (verbose >= 3) {
@@ -260,7 +259,7 @@ NormalizeCountTable <- function(counts,
       d <- calcNormFactors(d, method = "RLE")                 ## Compute normalizing factors
       scaling.factor <- d$samples$norm.factors
       size.factor <- 1/scaling.factor
-      
+
     } else if (m == "DESeq2") {
       if (verbose >= 3) {
         message("\t\tRunning DESeq2::estimateSizeFactors()")
@@ -276,7 +275,7 @@ NormalizeCountTable <- function(counts,
       size.factor <- sizeFactors(dds)
       scaling.factor <- 1/size.factor
       # plot(size.factor, sampleStats$sum) ## THE DIFFERENCE IS QUITE IMPRESSIVE
-      
+
     } else if (m == "VSD") {
       # Compute variance stabilizing transformations (VST) via DESeq2 (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010)
       if (verbose >= 3) {
@@ -288,21 +287,21 @@ NormalizeCountTable <- function(counts,
       vsd <- vst(dds, blind = FALSE)
       names(vsd)
       ## QUESTION: HOW DO I GET THE SIZE FACTORS FROM THE RESULTING OBJECT ?
-      
+
       #    rld <- rlog(dds, blind = FALSE)
-      
+
       # View(vsd)
       # head(assay(vsd), 3)
       # library("pheatmap")
       # library("vsn")
       # meanSdPlot(assay(vsd))
-      
+
       ## Run  differential expression analysis with DESeq2
       #    dds <- DESeq(dds)
-      
-      
+
+
       #    rld <- rlog(dds, blind=FALSE)
-      
+
     } else {
       stop(method, " is not a valid method for NormalizeSamples()")
     }
@@ -321,12 +320,12 @@ NormalizeCountTable <- function(counts,
         message("\t\tDiscarded samples: ", paste(collapse = "; ", discaredSampleNames))
       }
     }
-    
+
     #### Compute normalised counts ####
     normTarget <- mean(scaling.factor[!discardedSamples]) ## Ensure library eize equality before and after standardization
     scaling.factor <- scaling.factor * normTarget
     normCounts <- t(t(counts.to.norm[, !discardedSamples]) * scaling.factor)
-    
+
     #### log2 transformation (if required) ####
     if (log2) {
       normCounts <- log2(normCounts + epsilon)
@@ -337,16 +336,16 @@ NormalizeCountTable <- function(counts,
       size.factor = size.factor,
       scaling.factor = scaling.factor,
       normCounts = normCounts)
-    
+
     if (length(method) == 1) {
-      result$norm.result <- norm.result  
+      result$norm.result <- norm.result
     } else {
       result[[method.name]] <- norm.result
     }
   }
-  
+
   ## Get the method name(s) in the result
   result$method.name <- method.names
-  
+
   return(result)
 }

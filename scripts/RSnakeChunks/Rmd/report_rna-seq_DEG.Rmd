@@ -51,7 +51,7 @@ PROJECT-SPECIFIC PARAMETERS: THIS PART SHOULD BE ADAPTER FOR EACH PROJECT -->
 dir.fg <- "~/fg-chip-seq/" ## Directory containing routines from France Génomique
 
 ## Load a library with the utilities
-source(file.path(dir.fg, "scripts/R-scripts/deg_lib.R"))
+source(file.path(dir.fg, "scripts/RSnakeChunks/R/deg_lib.R"))
 
 ## base directory for the report (links are defined relative to this directory)
 dir.main <- "~/BeatriceRoche/"

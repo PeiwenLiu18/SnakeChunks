@@ -23,7 +23,7 @@ deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 \item{dir.figures=NULL}{optional directory to save figures}
 }
 \description{
-Detect differentially expressed genes (DEG) using the package DESeq2, 
+Detect differentially expressed genes (DEG) using the package DESeq2,
 and add a few custom columns (e-value, ...) to the result table.
 }
 \author{

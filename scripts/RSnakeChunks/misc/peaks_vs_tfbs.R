@@ -19,8 +19,8 @@
 #' library(GenomicRanges)
 #' 
 #' ## TEMPORARY: these two functions were borrowed from the roken package, still to be published
-#' source("~/SnakeChunks/scripts/R-scripts/R/bed_to_granges.R")
-#' source("~/SnakeChunks/scripts/R-scripts/R/bed_import.R")
+#' source("~/SnakeChunks/scripts/RSnakeChunks/R/bed_to_granges.R")
+#' source("~/SnakeChunks/scripts/RSnakeChunks/R/bed_import.R")
 #' 
 #' ## Define the root directory for this analysis
 #' mainDir <- "~/RegulonHT_results/GSE93506"

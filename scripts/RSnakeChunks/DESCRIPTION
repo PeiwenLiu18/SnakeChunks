@@ -1,12 +1,13 @@
 Package: RSnakeChunks
 Type: Package
-Title: What the Package Does (Title Case)
+Title: R functions and scripts used by the snakemake library SnakeChunks.
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Jacques van Helden (R code) + Claire Rioualen for the integration to snakemake.
+Maintainer: Jacques van Helden <Jacques.van-Helden@univ-amu.fr>
+Description: This packages accompanies the SnakeChunks library which enables to build snakemake workflows in a modular way. This includes
+    R functions for differential analysis with DESeq2 and edgeR
+    misc scripts for analysis of the differential analysis results
+License: GPL
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

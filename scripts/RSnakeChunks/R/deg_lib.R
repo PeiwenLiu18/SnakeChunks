@@ -2,6 +2,7 @@
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #' @param required.libraries a vector contianing the names of required CRAN libraries, which will be installed with install.packages()
 #' @param required.bioconductor a vector containing the required BioConductor libraries, which will be installed with biocLite
+#' @export
 CheckRequiredLibraries <- function(required.libraries,
                                    required.bioconductor = NULL) {
   for (lib in required.libraries) {
@@ -26,9 +27,11 @@ CheckRequiredLibraries <- function(required.libraries,
 
 #' @title Load parameters and required libraries
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
+#' @export
 LoadDEGparam <- function(yamlFile) {
   library(yaml)
   data <- yaml.load_file(yamlFile)
+  return(data)
 }
 
 
@@ -37,10 +40,6 @@ LoadDEGparam <- function(yamlFile) {
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #'
 #' @description Display messages depending on user-defined verbosity level
-#'
-#' @details
-#' First version: 2015-03.
-#' Last modification: 2015-03.
 #'
 #' @param verbosity   Level of verbosity above which the message should be printed.
 #' @param print.date=TRUE   Print date and time
@@ -71,7 +70,7 @@ verbose <- function(message.content,
   }
 }
 
-#' @title Draw a volcano plot for RNA-seq data.
+#' @title Draw a heatmap with the inter-sample correlation matrix.
 #'
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #'
@@ -82,12 +81,7 @@ verbose <- function(message.content,
 #'
 #' There is a close relationship between this RNA-seq version of the volcano
 #' and the volcano plots commonly used to show the result of a t-test with microarrays.
-#'
-#' @details
-
-
-################################################################
-## Draw a heatmap with the inter-sample correlation matrix.
+#' @export
 count.correl.heatmap <- function(count.table,
                                  main = NULL,
                                  plot.file = NULL,
@@ -407,6 +401,7 @@ sample.description.plots <- function (sample.desc,
 #' @param title=comparison.prefix main title for the plots
 #' @param dir.figures=NULL optional directory to save figures
 #' @param ... additional parameters are passed to DESeq2::DESeq() function
+#' @export
 deseq2.analysis <- function(
   counts,
   condition,
@@ -488,6 +483,7 @@ deseq2.analysis <- function(
 #' @param dir.figures=NULL optional directory to save figures
 #' @param norm.method="RLE" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
 #' @param ... additional parameters are passed to edgeR::exactTest() function
+#' @export
 edger.analysis <- function(counts,
                            condition,
                            ref.condition=NULL,

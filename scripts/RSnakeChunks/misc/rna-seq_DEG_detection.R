@@ -23,7 +23,7 @@ library("stats4bioinfo")
 ## Load library of functions for differential analysis
 dir.fg <- "~/fg-chip-seq/"
 #dir.fg <- "~/mountrsatlocal/fg-chip-seq/"
-source(file.path(dir.fg, "scripts/R-scripts/deg_lib.R"))
+source(file.path(dir.fg, "scripts/RSnakeChunks/R/deg_lib.R"))
 
 ## Define parameters
 run.param <- list()

@@ -13,11 +13,13 @@ NormalizeCountTable(counts, class.labels, nozero = TRUE, method = "TMM",
 
 \item{class.labels}{the class labels associated each sample of the count table. Should be provided in order to adapt it in case samples would be suppressed because they have a scaling factor of 0.}
 
-\item{method="quantile"}{normalization method. Optionally, can be specified as a vector with several methods. 
+\item{nozero=TRUE}{If TRUE, zero values are ommitted from the data table before computing the column-wise statistics.}
+
+\item{method="quantile"}{normalization method. Optionally, can be specified as a vector with several methods.
 
 Supported normalization methods: none, sum, mean, median, quantile, TMM, RLE, DESeq2.
 
-The "raw" methods simply returns the raw counts (no normalization). 
+The "raw" methods simply returns the raw counts (no normalization).
 
 Sum and mean are really not recommended because very sensitive to outliers.
 They are implemented only for the sake of comparison.
@@ -46,15 +48,15 @@ in order to avoid zero counts.}
 }
 \value{
 a list with the following elements.
-\begin{itemize}
-  \item[counts] The original count table
-  \item[class.labels] The original class labels 
-  \item[parameters]  Normalisation parameters
-  \item[norm.result] Normalisation results. If several methods are provided, normcounts is a list with one entry per normalisation method.
-
+\itemize{
+  \item{counts} The original count table
+  \item{class.labels} The original class labels
+  \item{parameters}  Normalisation parameters
+  \item{norm.result} Normalisation results. If several methods are provided, normcounts is a list with one entry per normalisation method.
+}
 Each normalisation results contains.
-\begin{itemize}{
-  \item{size.factor} Size factor for each sample. 
+\itemize{
+  \item{size.factor} Size factor for each sample.
   \item{scaling.factor} Scaling factor for each sample. Scaling.factor equals 1/size.factor
   \item{counts} Normalized counts
 }

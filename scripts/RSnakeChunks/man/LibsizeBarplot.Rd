@@ -15,6 +15,8 @@ LibsizeBarplot(counts, sample.labels = colnames(counts),
 \item{sample.labels=colnames(counts)}{sample labels (displayed as y legend)}
 
 \item{sample.colors=NULL}{sample-specific colors (e.g. reflecting conditions)}
+
+\item{plot.file=NULL}{Path of a file to store the figure (pdf format).}
 }
 \author{
 Jacques van Helden

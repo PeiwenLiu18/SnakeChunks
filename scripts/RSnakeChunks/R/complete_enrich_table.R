@@ -11,7 +11,7 @@
 #'
 #' @param enrich.table Enrichment table from GOstats, clusterProfiler or similar programs.
 #' @param pvalue.column Name or number of the column containing the p-values (this depends on the program).
-#' @param thresholds=c("evalue"=1)
+#' @param thresholds=c("evalue"=1) thresholds on one or several fields.
 #' @examples
 #'
 #' @export

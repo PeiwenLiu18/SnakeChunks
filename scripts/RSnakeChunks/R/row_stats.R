@@ -1,6 +1,7 @@
-#' @RowStats compute row-wise statistics on a data.frame or matrix
+#' @title compute row-wise statistics on a data.frame or matrix
 #' @author Jacques van Helden
 #' @param x data.frame or matrix
+#' @param verbose=0 level of verbosity
 #' @return a data.frame with one row per column of the input matrix, and one column per statistics
 RowStats <- function(x, verbose = 0) {
   if (verbose >= 1) {
@@ -10,7 +11,7 @@ RowStats <- function(x, verbose = 0) {
     zeros = apply(x == 0, 2, sum, na.rm = TRUE),
     na.values = apply(is.na(x), 2, sum),
     infinite.values = apply(is.infinite(as.matrix(x)), 2, sum),
-    non.null = apply(x > 0, 2, sum, na.rm = TRUE), 
+    non.null = apply(x > 0, 2, sum, na.rm = TRUE),
     sum = apply(x, 2, sum, na.rm = TRUE),
     mean = apply(x, 2, mean, na.rm = TRUE),
     var = apply(x, 2, var, na.rm = TRUE),
@@ -32,5 +33,5 @@ RowStats <- function(x, verbose = 0) {
   result$median.mean.ratio <- result$median/result$mean
   result$below.mean <- apply(t(x) < result$mean, 1, sum, na.rm = TRUE)
   result$fract.below.mean <- result$below.mean/nrow(x)
-  return(result)  
+  return(result)
 }

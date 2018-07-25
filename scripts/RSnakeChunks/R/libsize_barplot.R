@@ -4,7 +4,7 @@
 #' @param sample.labels=colnames(counts) sample labels (displayed as y legend)
 #' @param sample.colors=NULL sample-specific colors (e.g. reflecting conditions)
 #' @param main Main title for the plot
-#' @plot.file=NULL Path of a file to store the figure (pdf format).
+#' @param plot.file=NULL Path of a file to store the figure (pdf format).
 LibsizeBarplot <- function(counts,
                            sample.labels=colnames(counts),
                            sample.colors=NULL,

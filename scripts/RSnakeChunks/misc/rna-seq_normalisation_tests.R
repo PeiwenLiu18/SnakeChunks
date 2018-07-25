@@ -106,7 +106,7 @@ message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
 
 #### Load R functions ####
-deg.lib <- file.path(dir.SnakeChunks, "scripts/R-scripts/deg_lib.R")
+deg.lib <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R/deg_lib.R")
 message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
 
@@ -114,7 +114,7 @@ source(deg.lib)
 ##
 ## NOTE: these functions are designed to be later included 
 # in an R package (one file per function, roxygen2 doc)
-R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
+R.dir <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R")
 R.files <- c("pc_plot.R", 
              "filter_count_table.R",
              "normalise_count_table.R", 

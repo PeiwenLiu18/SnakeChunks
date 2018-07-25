@@ -8,9 +8,11 @@ FeatureColors(palette.type = "gray", scores = NULL, x = NULL, y = NULL,
   levels = 100, end.colors = c("blue", "red"))
 }
 \arguments{
-\item{type="2col"}{type of palette. Suppored: 2col (2-colors gradient), "gray" (gray scale), "dens" (proportional to local density). 
-Palette types 2col and gray resuire to specify a score associated to each feature. 
+\item{type="2col"}{type of palette. Suppored: 2col (2-colors gradient), "gray" (gray scale), "dens" (proportional to local density).
+Palette types 2col and gray resuire to specify a score associated to each feature.
 Density palette requires to specify X and Y coordinates.}
+
+\item{score=NULL}{score associated to each feature}
 
 \item{x=NULL}{feature abcsissas for density palettes}
 
