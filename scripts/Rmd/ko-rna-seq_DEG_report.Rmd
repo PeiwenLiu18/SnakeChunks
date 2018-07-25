@@ -137,11 +137,11 @@ if (is.null(parameters$dir$snakechunks)) {
 dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
 message("\tDirectory for the Rmd report: ", dir.SnakeChunks)
 
-deg.lib <- file.path(dir.SnakeChunks, "scripts/R-scripts/deg_lib.R")
+deg.lib <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R/deg_lib.R")
 message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
 
-R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
+R.dir <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R")
 # TO RESTORE ### source(file.path(R.dir, "pc_plot.R"))
 source(file.path(R.dir, "pc_plot.R"))
 source(file.path(R.dir, "filter_count_table.R"))

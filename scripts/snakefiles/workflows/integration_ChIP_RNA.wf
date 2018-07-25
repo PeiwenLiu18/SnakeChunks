@@ -142,7 +142,7 @@ rule gene_comparison:
     benchmark: INTEGRATION_DIR + "/" + outdir_prefix + "_benchmark.txt"
     conda: "../envs/venn.yaml"
     script:
-        "../../R-scripts/R/gene_lists_comparison.R"
+        "../../RSnakeChunks/misc/gene_lists_comparison.R"
 
  
 

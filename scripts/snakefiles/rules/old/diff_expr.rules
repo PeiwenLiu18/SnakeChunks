@@ -16,5 +16,5 @@ rule diff_expr:
     log: config["dir"]["results"] + "DEG/diff_expr.log"
     benchmark: config["dir"]["results"] + "DEG/diff_expr_benchmark.json"
     params: qsub = config["qsub"] + " -e " + config["dir"]["results"] + "DEG/diff_expr_qsub.err -o " + config["dir"]["results"] + "DEG/diff_expr_qsub.out", \
-            r_script = config["dir"]["fg-chip-seq"] + "/scripts/R-scripts/rna-seq_DEG_detection.R"
+            r_script = config["dir"]["fg-chip-seq"] + "/scripts/RSnakeChunks/misc/rna-seq_DEG_detection.R"
     shell: "Rscript {params.r_script} {input.R_params}"

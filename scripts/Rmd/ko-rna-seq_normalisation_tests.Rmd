@@ -139,13 +139,14 @@ if (is.null(parameters$dir$snakechunks)) {
 dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
 message("\tDirectory for the Rmd report: ", dir.SnakeChunks)
 
-deg.lib <- file.path(dir.SnakeChunks, "scripts/R-scripts/deg_lib.R")
+deg.lib <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R/deg_lib.R")
 message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
 
-R.dir <- file.path(dir.SnakeChunks, "scripts/R-scripts/R")
+R.dir <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R")
 R.files <- c("pc_plot.R", 
              "normalise_count_table.R", 
+             "libsize_barplot.R",
              "row_stats.R", 
              "feature_colors.R", 
              "libsize_barplot.R",
@@ -610,7 +611,7 @@ for (i in 1:nrow(design)) {
   
 #  stop("HELLO", "\tprefix = ", prefix)
   
-  message("\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2)
+  message("Differential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2)
   
   ## Create a specific result directory for this differential analysis
   comparison.prefix <- comparison.summary$prefixes[i]
