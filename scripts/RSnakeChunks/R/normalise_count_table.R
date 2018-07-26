@@ -196,11 +196,11 @@ NormalizeCountTable <- function(counts,
       } else {
         current.percentile <- percentile
       }
+      current.quantile <- current.percentile/100
 
       percentile.method <- "custom" ## alternative: compute percentile-based scaling factors via edgeR
       if (percentile.method == "edgeR") {
 
-        current.quantile <- current.percentile/100
         ## Compute quantile-based scaling factor via edgeR
         ## NOTE (2018-07-21) : with single-cell data containing MANY zeros, this returns Inf scaling factors for almost all the samples
         if (verbose >= 3) {
@@ -216,10 +216,9 @@ NormalizeCountTable <- function(counts,
         if (verbose >= 3) {
           message("\t\tScaling factor: sample percentile ", current.percentile)
         }
-        sampleStats$norm.percentile <- apply(counts.to.norm, 2, percentile, na.rm = TRUE, probs = current.percentile)
+        sampleStats$norm.percentile <- apply(counts.to.norm, 2, quantile, na.rm = TRUE, probs = current.quantile)
         size.factor <-  sampleStats$norm.percentile
         scaling.factor <- 1 / sampleStats$norm.percentile
-        scaling.factor <- scaling.factor / mean(scaling.factor[!is.infinite(scaling.factor)])
         # mean(scaling.factor[!is.infinite(scaling.factor)])
         # hist(scaling.factor, breaks = 1000)
       }
