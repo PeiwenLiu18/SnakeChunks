@@ -77,7 +77,7 @@ export.excel.files <- FALSE
 # dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
 # opts_knit$set(base.dir=dir.report) ## Set the working directory for knitr (generating HTML and pdf reports)
 # setwd(dir.report) ## Set the working directory for the console
-# source(file.path(dir.genereg, "scripts/R-scripts/deg_lib.R"))
+# source(file.path(dir.genereg, "scripts/RSnakeChunks/R/deg_lib.R"))
 # dir.create(file.path(dir.base, dir.figures), showWarnings = FALSE, recursive = TRUE)
 # 
 
@@ -86,7 +86,7 @@ export.excel.files <- FALSE
 # dir.genereg <- "/home/lkhamvongsa/mountrsatlocal/fg-chip-seq/" ## Directory containing routines from France Génomique
 # 
 # ## Load a library with the utilities
-# source(file.path(dir.genereg, "scripts/R-scripts/deg_lib.R"))
+# source(file.path(dir.genereg, "scripts/RSnakeChunks/R/deg_lib.R"))
 # 
 # ## base directory for the report (links are defined relative to this directory)
 # dir.main <- "/home/lkhamvongsa/mountrsatlocal/Mathilde/"

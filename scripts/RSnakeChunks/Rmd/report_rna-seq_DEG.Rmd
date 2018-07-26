@@ -1,15 +1,15 @@
 ---
-title: "RNA-seq differential analysis report"
+title: "RNA-seq differential analysis report - Beatrice Roche"
 output:
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
   html_document:
     fig_caption: yes
     highlight: zenburn
     theme: cerulean
-    toc: yes
-    toc_depth: 3
-  pdf_document:
-    fig_caption: yes
-    highlight: zenburn
     toc: yes
     toc_depth: 3
   word_document: default
@@ -17,7 +17,7 @@ date: '`r Sys.Date()`'
 ---
 
 ```{r knitr setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo=FALSE, eval=TRUE, cache=FALSE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo=FALSE, eval=TRUE, cache=TRUE, message=FALSE, warning=FALSE)
 ```
 
 
@@ -27,66 +27,91 @@ library("stats4bioinfo") ## Generic library from Jacques van Helden
 library("edgeR", warn.conflicts = FALSE, quietly=TRUE) ## Differential expression with RNA-seq
 library("DESeq2", warn.conflicts = FALSE, quietly=TRUE, verbose=FALSE) ## Differential expression with RNA-seq
 library("limma", warn.conflicts = FALSE, quietly=TRUE) ## Required for vennCounts and vennDiagram
-#library("GenomicFeatures") ## TO CHCK: STILL NEEDED ? For functional enrichment.
-
-required.libraries <- c("RColorBrewer", "gplots")
-#required.libraries <- append(required.libraries, "xlsx") ## THIS REQUIRES JAVA
-for (lib in required.libraries) {
-  if (!require(lib, character.only=TRUE)) {
-    install.packages(lib)
-  }
-  library(lib, character.only = TRUE)
-}
-
+library(gplots, warn.conflicts = FALSE, quietly=TRUE) ## Required for heatmaps.2
+library(RColorBrewer, warn.conflicts = FALSE, quietly=TRUE)
+library("GenomicFeatures")
 ```
 
 <!-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 PROJECT-SPECIFIC PARAMETERS: THIS PART SHOULD BE ADAPTER FOR EACH PROJECT -->
 
-
-
 ## Project information
 
+| Project Info |  |
+|--------------|-------------------------|
+| Customer  | Beatrice Roche
+| Platform | TGML/TAGC, Marseille, France
+| Bioinfo/stat analysis | Jacques van Helden
+| Project start | 2015
+| Last update | `r Sys.Date()`
+
 ```{r Required parameters}
-parameter.file <- "/Users/jvanheld/analyses/RNA-seq_SE_GSE71562/gene-regulation/scripts/Rmd/rna-seq_DEG_parameters.R"
-if (!exists("parameter.file")) {
-  ## The prompt does not seem to work with the Rmd documents
-  #   message("Choose the parameter file")
-  #   parameter.file <- file.choose()
-  stop("This report requires to specify a variable named parameter.file, containing the path to an R file describing the parameters for this analysis.")
-}
-source(file=parameter.file)
-```
 
+## In this chunk we define the project-specific parameters that are required to enable an analysis. Other (optional) parameters can be defined below to customize the thresholds, figure styles, ... 
+dir.fg <- "~/fg-chip-seq/" ## Directory containing routines from France Génomique
 
-```{r init_directories}
-## Initialize output directories
-dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
+## Load a library with the utilities
+source(file.path(dir.fg, "scripts/RSnakeChunks/R/deg_lib.R"))
+
+## base directory for the report (links are defined relative to this directory)
+dir.main <- "~/BeatriceRoche/"
+dir.report <- "~/BeatriceRoche/reports/"
+dir.base <- ".." ; ## Path to the main directory relative to the current report, which must be added to the all links
 opts_knit$set(base.dir=dir.report) ## Set the working directory for knitr (generating HTML and pdf reports)
 setwd(dir.report) ## Set the working directory for the console
-source(file.path(dir.genereg, "scripts/RSnakeChunks/R/deg_lib.R"))
-dir.create(file.path(dir.base, dir.figures), showWarnings = FALSE, recursive = TRUE)
+
+################################################################
+## Input parameters
+
+## Sample description file (one row per sample)
+sample.description.file <- "data/broche_samples.tab"
+
+## Dsign file (pairs of samples to be compared)
+design.file <- "data/broche_analyses.tab"
+
+## Table containing the counts of reads per gene (rows) for each sample (columns) 
+all.counts.table <- 'results/DEG/sickle_pe_q20_bowtie2_pe_sorted_name_all_counts.tab'
+
+## The GTF file contains genomic annotations for the selected species
+organism.name <- "Escherichia coli"
+gtf.file <- "genome/Escherichia_coli_str_k_12_substr_mg1655.GCA_000005845.2.28.gtf"
+gtf.source <- "ftp://ftp.ensemblgenomes.org/pub/bacteria/release-28/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655/"
+
+gene.info.file <- "genome/Escherichia_coli_str_k_12_substr_mg1655_GCA_000005845.2_gene_info.tab"
+
+################################################################
+## Output parameters
+dir.DEG <-'results/DEG' ## Output directory (relative to base dir)
+dir.figures <- file.path(dir.DEG, "figures")
+dir.create(dir.figures, showWarnings = FALSE, recursive = TRUE)
+suffix.deg <- 'broche_project' ## Suffix for the output files
+suffix.DESeq2 <- paste(sep="_", suffix.deg, "DESeq2")
+suffix.edgeR <- paste(sep="_", suffix.deg, "edgeR")
+
+## Prefix for output files concerning the whole count table (all samples together)
+## prefix["general.file"] <- sub(pattern = ".tab", replacement="", all.counts.table)
+prefix <- vector()
+prefix["general.file"] <- file.path(dir.DEG, suffix.deg)
+prefix["general.file"] <- file.path(dir.DEG, suffix.deg) ## Path prefix for the general files
+
+################################################################
+## Thresholds for differential analysis. 
+
+thresholds <- c("padj"=0.05, ## Upper threshold on False Discovery Rate (FDR)
+                "evalue"=1, ## Upper threshold on the expected number of false positives
+                "FC"=1.5 ## Lower threshold on the fold-change
+                )
+
 ```
 
 <!-- END OF THE PROJECT-SPECIFIC PARAMETERS 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
 
-```{r print project information}
-
-kable(data.frame(project.info))
-
-```
-
-
 ```{r Default parameters}
 ## In this chunk, we define a set of default parameters for the display and the analysis. 
 ## These parameters can be modified but it is not necessary to adapt them to each project.
- if ((!exists("verbosity")) || (is.null(verbosity))) {
-  verbosity <- 1
-}
-if (!exists("export.excel.files")) {
-  export.excel.files <- FALSE
-}
+
+verbosity <- 0
 
 ## Color palette for heatmaps. I like this Red-Blue palette because 
 ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
@@ -98,6 +123,97 @@ epsilon <- 0.01
 ```
 
 
+```{r Load gene information from GTF file}
+# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+
+################################################################
+## Load gene information from the GTF file 
+## (should be the same as used to count tags per gene)
+
+if (exists("gtf.file")) {
+  ## Jacques or Lucie, TO DO : check if the method makeTxDbFromGFF allows to get gene names and descriptions.
+  ## In principle it should be possible since this info is in the GTF file. 
+  ## If not, we migh rewite a parser for GTF. 
+  
+  verbose(paste("Loading gene annotations from GTF file: ", gtf.file), 2)
+  #   library(rtracklayer)  # for the import() function
+  #   gr <- import(gtf.file)
+  txdb <- makeTxDbFromGFF(file=file.path(dir.base, gtf.file),
+                          organism=organism.name,
+                          dataSource=gtf.source)
+  #seqlevels(txdb)
+  #   transcripts <- transcriptsBy(txdb, by="gene")
+  #   transcript.table <- as.data.frame(transcripts@unlistData)
+  #   cds <- cdsBy(txdb, by="gene")
+  #   cds.table <- as.data.frame(cds@unlistData)
+  #   exons <- exonsBy(txdb, by="gene")
+  #   exon.table <- as.data.frame(exons@unlistData)
+  all.genes <- genes(txdb)
+  gene.info <- as.data.frame(all.genes)
+  gene.info$name <- gene.info$gene_id
+  gene.info$entrez.id <- NA
+  gene.info$description <- "no description"
+} else {
+  verbose(paste("No GTF file has been specified"))
+  g <- nrow(all.counts)
+  gene.info <- data.frame("seqnames"=rep(NA, times=g),
+                          "start"=rep(NA, times=g),
+                          "end"=rep(NA, times=g),
+                          "width"=rep(NA, times=g),
+                          "strand"=rep(NA, times=g),
+                          "gene_id"=row.names(all.counts),
+                          "name"=row.names(all.counts),
+                          "entrez.id" = rep(NA, times=g),
+                          "description"=rep("no description", times=g))
+  row.names(gene.info) <- row.names(all.counts)
+}
+# View(gene.info)
+
+
+
+################################################################
+## TEMPORARY: load additional gene information from a tab-delimited file generated with RSAT, 
+## because for bacterial genomes there is no obvious way to obtain EntrezIDs.
+if (exists("gene.info.file")) {
+  verbose(paste("Loading gene information from tab-delimited file", gene.info.file))
+  
+  gene.info.rsat <- read.delim(file.path(dir.base, gene.info.file), sep="\t", skip=3, header=1)  
+  ## A bit tricky: we need to discard rows starting with ";", but we cannot use ";" as comment.char since it is found in descriptions and as separator for names
+  comment.lines <- grep(gene.info.rsat[,1], pattern = ";")
+  gene.info.rsat <- gene.info.rsat[-comment.lines,]
+  row.names(gene.info.rsat) <- gene.info.rsat[,1]
+  gene.info.rsat <- gene.info.rsat[row.names(gene.info), ] ## Ensure gene.info.rsat contains same IDs in the same order as gene.info
+  
+  
+  ## Extract additional attributes for the gene.info table
+  gene.info$name <- gene.info.rsat[row.names(gene.info), "name"]
+  gene.info$entrez.id <- gene.info.rsat[row.names(gene.info), 2]
+  gene.info$description <- gene.info.rsat[row.names(gene.info), "description"]
+  gene.info$names <- gene.info.rsat[row.names(gene.info), "names"]
+  # dim(gene.info.rsat)
+  # names(gene.info.rsat)
+  # View(gene.info.rsat)
+} 
+# View(gene.info)
+
+## Export the gene information table to keep a trace of what has been used. 
+gene.info.out <- paste(sep="", prefix["general.file"], "_gene_descriptions.tab")
+verbose(paste("Exporting gene information table", gene.info.out), 1)
+write.table(x = gene.info, row.names = FALSE,
+            file = file.path(dir.base, gene.info.out), sep = "\t", quote=FALSE)
+verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
+
+
+
+## Export the gene information table to keep a trace of what has been used. 
+gene.info.out <- paste(sep="", prefix["general.file"], "_gene_descriptions.tab")
+verbose(paste("Exporting gene information table", gene.info.out), 1)
+write.table(x = gene.info, row.names = FALSE,
+            file = file.path(dir.base, gene.info.out), sep = "\t", quote=FALSE)
+verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
+
+
+```
 
 
 ## Parameters
@@ -119,29 +235,29 @@ epsilon <- 0.01
 
 ## Read the sample description file, which indicates the 
 ## condition associated to each sample ID.
-message("Reading sample description file: ", sample.description.file)
+verbose(paste("Reading sample description file: ", sample.description.file), 2)
 sample.desc <- read.delim(file.path(dir.base, sample.description.file), sep="\t", 
-                          comment=";", header = TRUE, row.names=NULL)
-sample.ids <-  as.vector(sample.desc[,sample.id.col]) 
+                          comment=";", header = TRUE, row.names=1)
+sample.ids <- row.names(sample.desc)
 
 ## Experimental conditions
-sample.conditions <- as.vector(sample.desc[,sample.condition.col]) ## Condition associated to each sample
+sample.conditions <- as.vector(sample.desc[,1]) ## Condition associated to each sample
 names(sample.conditions) <- sample.ids
 # print(sample.conditions)
 
 ## Build sample labels by concatenating their ID and condition
-if (is.null(sample.label.col)) {
-  sample.desc[, "label"] <- paste(sep="_", sample.ids, sample.conditions)
-  sample.label.col <- "label"
-}
+sample.desc$label <- paste(sep="_", sample.ids, sample.conditions)
 
 ## Define a specific color for each distinct condition
 conditions <- unique(sample.conditions) ## Set of distinct conditions
 cols.conditions <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
 names(cols.conditions) <- conditions
+# print(cols.conditions)
 
 ## Define a color per sample according to its condition
 sample.desc$color <- cols.conditions[sample.conditions]
+# names(cols.samples) <- sample.ids
+# print(cols.samples)
 ```
 
 
@@ -151,6 +267,8 @@ sample.desc$color <- cols.conditions[sample.conditions]
 
 
 ```{r Loading count table}
+# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+
 ################################################################
 ## Read the count table
 verbose("Loading count table", 2)
@@ -167,26 +285,24 @@ if (length(ids.not.found) > 0) {
 ################################################################
 ## Restrict the count table to the sample IDs found in the sample description file
 all.counts <- all.counts[, sample.ids]
+# names(all.counts)
+# dim(all.counts)
 
 ########################################################################
 ## Treatment of 0 values.
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
 verbose(paste("Treating zero-values by adding epsilon =", epsilon), 2)
 all.counts.epsilon <- all.counts
-# all.counts.epsilon[all.counts==0] <- epsilon
-all.counts.epsilon <- all.counts + epsilon
+all.counts.epsilon[all.counts==0] <- epsilon
 
 ## Log-transformed data for some plots. 
 all.counts.log10 <- log10(all.counts.epsilon)
 
 ```
 
-
-
-
-
 ### Sample-wise statistics
 
+The raw counts table ([`r all.counts.table`](`r file.path(dir.base, all.counts.table)`)) contains `r nrow(all.counts)` rows (features, genes) and `r ncol(all.counts)` columns (conditions, samples).
 
 
 ```{r Sample-wise statistics}
@@ -210,8 +326,8 @@ cpms.libsum <- cpm(all.counts.epsilon)    ## Counts per million reads, normalise
 cpms.perc75 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc75)    ## Counts per million reads, normalised by 75th percentile
 cpms.perc95 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc95)    ## Counts per million reads, normalised by 95th percentile
 cpms.median <- cpm(all.counts.epsilon, lib.size = stats.per.sample$median)    ## Counts per million reads, normalised by sample-wise median count
-cpms <- cpms.median ## Choose one normalization factor for the CPMs used below
-# cpms <- cpms.perc75 ## Choose one normalization factor for the CPMs used below
+#cpms <- cpms.median ## Choose one normalization factor for the CPMs used below
+cpms <- cpms.perc75 ## Choose one normalization factor for the CPMs used below
 cpms.log10 <- log10(cpms) ## Log-10 transformed CPMs, with the epsilon for 0 counts
 cpms.log2 <- log2(cpms) ## Log-10 transformed CPMs, with the epsilon for 0 counts
 
@@ -227,37 +343,16 @@ stats.per.sample$log10.cpm.mean <- apply(cpms.log10, 2, mean)
 # head(stats.per.sample)
 verbose("Exporting stats per sample", 1)
 sample.summary.file <- paste(sep="", prefix["general.file"], "_summary_per_sample.tab")
-verbose(paste(sep="", "\tSample summary file: ",sample.summary.file), 1)
 write.table(x = stats.per.sample, row.names = TRUE, col.names=NA, 
             file = file.path(dir.base, sample.summary.file), sep = "\t", quote=FALSE)
-if (export.excel.files) {
-  sample.summary.file.xlsx <- paste(sep="", prefix["general.file"], "_summary_per_sample.xlsx")
-  verbose(paste(sep="", "\tSample summary file: ", sample.summary.file.xlsx), 1)
-  write.xlsx(x = stats.per.sample, row.names = TRUE, col.names=TRUE, 
-             file = file.path(dir.base, sample.summary.file.xlsx))
-}
-# verbose(paste(sep="", "\tSummary per sample\t", sample.summary.file), 1)
+verbose(paste(sep="", "\tSummary per sample\t", sample.summary.file), 1)
 ```
 
 ```{r print stats per sample}
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Statistics per sample
-stats.per.sample.to.print <- c("Mreads", 
-                               "sum", 
-                               "min", 
-                               "zeros", 
-                               "detected", 
-                               "perc05", 
-                               "perc25", 
-                               "mean", 
-                               "median", 
-                               "perc75", 
-                               "perc95", 
-                               "max", 
-                               "max.sum.ratio", 
-                               "median.mean.ratio", 
-                               "fract.below.mean")
+stats.per.sample.to.print <- c("M.reads", "sum", "min", "perc25", "mean", "median", "perc75", "max", "fract.below.mean")
 kable(stats.per.sample[stats.per.sample.to.print], digits=2,
       caption="Sample-wise statistics")
 
@@ -273,33 +368,23 @@ libsize.barplot(stats.per.sample, plot.file=NULL)
 
 ### Read count distributions
 
-The four plots below represent the distributions of counts per gene (X axis) for each sample (Y axis). 
-
-
 ```{r count_boxplots, fig.width=10, fig.height=10, fig.cap="Read count distributions. Top: raw counts. Bottom: counts per millon reads (CPMs). Left panels: linear scale, which emphasizes  outlier features denoted by very high counts. Rigt panels log counts permit to perceive the distribution of its whole range, including small count values. Null counts are replaced by an epsilon < 1, and appearas negative numbers after log transformation."}
-
 par(mfrow=c(2,2))
+  ## Boxplot of raw counts
+  count.boxplot(all.counts, stats.per.sample, xlab="Raw counts", 
+                main="Raw counts per sample")
 
-#par(mar=c(5.1,5.1,4.1,1.1))
-# par("mar")
+  ## Boxplot of log10-transformed counts
+  count.boxplot(all.counts.log10, stats.per.sample, xlab="log10(counts)", 
+                main="log10(counts) per sample")
 
-## Boxplot of raw counts
-count.boxplot(all.counts, sample.desc, 
-              xlab="Raw counts", 
-              main="Raw counts per sample")
-
-## Boxplot of log10-transformed counts
-count.boxplot(all.counts.log10, sample.desc,  xlab="log10(counts)", 
-              main="log10(counts) per sample")
-
-## Boxplot of CPMs
-count.boxplot(cpms, sample.desc, xlab="CPM", 
-              main="CPMs per sample")
-
-## Boxplot of log10-transformed CPMs
-count.boxplot(cpms.log10, sample.desc, xlab="log10(CPM)", 
-              main="log10(CPMs) per sample")
-
+  ## Boxplot of CPMs
+  count.boxplot(cpms, stats.per.sample, xlab="CPM", 
+                main="CPMs per sample")
+  
+  ## Boxplot of log10-transformed CPMs
+  count.boxplot(cpms.log10, stats.per.sample, xlab="log10(CPM)", 
+                main="log10(CPMs) per sample")
 par(mfrow=c(1,1))
 ```
 
@@ -340,7 +425,7 @@ for (cond in conditions) {
   
   ## Create a specific result directory for this condition
   dir.condition <- file.path(dir.DEG, "per_condition", cond)
-  dir.create(path = file.path(dir.base, dir.condition), showWarnings = FALSE, recursive = TRUE)
+  dir.create(path = dir.condition, showWarnings = FALSE, recursive = TRUE)
   
   ## Select the specific data for the current condition (samples, counts, CPMs)
   #all.counts.with.replicate <- setdiff(names(all.counts), "CI_CI_0H_1")
@@ -361,7 +446,7 @@ for (cond in conditions) {
   
   ################################################################
   ## Plot pairwise comparisons between replicates (result file can be heavy to open)
-   #pdf(file= file.path(dir.condition, paste(sep = "", "between-replicate_counts_plot_", cond, ".pdf")), width=10, height=10)
+#   pdf(file= file.path(dir.condition, paste(sep = "", "between-replicate_counts_plot_", cond, ".pdf")), width=10, height=10)
 #   # dim(current.counts[,1:min(max.rep.to.plot, nrep)])
   plot(current.counts[,1:min(max.rep.to.plot, nrep)], 
        log="xy", col=cols.conditions[cond], 
@@ -399,110 +484,18 @@ for (cond in conditions) {
 ```
 
 
-## Gene annotations
-
-
-
-```{r Load gene information from GTF file}
-# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
-
-################################################################
-## Load gene information from the GTF file 
-## (should be the same as used to count tags per gene)
-if (exists("gtf.file")) {
-  ## Jacques or Lucie, TO DO : check if the method makeTxDbFromGFF allows to get gene names and descriptions.
-  ## In principle it should be possible since this info is in the GTF file. 
-  ## If not, we migh rewite a parser for GTF. 
-  
-  verbose(paste("Loading gene annotations from GTF file: ", gtf.file), 2)
-  #   library(rtracklayer)  # for the import() function
-  #   gr <- import(gtf.file)
-  txdb <- makeTxDbFromGFF(file=file.path(dir.base, gtf.file),
-                          organism=organism.name,
-                          dataSource=gtf.source)
-  #seqlevels(txdb)
-  #   transcripts <- transcriptsBy(txdb, by="gene")
-  #   transcript.table <- as.data.frame(transcripts@unlistData)
-  #   cds <- cdsBy(txdb, by="gene")
-  #   cds.table <- as.data.frame(cds@unlistData)
-  #   exons <- exonsBy(txdb, by="gene")
-  #   exon.table <- as.data.frame(exons@unlistData)
-  all.genes <- genes(txdb)
-  gene.info <- as.data.frame(all.genes)
-  gene.info$name <- gene.info$gene_id
-  gene.info$entrez.id <- NA
-  gene.info$description <- "no description"
-} else {
-  message(paste("No GTF file has been specified"))
-  g <- nrow(all.counts)
-  gene.info <- data.frame("seqnames"=rep(NA, times=g),
-                          "start"=rep(NA, times=g),
-                          "end"=rep(NA, times=g),
-                          "width"=rep(NA, times=g),
-                          "strand"=rep(NA, times=g),
-                          "gene_id"=row.names(all.counts),
-                          "name"=row.names(all.counts),
-                          "entrez.id" = rep(NA, times=g),
-                          "description"=rep("no description", times=g))
-  row.names(gene.info) <- row.names(all.counts)
-}
-# View(gene.info)
-
-
-
-################################################################
-## TEMPORARY: load additional gene information from a tab-delimited file generated with RSAT, 
-## because for bacterial genomes there is no obvious way to obtain EntrezIDs.
- if ((exists("gene.info.file") && (!is.null(gene.info.file)))) {
-  verbose(paste("Loading gene information from tab-delimited file", gene.info.file))
-  
-  gene.info.rsat <- read.delim(file.path(dir.base, gene.info.file), sep="\t", skip=3, header=1)  
-  ## A bit tricky: we need to discard rows starting with ";", but we cannot use ";" as comment.char since it is found in descriptions and as separator for names
-  comment.lines <- grep(gene.info.rsat[,1], pattern = ";")
-  gene.info.rsat <- gene.info.rsat[-comment.lines,]
-  row.names(gene.info.rsat) <- gene.info.rsat[,1]
-  gene.info.rsat <- gene.info.rsat[row.names(gene.info), ] ## Ensure gene.info.rsat contains same IDs in the same order as gene.info
-  
-  
-  ## Extract additional attributes for the gene.info table
-  gene.info$name <- gene.info.rsat[row.names(gene.info), "name"]
-  gene.info$entrez.id <- gene.info.rsat[row.names(gene.info), 2]
-  gene.info$description <- gene.info.rsat[row.names(gene.info), "description"]
-  gene.info$names <- gene.info.rsat[row.names(gene.info), "names"]
-  # dim(gene.info.rsat)
-  # names(gene.info.rsat)
-  # View(gene.info.rsat)
-} 
-# View(gene.info)
-
-## Export the gene information table to keep a trace of what has been used. 
-gene.info.out <- paste(sep="", prefix["general.file"], "_gene_descriptions.tab")
-verbose(paste(sep="", "\tExporting gene information table: ", gene.info.out), 1)
-write.table(x = gene.info, row.names = FALSE,
-            file = file.path(dir.base, gene.info.out), sep = "\t", quote=FALSE)
-if (export.excel.files) {
-  gene.info.out.xlsx <- paste(sep="", prefix["general.file"], "_gene_descriptions.xlsx")
-  verbose(paste(sep="", "\tExporting gene information table: ", gene.info.out.xlsx), 1)
-  write.xlsx(x = gene.info, row.names = FALSE,
-             file = file.path(dir.base, paste(sep=".", gene.info.out.xlsx)))
-}
-# verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
-```
-
-
-
 ## Detection of differentially expressed genes
 
 ### Design
 
-```{r read_design_table, warning=FALSE}
+```{r Read the design, warning=FALSE}
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Read the design file, which indicates the anlayses to be done.
 ## Each row specifies one differential expression analysis, which 
 ## consists in comparing two conditions. 
-message("Reading design file: ", design.file)
-design.table <- read.delim(file.path(dir.base, design.file), sep="\t", 
+verbose(paste("Reading design file: ", design.file), 2)
+design <- read.delim(file.path(dir.base, design.file), sep="\t", 
                      comment=";", header = T, row.names=NULL)
 ```
 
@@ -513,34 +506,34 @@ design.table <- read.delim(file.path(dir.base, design.file), sep="\t",
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 i <- 1
-comparison.summary <- design.table ## Initialize a summary table for each DEG analysis
-comparison.summary$prefixes <- paste(sep="_", design.table[,1], "vs", design.table[,2])
+comparison.summary <- design ## Initialize a summary table for each DEG analysis
+comparison.summary$prefixes <- paste(sep="_", design$cond1, "vs", design$cond2)
 
-for (i in 1:nrow(design.table)) {
+for (i in 1:nrow(design)) {
   ## Identify samples for the first condition
-  cond1 <- as.vector(design.table[i,1])  ## First condition for the current comparison
+  cond1 <- as.vector(design[i,1])  ## First condition for the current comparison
   samples1 <- sample.ids[sample.conditions == cond1]
    if (length(samples1) < 2) {
      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond1))
    }
   
   ## Identify samples for the second condition
-  cond2 <- as.vector(design.table[i,2])  ## Second condition for the current comparison
+  cond2 <- as.vector(design[i,2])  ## Second condition for the current comparison
   samples2 <- sample.ids[sample.conditions == cond2]
    if (length(samples2) < 2) {
      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond2))
    }
   
-  verbose(paste(sep="", "\tDifferential analysis\t", i , "/", nrow(design.table), "\t", cond1, " vs ", cond2), 1)
+  verbose(paste(sep="", "\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2), 1)
   
   ## Create a specific result directory for this differential analysis
   prefix["comparison"] <- comparison.summary$prefixes[i]
   dir.analysis <- file.path(dir.DEG, paste(sep="", prefix["comparison"]))
   comparison.summary$dir.analysis <- dir.analysis
-  dir.create(path = file.path(dir.base, dir.analysis), showWarnings = FALSE, recursive = TRUE)
+  dir.create(path = dir.analysis, showWarnings = FALSE, recursive = TRUE)
   dir.figures <- file.path(dir.analysis, "figures")
   comparison.summary$dir.figures <- dir.figures
-  dir.create(path = file.path(dir.base, dir.figures), showWarnings = FALSE, recursive = TRUE)
+  dir.create(path = dir.figures, showWarnings = FALSE, recursive = TRUE)
   prefix["comparison_file"] <- file.path(dir.analysis, prefix["comparison"])
   prefix["comparison_figure"] <- file.path(
     dir.figures, 
@@ -567,7 +560,7 @@ for (i in 1:nrow(design.table)) {
   ################################################################
   ## DESeq2 analysis
   ################################################################
-  deseq2.result.table <- deseq2.analysis(dir.figures=file.path(dir.base, dir.figures))
+  deseq2.result.table <- deseq2.analysis()
   result.table <- cbind(result.table, 
                         "DESeq2" = deseq2.result.table[row.names(result.table),])
   # dim(deseq2.result.table)
@@ -577,44 +570,31 @@ for (i in 1:nrow(design.table)) {
   # View(result.table)
   
   ## Save the completed DESeq2 result table
-  deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "DESeq2")
-  comparison.summary[i,"deseq2"] <- paste(sep=".", deseq2.result.file, "tab")
-  verbose(paste(sep="", "\tExporting DESeq2 result table (tab): ", deseq2.result.file, ".tab"), 1)
+  deseq2.result.file <- paste(sep = "", prefix["DESeq2_file"], ".tab")
+  comparison.summary[i,"deseq2"] <- deseq2.result.file
   write.table(x = deseq2.result.table, row.names = FALSE, 
-              file = file.path(dir.base, paste(sep=".", deseq2.result.file, "tab")), sep = "\t", quote=FALSE)
-  if (export.excel.files) {
-    comparison.summary[i,"deseq2.xlsx"] <- paste(sep=".", deseq2.result.file, "xlsx")
-    verbose(paste(sep="", "\tExporting DESeq2 result table (xlsx): ", deseq2.result.file, ".xlsx"), 1)
-    write.xlsx(x = deseq2.result.table, row.names = FALSE, 
-               file = file.path(dir.base, paste(sep=".", deseq2.result.file, "xlsx")))
-  }  
-  # verbose(paste(sep="", "\t\tDESeq2 result file\t", deseq2.result.file), 1)
+              file = file.path(dir.base, deseq2.result.file), sep = "\t", quote=FALSE)
+  verbose(paste(sep="", "\t\tDESeq2 result file\t", deseq2.result.file), 1)
+  
 
   ################################################################
   ## edgeR analysis
   ################################################################
-  edger.result.table <- edger.analysis(dir.figures=file.path(dir.base, dir.figures))
+  edger.result.table <- edger.analysis()
   result.table <- cbind(result.table, 
                         "edgeR" = edger.result.table[row.names(result.table),])
  
   ## Export edgeR result table
-  edger.result.file <- paste(sep="", prefix["comparison_file"], "edgeR")
-  comparison.summary[i,"edger"] <- paste(sep=".", edger.result.file, "tab")
-  verbose(paste(sep="", "\tExporting edgeR result table (tab): ", edger.result.file, ".tab"), 1)
-  write.table(x = edger.result.table, row.names = FALSE, 
-              file = file.path(dir.base, paste(sep=".", edger.result.file, "tab")), sep = "\t", quote=FALSE)
-  if (export.excel.files) {
-    comparison.summary[i,"edger.xlsx"] <- paste(sep=".", edger.result.file, "xlsx")
-    verbose(paste(sep="", "\tExporting edgeR result table (xlsx): ", edger.result.file, ".xlsx"), 1)
-    write.xlsx(x = edger.result.table, row.names = FALSE, 
-               file = file.path(dir.base, paste(sep=".", edger.result.file, "xlsx")))
-  }
-  # verbose(paste(sep="", "\t\tedgeR result file\t", edger.result.file), 1)
+  edger.result.file <- paste(sep="", prefix["edgeR_file"], ".tab")
+  comparison.summary[i,"edger"] <- edger.result.file
   
+  write.table(x = edger.result.table, row.names = FALSE, 
+              file = file.path(dir.base, edger.result.file), sep = "\t", quote=FALSE)
+  verbose(paste(sep="", "\t\tedgeR result file\t", edger.result.file), 1)
+
   ################################################################
   ## Compute main stats from edgeR and DESeq2
   ################################################################
-  verbose("Merging DESeq2 and edgeR results", 1)
   result.table$mean.FC <- (result.table$edgeR.FC + result.table$DESeq2.FC)/2 ## Arithmetic mean for fold-changes
   result.table$mean.log2FC <- (result.table$edgeR.log2FC + result.table$DESeq2.log2FC)/2 ## Arithmetic mean for log-fold-changes
   result.table$padj.geom.mean <- signif(digits=3, sqrt(result.table$edgeR.padj * result.table$DESeq2.padj)) ## geometric mean for p-values
@@ -631,18 +611,12 @@ for (i in 1:nrow(design.table)) {
   ################################################################
   result.file <- paste(sep = "", 
                        prefix["comparison_file"], 
-                       "_", suffix.deg, "_DESeq2_and_edgeR")
-  comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tab")
-  verbose(paste(sep="", "\tExporting result table (tab): ", result.file, ".tab"), 1)
+                       "_", suffix.deg, "_DESeq2_and_edgeR.tab")
+  comparison.summary[i,"result.table"] <- result.file
   write.table(x = result.table, row.names = FALSE,
-              file = file.path(dir.base, paste(sep=".", result.file, "tab")), sep = "\t", quote=FALSE)
-  if (export.excel.files) {
-    comparison.summary[i,"result.table.xlsx"] <- paste(sep=".", result.file, "xlsx")
-    verbose(paste(sep="", "\tExporting result table (xlsx): ", result.file, ".xslx"), 1)
-    write.xlsx(x = result.table, row.names = FALSE,
-               file = file.path(dir.base, paste(sep=".", result.file, "xlsx")))
-  }  
-  # verbose(paste(sep="", "\t\tMerged result file\t", result.file), 1)
+              file = file.path(dir.base, result.file), sep = "\t", quote=FALSE)
+  verbose(paste(sep="", "\t\tMerged result file\t", result.file), 1)
+  
   
   ################################################
   ## Export tables with only the differentially expressed genes 
@@ -651,106 +625,77 @@ for (i in 1:nrow(design.table)) {
   selected.columns <- c("gene_id", "name", "description", 
                         "DESeq2.FC", "edgeR.FC", "mean.FC", "mean.log2FC",
                         "DESeq2.padj", "edgeR.padj", "padj.geom.mean", "mean.evalue")
+
   up.genes <- result.table$edgeR.DEG & result.table$DESeq2.DEG & (result.table$sign > 0) 
-  comparison.summary[i,"N.up"] <- sum(up.genes, na.rm = TRUE)
   down.genes <- result.table$edgeR.DEG & result.table$DESeq2.DEG & (result.table$sign < 0) 
-  comparison.summary[i,"N.down"] <- sum(down.genes, na.rm = TRUE)
-  positive.genes <- up.genes + down.genes
-  comparison.summary[i,"N.positive"] <- sum(positive.genes, na.rm = TRUE)
+  selected.genes <- up.genes + down.genes
+  sum(selected.genes)
   
   verbose("Exporting tables with up-regulated genes only")
   deg.file.up <- paste(sep = "", 
                     prefix["comparison_file"], 
-                    "_", suffix.deg, "_selected_DEG_up")
-  comparison.summary[i,"deg.table.up"] <- paste(sep=".", deg.file.up, "tab")
-  verbose(paste(sep="", "\tExporting up-regulated genes (tab): ", deg.file.up, ".tab"), 1)
+                    "_", suffix.deg, "_selected_DEG_up.tab")
+  comparison.summary[i,"deg.table.up"] <- deg.file.up
   write.table(x = result.table[up.genes, selected.columns], row.names = FALSE,
-              file = file.path(dir.base, paste(sep=".", deg.file.up, "tab")), sep = "\t", quote=FALSE)
-  if (export.excel.files) {
-    comparison.summary[i,"deg.table.up.xlsx"] <- paste(sep=".", deg.file.up, "xslx")
-    verbose(paste(sep="", "\tExporting up-regulated genes (xlsx): ", deg.file.up, ".xlsx"), 1)
-    write.xlsx(x = result.table[up.genes, selected.columns], row.names = FALSE,
-               file = file.path(dir.base, paste(sep=".", deg.file.up, "xlsx")))
-  }
-  # verbose(paste(sep="", "\t\tSelected DEG file with up-regulated genes\t", deg.file.up), 1)
+              file = file.path(dir.base, deg.file.up), sep = "\t", quote=FALSE)
+  verbose(paste(sep="", "\t\tSelected DEG file with up-regulated genes\t", deg.file.up), 1)
 
   verbose("Exporting tables with down-regulated genes only")
   deg.file.down <- paste(sep = "", 
                     prefix["comparison_file"], 
-                    "_", suffix.deg, "_selected_DEG_down")
-  comparison.summary[i,"deg.table.down"] <- paste(sep=".", deg.file.down, "tab")
-  verbose(paste(sep="", "\tExporting down-regulated genes (tab): ", deg.file.down, ".tab"), 1)
+                    "_", suffix.deg, "_selected_DEG_down.tab")
+  comparison.summary[i,"deg.table.down"] <- deg.file.down
   write.table(x = result.table[down.genes, selected.columns], row.names = FALSE,
-              file = file.path(dir.base, paste(sep=".", deg.file.down, "tab")), sep = "\t", quote=FALSE)
-  if (export.excel.files) {
-    comparison.summary[i,"deg.table.down.xlsx"] <- paste(sep=".", deg.file.down, "xlsx")
-    verbose(paste(sep="", "\tExporting down-regulated genes (xlsx): ", deg.file.down, ".xlsx"), 1)
-    write.xlsx(x = result.table[down.genes, selected.columns], row.names = FALSE,
-               file = file.path(dir.base, paste(sep=".", deg.file.down, "xlsx")))
-  }
-  # verbose(paste(sep="", "\t\tSelected DEG file with down-regulated genes\t", deg.file.down), 1)
+              file = file.path(dir.base, deg.file.down), sep = "\t", quote=FALSE)
+  verbose(paste(sep="", "\t\tSelected DEG file with down-regulated genes\t", deg.file.down), 1)
+
 }
-
-
-```
-
-
-```{r add_links_to_table}
-
-########################################################################
-## Add link columns to the comparison summary.
 
 ## Add a column with links to the result directories
-columns.to.link <- c("dir.analysis", "dir.figures","deg.table.up", "deg.table.down", "result.table")
-columns.to.print <- c("cond1", "cond2")
-for (i in columns.to.link) {
-  comparison.summary[, paste(sep="", i, ".link")] <- paste (
-    sep="", "[", comparison.summary[,i], "]",
-    "(", file.path(dir.base, comparison.summary[,i]), ")")
-  columns.to.print <- c(columns.to.print, paste(sep="", i, ".link"))
-    
-  if (export.excel.files) {
-    xlsx.file <- paste(sep=".", i, "xlsx")
-    if (xlsx.file %in% names(comparison.summary))
-    comparison.summary[, paste(sep="", i, ".xlsx.link")] <- paste (
-      sep="", "[", comparison.summary[,xlsx.file], "]",
-      "(", file.path(dir.base, comparison.summary[,xlsx.file]), ")")
-    columns.to.print <- c(columns.to.print, paste(sep="", i, ".xlsx.link"))
-  }
-}
-comparison.summary.to.print <- comparison.summary[columns.to.print]
-
-## Print the table in markdown format for the Rmd report.
-verbose("Printing summary table with links", 1)
-kable(comparison.summary.to.print)
-#       caption="Detailed result files",
-#       row.names=FALSE)
+comparison.summary$dir.analysis.link <- paste (
+  sep="", "[", comparison.summary$dir.analysis, "]",
+  "(", file.path(dir.base, comparison.summary$dir.analysis), ")")
+comparison.summary$dir.figures.link <- paste (
+  sep="", "[",comparison.summary$dir.figures,"]",
+  "(", file.path(dir.base, comparison.summary$dir.figures), ")")
+comparison.summary$deg.table.up.link <- paste (
+  sep="", "[",comparison.summary$deg.table.up,"]",
+  "(", file.path(dir.base, comparison.summary$deg.table.up), ")")
+comparison.summary$deg.table.down.link <- paste (
+  sep="", "[",comparison.summary$deg.table.down,"]",
+  "(", file.path(dir.base, comparison.summary$deg.table.up), ")")
+comparison.summary$result.table.link <- paste (
+  sep="", "[",comparison.summary$result.table,"]",
+  "(", file.path(dir.base, comparison.summary$result.table), ")")
+comparison.summary.to.print <- comparison.summary[
+  c("cond1","cond2", 
+    "dir.analysis.link",
+    "dir.figures.link",
+    "result.table.link")]
 
 ```
+
+
 
 
 ```{r print_analysis_summary_table, comment="", eval=FALSE}
-
-# ## Print the table in markdown format for the Rmd report.
-# verbose("Printing summary table with links", 1)
-# library(ascii)
-# print(ascii(comparison.summary.to.print), type = 'pandoc')
-
-# 
-# library(xtable)
-# print(xtable(comparison.summary.to.print))
-
+library(ascii)
+print(ascii(comparison.summary.to.print), type = 'pandoc')
 ```
 
 ```{r, comment="", eval=FALSE}
-## Print table in markdown format for the Rmd report
-verbose("Printing summary table with links", 1)
-library(pander)
-# pandoc.table(comparison.summary.to.print)
-pander(comparison.summary.to.print, style = 'rmarkdown')
-
+library(xtable)
+print(xtable(comparison.summary.to.print))
 ```
 
+```{r, comment="", eval=FALSE}
+# library(pander)
+# pandoc.table(comparison.summary.to.print)
+```
+```{r eval=TRUE, eval=FALSE}
+library(pander)
+pander(comparison.summary.to.print, style = 'rmarkdown')
+```
 
 
 * * * 
@@ -771,7 +716,7 @@ pander(comparison.summary.to.print, style = 'rmarkdown')
 |-----------|-------|
 | Output directory | [`r dir.DEG`](`r file.path(dir.base, dir.DEG)`) |
 | Gene info table | [`r gene.info.out`](`r file.path(dir.base, gene.info.out)`) |
-| Sample summary table | [`r sample.summary.file`](`r file.path(dir.base, sample.summary.file)`) [`r sample.summary.file.xlsx`](`r file.path(dir.base, sample.summary.file.xlsx)`) |
+| Sample summary table | [`r sample.summary.file`](`r file.path(dir.base, sample.summary.file)`) |
 
 ### Differential analysis
 
@@ -779,18 +724,18 @@ pander(comparison.summary.to.print, style = 'rmarkdown')
 library(knitr)
 
 ## Selection of up-regulated genes
-kable(comparison.summary[, c("cond1", "cond2", "N.up", "deg.table.up.link")], 
+kable(comparison.summary[, c("cond1", "cond2", "deg.table.up.link")], 
       caption="Up-regulated genes",
       row.names=FALSE)
 
 ## Selection of down-regulated genes
-kable(comparison.summary[, c("cond1", "cond2", "N.down", "deg.table.down.link")], 
+kable(comparison.summary[, c("cond1", "cond2", "deg.table.down.link")], 
       caption="Down-regulated genes",
       row.names=FALSE)
 
 ## Full result table (with *many* columns)
-kable(comparison.summary[, c("cond1", "cond2", "N.positive", "N.up", "N.down", "result.table.link")], 
-      caption="Complete result tables",
+kable(comparison.summary[, c("cond1", "cond2", "result.table.link")], 
+      caption="Detailed result files",
       row.names=FALSE)
 
 ## Output directories per comparison
@@ -800,9 +745,5 @@ kable(comparison.summary[, c("cond1", "cond2", "dir.analysis.link", "dir.figures
 
 ```
 
-```{r job done message}
-message("Job done")
-```
 
 * * *
-

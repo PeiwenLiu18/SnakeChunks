@@ -43,7 +43,7 @@ rule spp:
         peaks_broadPeak = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp.broadPeak",
         bdg_positions = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp.binding.positions.txt"
     params:
-        rscript = "../../R-scripts/R/spp.R",
+        rscript = "../../RSnakeChunks/misc/spp.R",
         fdr = config["spp"]["fdr"],
         qsub=config["qsub"] \
           + " -e " + dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp_qsub.err" \
