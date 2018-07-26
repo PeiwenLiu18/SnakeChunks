@@ -216,10 +216,10 @@ if (is.null(parameters$DEG$thresholds)) {
     parameters$DEG <- list()
   }
   parameters$DEG$thresholds <- list(
+    min.count = 1,
+    mean.count = 5,
     padj = 0.05,
-    FC = 1.2,
-    max.log10.cpm = 8.5)
-
+    FC = 1.2)
 }
 thresholds <- parameters$DEG$thresholds
 
@@ -339,7 +339,6 @@ if (is.null(parameters$DEG$blacklist)) {
   black.listed.features <- NULL
 } else {
   infiles["black_list"] <- parameters$DEG$blacklist
-  message("Loading black-listed features\t", parameters$DEG$blacklist)
   black.list.table <- read.table(
     infiles["black_list"], sep = "\t",
     comment.char = "#",
@@ -351,12 +350,12 @@ if (is.null(parameters$DEG$blacklist)) {
     message("\tNot found IDs", paste(collapse = ", ", head(black.listed.not.found)))
   }
   black.listed.features <- intersect(black.listed.features, row.names(all.counts))
+  message("Discarding ", length(black.listed.features), " black-listed features\t", parameters$DEG$blacklist)
 }
 
-## Filter out features according to various user-specified criteria
-## (parameters defined in the config file)
-
-counts.filtered <- FilterCountTable(
+## ---- Filter out features according to various user-specified criteria ----
+## (parameters defined in the config files
+filtered.counts <- FilterCountTable(
   counts = all.counts,
   na.omit = TRUE,
   min.count = thresholds$min.count,
@@ -368,13 +367,13 @@ counts.filtered <- FilterCountTable(
 
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
 message("\tTreating zero-values by adding epsilon =", epsilon)
-all.counts.epsilon <- all.counts
-all.counts.epsilon[all.counts == 0] <- epsilon
+filtered.counts.epsilon <- filtered.counts
+filtered.counts.epsilon[filtered.counts == 0] <- epsilon
 
 ## Log-transformed data for some plots.
 message("\tComputing log-transformed values")
-all.counts.log10 <- log10(all.counts.epsilon)
-all.counts.log2 <- log2(all.counts.epsilon)
+filtered.counts.log10 <- log10(filtered.counts.epsilon)
+filtered.counts.log2 <- log2(filtered.counts.epsilon)
 
 
 ## ----sample_statistics---------------------------------------------------
@@ -382,12 +381,15 @@ all.counts.log2 <- log2(all.counts.epsilon)
 ################################################################
 ## Compute sample-wise statistics on mapped counts
 ################################################################
-message("Computing sample-wise statistics")
+message("Computing sample-wise statistics on non-filtered counts")
 #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
 # View(stats.per.sample)
-stats.per.sample <- cbind(sample.desc, RowStats(all.counts))
-stats.per.sample$Mreads <- stats.per.sample$sum / 1e6
-# View(stats.per.sample.all)
+stats.per.sample.all <- cbind(sample.desc, RowStats(all.counts))
+stats.per.sample.all$Mreads <- stats.per.sample.all$sum / 1e6
+# View(stats.per.sample.all.all)
+outfiles["stats_per_sample_all_features"] <- file.path(dir.tsv, "stats_per_sample_all_features.tsv")
+message("\t", outfiles["stats_per_sample_all_features"])
+write.table(x = stats.per.sample.all, file = outfiles["stats_per_sample_all_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
 ## Compute statistics ommitting zero values
 message("Computing sample-wise statistics for non-zero counts")
@@ -395,6 +397,16 @@ all.counts.nozero <- all.counts
 all.counts.nozero[all.counts.nozero == 0] <- NA
 stats.per.sample.nozero <- cbind(sample.desc, RowStats(all.counts.nozero))
 stats.per.sample.nozero$Mreads <- stats.per.sample.nozero$sum / 1e6
+outfiles["stats_per_sample_no-zero"] <- file.path(dir.tsv, "stats_per_sample_no-zero.tsv")
+message("\t", outfiles["stats_per_sample_no-zero"])
+write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-zero"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
+# names(stats.per.sample)
+# View(stats.per.sample.nozero)
+
+## Compute statistics ommitting zero values
+message("Computing sample-wise statistics for filtered counts")
+stats.per.sample.filtered <- cbind(sample.desc, RowStats(filtered.counts))
+stats.per.sample.filtered$Mreads <- stats.per.sample.filtered$sum / 1e6
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
 
@@ -407,10 +419,10 @@ message("Computing normalized values with edgeR::cpm")
 ## (very highly expressed genes).  A more robust normalisation criterion
 ## is to use the 75th percentile, or the median. We use the median, somewhat arbitrarily,
 ## beause it gives a nice alignment on the boxplots.
-stdcounts.libsum <- cpm(all.counts.epsilon)    ## Counts per million reads, normalised by library sum
-stdcounts.perc75 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc75)    ## Counts per million reads, normalised by 75th percentile
-stdcounts.perc95 <- cpm(all.counts.epsilon, lib.size = stats.per.sample$perc95)    ## Counts per million reads, normalised by 95th percentile
-stdcounts.median <- cpm(all.counts.epsilon, lib.size = stats.per.sample$median)    ## Counts per million reads, normalised by sample-wise median count
+stdcounts.libsum <- cpm(filtered.counts.epsilon)    ## Counts per million reads, normalised by library sum
+stdcounts.perc75 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample$perc75)    ## Counts per million reads, normalised by 75th percentile
+stdcounts.perc95 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$perc95)    ## Counts per million reads, normalised by 95th percentile
+stdcounts.median <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$median)    ## Counts per million reads, normalised by sample-wise median count
 
 ## Chose one of the standardization methods to get
 #stdcounts <- stdcounts.median ## Choose one normalization factor for the stdcounts used below
@@ -442,21 +454,25 @@ write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA,
 # sum(outliers)
 
 ## Compute Trimmed Means of M Values (TMM): TO BE DONE
-stats.per.sample$cpm.mean <- apply(stdcounts, 2, mean)
-stats.per.sample$log2.cpm.mean <- apply(stdcounts.log2, 2, mean)
-stats.per.sample$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
+stats.per.sample.filtered$cpm.mean <- apply(stdcounts, 2, mean)
+stats.per.sample.filtered$log2.cpm.mean <- apply(stdcounts.log2, 2, mean)
+stats.per.sample.filtered$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
 
 ################################################################
 ## Export stats per sample
 #
 # names(stats.per.sample)
 # head(stats.per.sample)
-sample.summary.file <- paste(sep = "", count.prefix, "_summary_per_sample.tsv")
-sample.summary.file.path <- file.path(dir.main, paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
-message("\tExporting stats per sample\t", sample.summary.file.path)
-write.table(x = stats.per.sample,
-            row.names = TRUE, col.names = NA,
-            file = sample.summary.file.path, sep = "\t", quote = FALSE)
+outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_sample_filtered_features.tsv")
+message("\t", "Exporting stats per sample for filtered features")
+message("\t", outfiles["stats_per_sample_filtered_features"])
+write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
+# sample.summary.file <- paste(sep = "", count.prefix, "_summary_per_sample.tsv")
+# sample.summary.file.path <- file.path(dir.main, paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
+# message("\tExporting stats per sample\t", sample.summary.file.path)
+# write.table(x = stats.per.sample,
+#             row.names = TRUE, col.names = NA,
+#             file = sample.summary.file.path, sep = "\t", quote = FALSE)
 # sample.summary.file.xlsx <- paste(sep = "", count.prefix, "_summary_per_sample.xlsx")
 # if (export.excel.files) {
 #   message(paste(sep = "", "\tSample summary file: ", sample.summary.file.xlsx))
@@ -502,16 +518,23 @@ par.ori <- par(no.readonly = TRUE) # Store original parameters
 #   main = "Assigned reads per sample (libsum)")
 # par(par.ori) # Restore original parameters
 #
-figfiles["libsize_barplot"] <- file.path(dir.figures, "libsize_barplot.pdf")
-message("\tLibrary size barplot\t", figfiles["libsize_barplot"])
-pdf(file = figfiles["libsize_barplot"], width = 5, height = 8)
-LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color)
+figfiles["libsize_barplot_all_features"] <- file.path(dir.figures, "libsize_barplot_all_features.pdf")
+message("\tLibrary size barplot for all features\t", figfiles["libsize_barplot_all_features"])
+pdf(file = figfiles["libsize_barplot_all_features"], width = 8, height = 8)
+LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "All features")
 silence <- dev.off(); rm(silence)
+
+figfiles["libsize_barplot_filtered_features"] <- file.path(dir.figures, "libsize_barplot_filtered_features.pdf")
+message("\tLibrary size barplot after filtering\t", figfiles["libsize_barplot_filtered_features"])
+pdf(file = figfiles["libsize_barplot_filtered_features"], width = 8, height = 8)
+LibsizeBarplot(counts = filtered.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "After filtering")
+silence <- dev.off(); rm(silence)
+
 
 ## ----normalisation-------------------------------------------------------
 norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
-  counts = all.counts, class.labels = sample.conditions, nozero = TRUE,
+  counts = filtered.counts, class.labels = sample.conditions, nozero = TRUE,
   method = norm.methods, percentile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
   verbose = 2)
 #names(norm.comparison)
@@ -577,7 +600,7 @@ for (i in 1:nrow(design)) {
 
   ## Select counts for the samples belonging to the two conditions
   current.samples <- c(samples1, samples2)
-  current.counts <- data.frame(all.counts[,current.samples])
+  current.counts <- data.frame(filtered.counts[,current.samples])
   # dim(current.counts)  ## For test
   # names(current.counts)
 
@@ -591,7 +614,7 @@ for (i in 1:nrow(design)) {
 
   result.table <- init.deg.table(stdcounts, samples1, samples2, stats = FALSE)
   # View(result.table)
-
+  # dim(result.table)
 
   ################################################################
   ## DESeq2 analysis
@@ -711,7 +734,7 @@ for (i in 1:nrow(design)) {
 
 
   ## Define feature colors according to their level of expression (count means)
-  feature.scores <- log2(apply(all.counts.epsilon, 1, median))
+  feature.scores <- log2(apply(filtered.counts.epsilon, 1, median))
 
   # hist(feature.scores, breaks = 100)
 
