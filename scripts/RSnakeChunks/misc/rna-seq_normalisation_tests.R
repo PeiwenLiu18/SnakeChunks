@@ -74,12 +74,12 @@ for (lib in required.bioconductor) {
 }
 
 
-## Install SARTools if required
-message("\tRequired devtools library\t", "SARTools")
-if (!require("SARTools")) {
-  library(devtools)
-  install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
-}
+## ## Install SARTools if required
+## message("\tRequired devtools library\t", "SARTools")
+## if (!require("SARTools")) {
+##   library(devtools)
+##   install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
+## }
 
 ## ---- Detine in/outfiles ----
 
@@ -90,12 +90,6 @@ outfiles <- vector()  ## For tab-separated value files
 figfiles <- vector()  ## Store figures
 
 ## ---- Check SnakeChunks directory ----------------------------------------------------
-
-if (is.null(parameters$dir$snakechunks)) {
-  stop("The SnakeChunks directory should be defined in the config file: ", configFile)
-}
-dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
-message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
 ## ---- Load configuration file (YAML-formatted) ----
 if (!exists("configFile")) {
@@ -108,25 +102,24 @@ parameters <- yaml.load_file(configFile)
 message("\tLoaded parameters from file ", configFile)
 
 
+if (is.null(parameters$dir$snakechunks)) {
+  stop("The SnakeChunks directory should be defined in the config file: ", configFile)
+}
+dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
+message("\tSnakeChunks directory:\t", dir.SnakeChunks)
+
+
 
 
 ## ----  Load R functions --------------------
-deg.lib <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R/deg_lib.R")
-message("\tLoading DEG library\t", deg.lib)
-source(deg.lib)
 
-## Load specific functions
-##
-## NOTE: these functions are designed to be later included
-# in an R package (one file per function, roxygen2 doc)
+## NOTE: if the RSnakechunks package has been compiled on this machine
+## the functions will be loaded with library('RSnakeChunks'). However
+## for the ime being we do not assume that RSnakeChunks has been
+## compiled with SnakeChunks installation, so we souce all the files
+## containing R functions.
 R.dir <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R")
-R.files <- c("pc_plot.R",
-             "filter_count_table.R",
-             "normalise_count_table.R",
-             "row_stats.R",
-             "feature_colors.R",
-             "libsize_barplot.R",
-             "volcano_plot.R")
+R.files <- list.files(R.dir)
 for (f in R.files) {
   message("\tLoading R file ", f)
   source(file.path(R.dir, f))
@@ -541,7 +534,10 @@ silence <- dev.off(); rm(silence)
 # setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 i <- 1
+
 for (i in 1:nrow(design)) {
+
+
   prefix <- list() ## list for output file prefixes
 
   deg.results <- list()
@@ -721,26 +717,45 @@ for (i in 1:nrow(design)) {
 
   # View(deg.compa$padj)
   ## compare DESeq2 and edgeR normalisatio results
-  plot(deg.compa$padj, log = "xy",
+
+    ## ---- Plot comparing DEGs obtained with DESeq2 and edgeR ----
+    
+    ## Comparison between adjusted p-values
+    prefix <- paste(sep = "", comparison.prefix, "_padj_comparisons")
+    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+    pdf(file = figfiles[prefix], width = 10, height = 10)
+    plot(deg.compa$padj, log = "xy",
 #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
                            x = deg.compa$padj[,1], y = deg.compa$padj[,2]),
        main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
+    silence <- dev.off(); rm(silence)
 
-  plot(deg.compa$log2FC,
+    prefix <- paste(sep = "", comparison.prefix, "_lof2FC_comparisons")
+    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+    pdf(file = figfiles[prefix], width = 10, height = 10)
+    plot(deg.compa$log2FC,
 #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
                            x = deg.compa$log2FC[,1], y = deg.compa$log2FC[,2]),
        main = paste(sep = "", comparison.prefix, "\nlog2(fold change)"))
+    silence <- dev.off(); rm(silence)
 
   ## Draw Volcano plots
   # deg.name <- "DESeq2"
   # deg.name <- "edgeR_TMM"
-  deg.names <- names(deg.results)
-  par.ori <- par(no.readonly = TRUE)
-  par(mfrow = n2mfrow(length(deg.names)))
-  # deg.name <- "DESeq2"
-  for (deg.name in deg.names) {
+    deg.names <- names(deg.results)
+
+    nb.panels <- n2mfrow(length(deg.names))
+    
+    prefix <- paste(sep = "", comparison.prefix, "_volcano_plots")
+    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+    pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 1 + nb.panels[2]*3)
+    par.ori <- par(no.readonly = TRUE)
+    par(mfrow = nb.panels)
+    # deg.name <- "DESeq2"
+    
+    for (deg.name in deg.names) {
     deg.result.table <- deg.results[[deg.name]]$result.table
     table(deg.result.table$DEG)
     # head(deg.result.table)
@@ -749,7 +764,7 @@ for (i in 1:nrow(design)) {
 
     # plot(deg.result.table$log2FC,
     #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
-    # # # View(deg.result.table)
+                                        # # # View(deg.result.table)
     VolcanoPlot(multitest.table = deg.result.table,
                 main = deg.name,
                 effect.size.col = "log2FC",
@@ -761,6 +776,8 @@ for (i in 1:nrow(design)) {
   }
   par(mfrow = c(1,1))
   par(par.ori)
+    silence <- dev.off(); rm(silence)
+    ## system(paste("ls -ltr ", figfiles[prefix]))
 }
 
 ## ----sessioninfo---------------------------------------------------------
