@@ -18,17 +18,6 @@ message("\tPrefix for the count table: ", count.prefix)
 dir.base <- ".."
 message("\tBase directory: ", dir.base)
 
-## Load configuration file (YAML-formatted)
-if (!exists("configFile")) {
-  ## The prompt does not seem to work with the Rmd documents
-  #   message("Choose the parameter file")
-  #   parameter.file <- file.choose()
-  stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
-}
-parameters <- yaml.load_file(configFile)
-message("\tLoaded parameters from file ", configFile)
-
-
 ## ---- knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
 
 quick.test <- FALSE ## For debug
@@ -100,16 +89,28 @@ infiles <- vector()   ## Input files
 outfiles <- vector()  ## For tab-separated value files
 figfiles <- vector()  ## Store figures
 
-## ----init_directories----------------------------------------------------
-## Check SnakeChunks directory
+## ---- Check SnakeChunks directory ----------------------------------------------------
+
 if (is.null(parameters$dir$snakechunks)) {
   stop("The SnakeChunks directory should be defined in the config file: ", configFile)
 }
 dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
 message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
+## ---- Load configuration file (YAML-formatted) ----
+if (!exists("configFile")) {
+  ## The prompt does not seem to work with the Rmd documents
+  #   message("Choose the parameter file")
+  #   parameter.file <- file.choose()
+  stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
+}
+parameters <- yaml.load_file(configFile)
+message("\tLoaded parameters from file ", configFile)
 
-#### Load R functions ####
+
+
+
+## ----  Load R functions --------------------
 deg.lib <- file.path(dir.SnakeChunks, "scripts/RSnakeChunks/R/deg_lib.R")
 message("\tLoading DEG library\t", deg.lib)
 source(deg.lib)
