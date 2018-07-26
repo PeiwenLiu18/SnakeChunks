@@ -454,7 +454,7 @@ deseq2.analysis <- function(
     "padj" = deseq2.res$padj)
 
   ## Add complementary statistics on the DEG table
-  deseq2.result.table <- complete.deg.table(
+  deseq2.result.table <- DEGtablePostprocessing(
     deg.table = deseq2.result.table,
     table.name = paste(sep = "_", "DESeq2", comparison.prefix),
     sort.column = "padj",
@@ -529,7 +529,7 @@ edger.analysis <- function(counts,
                                    "log2FC" = edger.tt$table$logFC,
                                    "pvalue" = edger.tt$table$PValue,
                                    "padj" = edger.tt$table$FDR)
-  edger.result.table <- complete.deg.table(
+  edger.result.table <- DEGtablePostprocessing(
     deg.table = edger.result.table,
     table.name = paste(sep = "_", "edgeR", prefix["comparison"]),
     sort.column = "padj",

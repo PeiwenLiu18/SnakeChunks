@@ -33,7 +33,7 @@ detectDegDESeq2 <- function(dir.figures=NULL) {
     "log2FC" = deseq2.res$log2FoldChange,
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
-  deseq2.result.table <- complete.deg.table(
+  deseq2.result.table <- DEGtablePostprocessing(
     deseq2.result.table,
     paste(sep="_", "DESeq2", prefix["comparison"]),
     sort.column = "padj",

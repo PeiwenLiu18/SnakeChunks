@@ -541,7 +541,7 @@ for (i in 1:nrow(design)) {
     "log2FC" = deseq2.res$log2FoldChange,
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
-  deseq2.result.table <- complete.deg.table(
+  deseq2.result.table <- DEGtablePostprocessing(
     deseq2.result.table, 
     paste(sep="_", "DESeq2", prefix["comparison"]),
     sort.column = "padj",
@@ -616,7 +616,7 @@ for (i in 1:nrow(design)) {
                                    "log2FC"=edger.tt$table$logFC,
                                    "pvalue"=edger.tt$table$PValue,
                                    "padj"=edger.tt$table$FDR)
-  edger.result.table <- complete.deg.table(
+  edger.result.table <- DEGtablePostprocessing(
     deg.table = edger.result.table, 
     table.name = paste(sep="_","edgeR",prefix["comparison"]),
     sort.column = "padj",

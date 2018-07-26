@@ -10,6 +10,7 @@
 #' @param gene.info optional table with detailed information about each feature (gene).
 #' @param stats=FALSE add columns with statistics (mean, quartiles, var, ...) for the whole count table and for the respective sample groups
 #' @return a data frame with one row per feature and some descriptive columns + optional table-wise and group-wise statistics.
+#' @export
 init.deg.table <- function(count.table,
                            samples1,
                            samples2,

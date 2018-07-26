@@ -47,7 +47,7 @@ Last modification: 2015-08.
     "log2FC" = deseq2.res$log2FoldChange,
     "pvalue" = deseq2.res$pvalue,
     "padj" = deseq2.res$padj)
-deseq2.result.table <- complete.deg.table(deseq2.result.table,
+deseq2.result.table <- DEGtablePostprocessing(deseq2.result.table,
     table.name="DESeq2", sort.column="padj")
 
 }

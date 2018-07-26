@@ -25,7 +25,7 @@ detectDEGedgeR <- function(dir.figures=NULL) {
                                    "log2FC"=edger.tt$table$logFC,
                                    "pvalue"=edger.tt$table$PValue,
                                    "padj"=edger.tt$table$FDR)
-  edger.result.table <- complete.deg.table(
+  edger.result.table <- DEGtablePostprocessing(
     deg.table = edger.result.table,
     table.name = paste(sep="_","edgeR",prefix["comparison"]),
     sort.column = "padj",
