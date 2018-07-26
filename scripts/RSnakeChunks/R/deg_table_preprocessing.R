@@ -1,10 +1,14 @@
 
-#' @title Analyse a table of differentially expressed genes.
+#' @title Post-process differential expression analysis result.
 #'
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #'
-#' @description Analyse a table of differentially expressed genes to
-#' produce plots and additional statistics.
+#' @description Starting from a result table produced by DESeq2 or edgeR (or similar), to the following:
+#' \itemize{
+#'   \item add some relevant columns for further analysis and thresholding
+#'   \item sort the table by increasing adjusted p-value
+#'   \item optionally, filter the result table by applying thresholds on one or more user-selected columns
+#' }
 #'
 #' @details
 #' First version: 2015-08
@@ -23,7 +27,7 @@
 #' @param sort.column="none" Column to sort the result.
 #' Supported: c("none", "mean", "log2FC", "pvalue", "padj").
 #'
-#' @param thresholds=c("pvalue" = 0.05, "padj"=0.05, "evalue"=1, "FC"=1.5)
+#' @param thresholds=c(pvalue=0.05,padj=0.05,evalue=1,FC=1.5)
 #' Thresholds on some specific scores, used for display purpose, and to
 #' add some columns to the result table, indicating if the gene passes the
 #' threshold or not.
@@ -35,18 +39,20 @@
 #' @param verbose=0 level of verbosity
 #'
 #' @examples
-#'
+#'  ##-----------------------------------
+#'  ## Post-process a DESeq2 result table
+#'  ##-----------------------------------
 #'  deseq2.result.table <- data.frame(
 #'     "gene.id" = row.names(deseq2.res),
 #'     "mean" = deseq2.res$baseMean,
 #'     "log2FC" = deseq2.res$log2FoldChange,
 #'     "pvalue" = deseq2.res$pvalue,
 #'     "padj" = deseq2.res$padj)
-#' deseq2.result.table <- complete.deg.table(deseq2.result.table,
+#' deseq2.result.table <- DEGtablePostprocessing(deseq2.result.table,
 #'     table.name="DESeq2", sort.column = "padj")
 #'
 #' @export
-complete.deg.table <- function(deg.table,
+DEGtablePostprocessing <- function(deg.table,
                                table.name,
                                sort.column = "none",
                                thresholds = c(),
@@ -56,7 +62,7 @@ complete.deg.table <- function(deg.table,
 
   # names(deg.table)
   if (verbose >= 1) {
-    message("\tcomplete.deg.table()\tTable name: ", table.name, "\t", nrow(deg.table), " features (rows)")
+    message("\tDEGtablePostprocessing()\tTable name: ", table.name, "\t", nrow(deg.table), " features (rows)")
   }
 
   col.descriptions <- vector() ## Initialize vector with column descriptions
