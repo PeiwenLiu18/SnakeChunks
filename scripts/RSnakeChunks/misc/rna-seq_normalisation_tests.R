@@ -41,8 +41,8 @@ required.libraries <- c("knitr",
                         "gplots",
                         "RColorBrewer",
                         "devtools"#,
-#                        "stats4bioinfo" ## Generic library from Jacques van Helden
-                        )
+                        #                        "stats4bioinfo" ## Generic library from Jacques van Helden
+)
 for (lib in required.libraries) {
   message("\tRequired CRAN library\t", lib)
   if (!require(lib, character.only = TRUE)) {
@@ -58,7 +58,7 @@ required.bioconductor <- c(
   "edgeR",
   "DESeq2",
   "limma",
-#  "SARTools", ## for SERE coefficient
+  #  "SARTools", ## for SERE coefficient
   "GenomicFeatures")
 
 for (lib in required.bioconductor) {
@@ -216,9 +216,9 @@ if (is.null(parameters$DEG$thresholds)) {
     parameters$DEG <- list()
   }
   parameters$DEG$thresholds <- list(
-   padj = 0.05,
-   FC = 1.2,
-   max.log10.cpm = 8.5)
+    padj = 0.05,
+    FC = 1.2,
+    max.log10.cpm = 8.5)
 
 }
 thresholds <- parameters$DEG$thresholds
@@ -226,7 +226,7 @@ thresholds <- parameters$DEG$thresholds
 ## Print the threshold tables
 ## NOTE: I should evaluate what I do with the kable calls
 kable(t(as.data.frame(thresholds)), col.names = "Threshold",
-        caption = "Thresholds for the selection of differentially expressed genes. ")
+      caption = "Thresholds for the selection of differentially expressed genes. ")
 
 outfiles["threshold"] <- file.path(dir.tsv, "thresholds.tsv")
 write.table(x = t(as.data.frame(thresholds)),
@@ -506,13 +506,13 @@ figfiles["libsize_barplot"] <- file.path(dir.figures, "libsize_barplot.pdf")
 message("\tLibrary size barplot\t", figfiles["libsize_barplot"])
 pdf(file = figfiles["libsize_barplot"], width = 5, height = 8)
 LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color)
-silence <- dev.off(); rm(silcence)
+silence <- dev.off(); rm(silence)
 
 ## ----normalisation-------------------------------------------------------
 norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
   counts = all.counts, class.labels = sample.conditions, nozero = TRUE,
-  method = norm.methods, quantile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
+  method = norm.methods, percentile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
   verbose = 2)
 #names(norm.comparison)
 
@@ -556,7 +556,7 @@ for (i in 1:nrow(design)) {
     stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond2))
   }
 
-#  stop("HELLO", "\tprefix = ", prefix)
+  #  stop("HELLO", "\tprefix = ", prefix)
 
   message("\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2)
 
@@ -572,7 +572,7 @@ for (i in 1:nrow(design)) {
   prefix["comparison_figure"] <- file.path(
     dir.figures,
     paste(sep = "", comparison.prefix))
-#    paste(sep = "", comparison.prefix, "_",  suffix.deg))
+  #    paste(sep = "", comparison.prefix, "_",  suffix.deg))
 
 
   ## Select counts for the samples belonging to the two conditions
@@ -590,7 +590,7 @@ for (i in 1:nrow(design)) {
   current.labels <- paste(current.conditions, names(current.counts), sep = "_")
 
   result.table <- init.deg.table(stdcounts, samples1, samples2, stats = FALSE)
-# View(result.table)
+  # View(result.table)
 
 
   ################################################################
@@ -706,7 +706,7 @@ for (i in 1:nrow(design)) {
       deg.compa[[stat]][feature.ids, deg.name] <-
         as.vector(deg.results[[deg.name]]$result.table[feature.ids,stat])
     }
-#    View(deg.compa[[stat]])
+    #    View(deg.compa[[stat]])
   }
 
 
@@ -718,44 +718,45 @@ for (i in 1:nrow(design)) {
   # View(deg.compa$padj)
   ## compare DESeq2 and edgeR normalisatio results
 
-    ## ---- Plot comparing DEGs obtained with DESeq2 and edgeR ----
-    
-    ## Comparison between adjusted p-values
-    prefix <- paste(sep = "", comparison.prefix, "_padj_comparisons")
-    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
-    pdf(file = figfiles[prefix], width = 10, height = 10)
-    plot(deg.compa$padj, log = "xy",
-#       col = FeatureColors(palette.type = "2col", scores = feature.scores),
+  ## ---- Plot comparing DEGs obtained with DESeq2 and edgeR ----
+
+  ## Comparison between adjusted p-values
+  prefix <- paste(sep = "", comparison.prefix, "_padj_comparisons")
+  figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  pdf(file = figfiles[prefix], width = 10, height = 10)
+  plot(deg.compa$padj, log = "xy",
+       #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
                            x = deg.compa$padj[,1], y = deg.compa$padj[,2]),
        main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
-    silence <- dev.off(); rm(silence)
+  silence <- dev.off(); rm(silence)
 
-    prefix <- paste(sep = "", comparison.prefix, "_lof2FC_comparisons")
-    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
-    pdf(file = figfiles[prefix], width = 10, height = 10)
-    plot(deg.compa$log2FC,
-#       col = FeatureColors(palette.type = "2col", scores = feature.scores),
+  prefix <- paste(sep = "", comparison.prefix, "_lof2FC_comparisons")
+  figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  pdf(file = figfiles[prefix], width = 10, height = 10)
+  plot(deg.compa$log2FC,
+       #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
                            x = deg.compa$log2FC[,1], y = deg.compa$log2FC[,2]),
        main = paste(sep = "", comparison.prefix, "\nlog2(fold change)"))
-    silence <- dev.off(); rm(silence)
+  silence <- dev.off(); rm(silence)
 
   ## Draw Volcano plots
   # deg.name <- "DESeq2"
   # deg.name <- "edgeR_TMM"
-    deg.names <- names(deg.results)
+  deg.names <- names(deg.results)
 
-    nb.panels <- n2mfrow(length(deg.names))
-    
-    prefix <- paste(sep = "", comparison.prefix, "_volcano_plots")
-    figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
-    pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 1 + nb.panels[2]*3)
-    par.ori <- par(no.readonly = TRUE)
-    par(mfrow = nb.panels)
-    # deg.name <- "DESeq2"
-    
-    for (deg.name in deg.names) {
+  nb.panels <- n2mfrow(length(deg.names))
+
+  prefix <- paste(sep = "", comparison.prefix, "_volcano_plots")
+  figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 1 + nb.panels[2]*3)
+  par.ori <- par(no.readonly = TRUE)
+  par(mfrow = nb.panels)
+  # deg.name <- "DESeq2"
+
+  for (deg.name in deg.names) {
+    message("\tDrawing volcano plot\t", deg.name)
     deg.result.table <- deg.results[[deg.name]]$result.table
     table(deg.result.table$DEG)
     # head(deg.result.table)
@@ -764,11 +765,11 @@ for (i in 1:nrow(design)) {
 
     # plot(deg.result.table$log2FC,
     #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
-                                        # # # View(deg.result.table)
+    # # # View(deg.result.table)
     VolcanoPlot(multitest.table = deg.result.table,
                 main = deg.name,
                 effect.size.col = "log2FC",
-                control.type = "pvalue",
+                control.type = "padj",
                 alpha = parameters$DEG$thresholds$padj,
                 effect.threshold = parameters$DEG$thresholds$FC,
                 legend.corner = "topleft")
@@ -776,8 +777,8 @@ for (i in 1:nrow(design)) {
   }
   par(mfrow = c(1,1))
   par(par.ori)
-    silence <- dev.off(); rm(silence)
-    ## system(paste("ls -ltr ", figfiles[prefix]))
+  silence <- dev.off(); rm(silence)
+  ## system(paste("ls -ltr ", figfiles[prefix]))
 }
 
 ## ----sessioninfo---------------------------------------------------------
