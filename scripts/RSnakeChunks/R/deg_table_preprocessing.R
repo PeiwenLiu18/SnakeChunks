@@ -98,7 +98,6 @@ DEGtablePostprocessing <- function(deg.table,
   deg.table$FC <- 2^abs(deg.table$log2FC)
 
   col.descriptions["FC"] <- "Sense-insensitive fold change (always >= 1)"
-  as.data.frame(col.descriptions)
 
   ## Compute E-value
   deg.table$evalue <- deg.table$pvalue * nrow(deg.table)
@@ -112,6 +111,8 @@ DEGtablePostprocessing <- function(deg.table,
   deg.table$sign <- sign(deg.table$log2FC)
   col.descriptions["sign"] <- "Sign of the regulation (1= up, -1 = down)"
 
+  # as.data.frame(col.descriptions)
+
   ## Label the genes passing the FDR, E-value and fold-change thresholds
   threshold.type <- c(
     "pvalue" = "upper",
@@ -119,29 +120,28 @@ DEGtablePostprocessing <- function(deg.table,
     "evalue" = "upper",
     "FC" = "lower")
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
-  if (verbose >= 1) {
-    message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
-  }
+
+  message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
+  message("\t\tStarting features\t", nrow(deg.table))
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
   s <- thresholds.to.apply[1]
+  selected.features <- rep(TRUE, length.out = nrow(deg.table))
   for (s in thresholds.to.apply) {
     if (threshold.type[s] == "upper") {
-      selected.features <- deg.table[, s] < thresholds[s]
+      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] < thresholds[s]
     } else {
-      selected.features <- deg.table[, s] > thresholds[s]
+      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] > thresholds[s]
     }
-    na.values <- is.na(selected.features)
-    if (sum(na.values) > 0) {
-      selected.features[is.na(selected.features)] <- FALSE
-    }
+    # summary(threshold.passed)
+    selected.features <- selected.features & threshold.passed
 
-    # table(selected.features)
-    deg.table[, selection.columns[s]] <- selected.features * 1
+    deg.table[, selection.columns[s]] <- threshold.passed * 1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    message("\t\t", sum(selected), " features passed ", threshold.type[s],
-            " threshold on ", s, "\t", thresholds[s])
+    message("\t\t", sum(threshold.passed), " features passed ", threshold.type[s],
+            " threshold on ", s, "\t", thresholds[s], "\tKept features: ", sum(selected.features))
   }
+
   ## Select genes passing all thresholds
   if (verbose  >= 2) {
     message("\t\tSelection columns: ", paste(collapse = ", ", selection.columns))
