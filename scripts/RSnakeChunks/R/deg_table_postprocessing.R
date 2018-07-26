@@ -122,7 +122,7 @@ DEGtablePostprocessing <- function(deg.table,
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
 
   message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
-  message("\t\tStarting features\t", nrow(deg.table))
+  message("\t\t\tStarting features\t", nrow(deg.table))
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
   s <- thresholds.to.apply[1]
@@ -138,8 +138,10 @@ DEGtablePostprocessing <- function(deg.table,
 
     deg.table[, selection.columns[s]] <- threshold.passed * 1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    message("\t\t", sum(threshold.passed), " features passed ", threshold.type[s],
-            " threshold on ", s, "\t", thresholds[s], "\tKept features: ", sum(selected.features))
+    message("\t\t\t", threshold.type[s],
+            " threshold on ", s, ": ", thresholds[s],
+            "\tPassing features: ", sum(threshold.passed),
+            "\tKept features: ", sum(selected.features))
   }
 
   ## Select genes passing all thresholds
