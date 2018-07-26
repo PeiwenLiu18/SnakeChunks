@@ -53,7 +53,7 @@
 #'
 #' @export
 DEGtablePostprocessing <- function(deg.table,
-                               table.name,
+                               table.name="DEG_table",
                                sort.column = "none",
                                thresholds = c(),
                                round.digits = 3,
@@ -84,7 +84,7 @@ DEGtablePostprocessing <- function(deg.table,
                        "pvalue" = FALSE,
                        "log2FC" = TRUE)
   if (sort.column != "none") {
-    verbose(paste("\tSorting DEG table by", sort.column), 2)
+    message("\t\tSorting DEG table by ", sort.column)
     deg.table <- deg.table[order(deg.table[,sort.column],
                                  decreasing = sort.decreasing[sort.column]),]
   }
@@ -124,19 +124,23 @@ DEGtablePostprocessing <- function(deg.table,
   }
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
+  s <- thresholds.to.apply[1]
   for (s in thresholds.to.apply) {
     if (threshold.type[s] == "upper") {
-      selected <- deg.table[, s] < thresholds[s]
+      selected.features <- deg.table[, s] < thresholds[s]
     } else {
-      selected <- deg.table[, s] > thresholds[s]
+      selected.features <- deg.table[, s] > thresholds[s]
     }
-    selected[is.na(selected)] <- FALSE
-    #table(selected)
-    deg.table[, selection.columns[s]] <- selected*1
+    na.values <- is.na(selected.features)
+    if (sum(na.values) > 0) {
+      selected.features[is.na(selected.features)] <- FALSE
+    }
+
+    # table(selected.features)
+    deg.table[, selection.columns[s]] <- selected.features * 1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    message("\t\tApplied ", threshold.type[s],
-            " threshold on ", s, "\t", thresholds[s],
-            "; remaining features: ",  sum(selected))
+    message("\t\t", sum(selected), " features passed ", threshold.type[s],
+            " threshold on ", s, "\t", thresholds[s])
   }
   ## Select genes passing all thresholds
   if (verbose  >= 2) {
