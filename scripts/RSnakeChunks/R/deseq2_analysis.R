@@ -21,7 +21,7 @@ deseq2.analysis <- function(
   dir.figures=NULL,
   ...) {
 
-  require(DESeq2)
+  require("DESeq2")
 
   message("\tDESeq2 analysis\t", comparison.prefix)
 
