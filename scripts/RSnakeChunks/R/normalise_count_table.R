@@ -5,28 +5,30 @@
 #' @description normalisation of RNA-seq count table.
 #' More precisely this function runs a sample-wise scaling so that all the samples
 #' have the same value for a user-defined scaling parameter.
-#' By default, we use the quantile 0.75 as scaling factor.
+#' By default, we use the percentile 75 as scaling factor.
 #'
 #' @param counts a data frame with counts per feature, with one feature (gene, transcript) per row and one sample per column.
 #' @param class.labels the class labels associated each sample of the count table. Should be provided in order to adapt it in case samples would be suppressed because they have a scaling factor of 0.
 #'
 #' @param nozero=TRUE If TRUE, zero values are ommitted from the data table before computing the column-wise statistics.
 #'
-#' @param method="quantile" normalization method. Optionally, can be specified as a vector with several methods.
+#' @param method="percentile" normalization method. Optionally, can be specified as a vector with several methods.
 #'
-#' Supported normalization methods: none, sum, mean, median, quantile, TMM, RLE, DESeq2.
+#' Supported normalization methods: none, sum, mean, median, percentile, quantiles, TMM, RLE, DESeq2.
 #'
 #' The "raw" methods simply returns the raw counts (no normalization).
 #'
 #' Sum and mean are really not recommended because very sensitive to outliers.
 #' They are implemented only for the sake of comparison.
 #'
-#' Quantile: Preferred quantile = 0.75. Quantiles are more robust to outliers than the mean
-#' or sum. The median is sometimes weak in RNA-seq data, the 75th percentile (quantile 0.75)
-#' seems a good tradeoff between robustness and representativity (taking into account a
+#' Percentile: Preferred percentile = 75. Percentile-base scaling is more robust to
+#' outliers than the mean or sum. Note that for RNA-seq count tables, sample median counts may
+#' be unsatisfying  because for some datasets even the median counts are very low. A common
+#' approach is to use the third quartile (equal to percentile 75), which seems to provide a
+#' good tradeoff between robustness and representativity (taking into account a
 #' representative proportion of the total counts per samples).
 #'
-#' Median: actually runs quantile-based scaling factor with quantile=0.5.
+#' Median: actually runs percentile-based scaling factor with percentile=50.
 #'
 #' TMM: trimmed mean of M-values proposed by Robinson and Oshlack (2010), computed via edgeR::calcNormFactors().
 #'
@@ -34,7 +36,7 @@
 #'
 #' DESeq2: compute size factors via DESeq2::estimateSizeFactors()
 #'
-#' @param quantile=0.75 quantile used as scaling factor when quantile method is selected.
+#' @param percentile=75 reference percentile used as scaling factor when percentile method is selected.
 #'
 #' @param log2=FALSE  Apply log2 transformation after sample size correction
 #'
@@ -62,7 +64,7 @@ NormalizeCountTable <- function(counts,
                                 class.labels,
                                 nozero = TRUE,
                                 method = "TMM",
-                                quantile = 0.75,
+                                percentile = 75,
                                 log2 = FALSE,
                                 epsilon = 0.1,
                                 detailed.sample.stats = FALSE,
@@ -86,7 +88,7 @@ NormalizeCountTable <- function(counts,
   result$parameters <- list(
     method = method,
     nozero = nozero,
-    quantile = quantile,
+    percentile = percentile,
     log2 = log2,
     epsilon = epsilon
   )
@@ -154,21 +156,21 @@ NormalizeCountTable <- function(counts,
   method.names <- vector()
   for (m in method) {
     #### Define method name ####
-    if (m == "quantile") {
-      if (!exists("quantile")) {
-        stop("NormalizeSamples()\tMissing required parameter: standardization quantile")
+    if (m == "percentile") {
+      if (!exists("percentile")) {
+        stop("NormalizeSamples()\tMissing required parameter: standardization percentile")
       }
-      if (is.null(quantile)) {
-        stop("NormalizeSamples()\tquantile-based scaling requires a non-null quantile parameter.")
+      if (is.null(percentile)) {
+        stop("NormalizeSamples()\tpercentile-based scaling requires a non-null percentile parameter.")
       }
-      if (quantile == 0.25) {
+      if (percentile == 25) {
         method.name <- "Q1"
-      } else if (quantile == 0.75) {
+      } else if (percentile == 75) {
         method.name <- "Q3"
-      } else if (quantile == 0.5) {
+      } else if (percentile == 50) {
         method.name <- "median"
       } else {
-        method.name <- paste(sep = "", "q", quantile)
+        method.name <- paste(sep = "", "q", percentile)
       }
     } else {
       method.name <- m
@@ -187,17 +189,18 @@ NormalizeCountTable <- function(counts,
       scaling.factor <- rep(x = 1, length.out = ncol(counts))
       size.factor <-  rep(x = 1, length.out = ncol(counts))
 
-    } else if (m %in% c("quantile", "median")) {
-        ## Median will be treated as quantile 0.5
+    } else if (m %in% c("percentile", "median")) {
+        ## Median will be treated as percentile 0.5
       if (m == "median") {
-        current.quantile <- 0.5
+        current.percentile <- 50
       } else {
-        current.quantile <- quantile
+        current.percentile <- percentile
       }
 
-      quantile.method <- "custom" ## alternative: compute quantiles via edgeR
-      if (quantile.method == "edgeR") {
+      percentile.method <- "custom" ## alternative: compute percentile-based scaling factors via edgeR
+      if (percentile.method == "edgeR") {
 
+        current.quantile <- current.percentile/100
         ## Compute quantile-based scaling factor via edgeR
         ## NOTE (2018-07-21) : with single-cell data containing MANY zeros, this returns Inf scaling factors for almost all the samples
         if (verbose >= 3) {
@@ -211,11 +214,11 @@ NormalizeCountTable <- function(counts,
 
       } else {
         if (verbose >= 3) {
-          message("\t\tScaling factor: sample quantile ", current.quantile)
+          message("\t\tScaling factor: sample percentile ", current.percentile)
         }
-        sampleStats$norm.quantile <- apply(counts.to.norm, 2, quantile, na.rm = TRUE, probs = current.quantile)
-        size.factor <-  sampleStats$norm.quantile
-        scaling.factor <- 1 / sampleStats$norm.quantile
+        sampleStats$norm.percentile <- apply(counts.to.norm, 2, percentile, na.rm = TRUE, probs = current.percentile)
+        size.factor <-  sampleStats$norm.percentile
+        scaling.factor <- 1 / sampleStats$norm.percentile
         scaling.factor <- scaling.factor / mean(scaling.factor[!is.infinite(scaling.factor)])
         # mean(scaling.factor[!is.infinite(scaling.factor)])
         # hist(scaling.factor, breaks = 1000)
@@ -223,7 +226,7 @@ NormalizeCountTable <- function(counts,
       null.scaling <- sum(size.factor == 0)
       # inf.scaling <- sum(is.infinite(scaling.factor))
       if (null.scaling > 1) {
-        message("\t\tdiscarding ", null.scaling, " samples with null value for quantile ", quantile)
+        message("\t\tdiscarding ", null.scaling, " samples with null value for percentile ", percentile)
       }
 
     } else if (m %in% c("mean", "libsum", "TC", "sum")) {
@@ -231,7 +234,6 @@ NormalizeCountTable <- function(counts,
         message("\t\tScaling factor: library size (equivalent for sum, mean, total counts).  ")
       }
       ## Note: mean is very sensitive to outliers, which are very problematic with RNAseq data
-      #  scaling.factor <- apply(counts.to.norm, 2, quantile, na.rm = TRUE, probs=quantile)
       size.factor <- apply(counts.to.norm, 2, mean, na.rm = TRUE)
       scaling.factor <- 1 / size.factor
       scaling.factor <- scaling.factor / mean(scaling.factor)

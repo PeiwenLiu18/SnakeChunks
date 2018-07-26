@@ -516,10 +516,10 @@ LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.co
 silence <- dev.off(); rm(silcence)
 
 ## ----normalisation-------------------------------------------------------
-norm.methods <- c("none", "mean", "median", "quantile", "TMM", "DESeq2")
+norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
   counts = all.counts, class.labels = sample.conditions, nozero = TRUE,
-  method = norm.methods, quantile = 0.75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
+  method = norm.methods, quantile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
   verbose = 2)
 #names(norm.comparison)
 

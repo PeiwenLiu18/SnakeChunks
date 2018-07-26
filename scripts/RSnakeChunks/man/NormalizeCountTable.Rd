@@ -5,7 +5,7 @@
 \title{scaling RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods)}
 \usage{
 NormalizeCountTable(counts, class.labels, nozero = TRUE, method = "TMM",
-  quantile = 0.75, log2 = FALSE, epsilon = 0.1,
+  percentile = 75, log2 = FALSE, epsilon = 0.1,
   detailed.sample.stats = FALSE, verbose = 1)
 }
 \arguments{
@@ -15,21 +15,23 @@ NormalizeCountTable(counts, class.labels, nozero = TRUE, method = "TMM",
 
 \item{nozero=TRUE}{If TRUE, zero values are ommitted from the data table before computing the column-wise statistics.}
 
-\item{method="quantile"}{normalization method. Optionally, can be specified as a vector with several methods.
+\item{method="percentile"}{normalization method. Optionally, can be specified as a vector with several methods.
 
-Supported normalization methods: none, sum, mean, median, quantile, TMM, RLE, DESeq2.
+Supported normalization methods: none, sum, mean, median, percentile, quantiles, TMM, RLE, DESeq2.
 
 The "raw" methods simply returns the raw counts (no normalization).
 
 Sum and mean are really not recommended because very sensitive to outliers.
 They are implemented only for the sake of comparison.
 
-Quantile: Preferred quantile = 0.75. Quantiles are more robust to outliers than the mean
-or sum. The median is sometimes weak in RNA-seq data, the 75th percentile (quantile 0.75)
-seems a good tradeoff between robustness and representativity (taking into account a
+Percentile: Preferred percentile = 75. Percentile-base scaling is more robust to
+outliers than the mean or sum. Note that for RNA-seq count tables, sample median counts may
+be unsatisfying  because for some datasets even the median counts are very low. A common
+approach is to use the third quartile (equal to percentile 75), which seems to provide a
+good tradeoff between robustness and representativity (taking into account a
 representative proportion of the total counts per samples).
 
-Median: actually runs quantile-based scaling factor with quantile=0.5.
+Median: actually runs percentile-based scaling factor with percentile=50.
 
 TMM: trimmed mean of M-values proposed by Robinson and Oshlack (2010), computed via edgeR::calcNormFactors().
 
@@ -37,7 +39,7 @@ RLE: relative log expression proposed by Anders and Huber (2010), computed via e
 
 DESeq2: compute size factors via DESeq2::estimateSizeFactors()}
 
-\item{quantile=0.75}{quantile used as scaling factor when quantile method is selected.}
+\item{percentile=75}{reference percentile used as scaling factor when percentile method is selected.}
 
 \item{log2=FALSE}{Apply log2 transformation after sample size correction}
 
@@ -65,7 +67,7 @@ Each normalisation results contains.
 normalisation of RNA-seq count table.
 More precisely this function runs a sample-wise scaling so that all the samples
 have the same value for a user-defined scaling parameter.
-By default, we use the quantile 0.75 as scaling factor.
+By default, we use the percentile 75 as scaling factor.
 }
 \author{
 Jacques van Helden and Mustafa AbuElqumsan
