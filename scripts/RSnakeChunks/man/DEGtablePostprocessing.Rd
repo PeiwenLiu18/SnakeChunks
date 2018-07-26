@@ -4,8 +4,9 @@
 \alias{DEGtablePostprocessing}
 \title{Post-process differential expression analysis result.}
 \usage{
-DEGtablePostprocessing(deg.table, table.name, sort.column = "none",
-  thresholds = c(), round.digits = 3, dir.figures = NULL, verbose = 0)
+DEGtablePostprocessing(deg.table, table.name = "DEG_table",
+  sort.column = "none", thresholds = c(), round.digits = 3,
+  dir.figures = NULL, verbose = 0)
 }
 \arguments{
 \item{deg.table}{Table with the results of differential expression analysis
