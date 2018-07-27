@@ -9,7 +9,8 @@ spec = matrix(c(
   'help', 'h', 0, "logical",
   'main_dir', 'm', 1, "character",
   'config_file', 'c', 1, "character",
-  'count_table', 't', 1, "character"
+  'count_table', 't', 1, "character",
+  'out_dir', 'o', 1, "character"
 ), byrow = TRUE, ncol = 4)
 opt = getopt(spec)
 
@@ -36,11 +37,15 @@ if (is.null(opt$main_dir) ) {
 ## Mandatory arguments
 if (is.null(opt$config_file) ) {
   stop("Configuration file is a mandatory argument (-c, --config_file)")
-  }
+}
+
 if (is.null(opt$count_table) ) {
   stop("Count table is a mandatory argument (-t1, --count_table)")
 }
 
+if (is.null(opt$config_file) ) {
+  stop("Configuration file is a mandatory argument (-c, --config_file)")
+}
 
 
 # script.name <- get_Rscript_filename()
@@ -48,8 +53,12 @@ if (is.null(opt$count_table) ) {
 
 ## ---- Define the main_parameters -----------------------------------------------------
 
+## Prepare a list of input and output files.
+## This will later serve to generate a report.
 dirs <- vector()
-
+infiles <- vector()   ## Input files
+outfiles <- vector()  ## For tab-separated value files
+figfiles <- vector()  ## Store figures
 
 ## Define main parameters to generate this report
 #dirs["main"] <- "~/ko-rna-seq/" ## Main directory
@@ -60,12 +69,14 @@ message("\tMain directory: ", dirs["main"])
 ## Define YAML configuration file
 #configFile <- "metadata/config_RNA-seq.yml"
 configFile <- opt$config_file
+infiles["config"] <- configFile
 message("\tConfiguration file: ", configFile)
 
 ## Prefix for the count table
 #count.prefix <- "bowtie2_featureCounts_all"
 #message("\tPrefix for the count table: ", count.prefix)
 count.table <- opt$count_table
+infiles["count_table"] <- count.table
 message("\tCount table: ", count.table)
 
 ## Relative path of the main dir starting from the Rmd file
@@ -135,13 +146,6 @@ for (lib in required.bioconductor) {
 ##   install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
 ## }
 
-## ---- Detine in/outfiles ----
-
-## Prepare a list of input and output files.
-## This will later serve to generate a report.
-infiles <- vector()   ## Input files
-outfiles <- vector()  ## For tab-separated value files
-figfiles <- vector()  ## Store figures
 
 ## ---- Check SnakeChunks directory ----------------------------------------------------
 
@@ -202,26 +206,35 @@ for (f in R.files) {
 # setwd(dirs["Rmd"]) ## Set the working directory for the console
 
 
-## Directory for Figures
-if (is.null(parameters$dir$figures)) {
-  stop("The figures directory should be defined in the config file: ", configFile)
-}
-dirs["figures"] <- parameters$dir$figures
-message("\tDirectory for the generic figures: ", dirs["figures"])
-dir.create(dirs["figures"], showWarnings = FALSE, recursive = TRUE)
-
 ## Directory to store differential expression results
-if (is.null(parameters$dir$diffexpr)) {
+if (!is.null(opt$out_dir)) {
+  message("\tOutput drectory defined as command argument: ", opt$out_dir)
+  dir.out <- opt$out_dir
+} else if (!is.null(parameters$dir$diffexpr)) {
+  message("\tOutput drectory defined in config file: ", parameters$dir$diffexp)
+  dir.out <- parameters$dir$diffexp
+} else {
   stop("The diffexpr directory should be defined in the config file: ", configFile)
 }
-dirs["diffexpr"] <- parameters$dir$diffexpr
-message("\tDirectory for differential expresion: ", dirs["diffexpr"])
-dir.create(dirs["diffexpr"], showWarnings = FALSE, recursive = TRUE)
+dirs["output"] <- dir.out ## Index dir for the report
+message("\tDirectory for differential expression: ", dir.out)
+dir.create(dir.out, showWarnings = FALSE, recursive = TRUE)
+
+## Directory for Figures
+if (is.null(parameters$dir$figures)) {
+  dir.main.figures <- file.path(dir.out, "figures")
+} else {
+  dir.main.figures <- parameters$dir$figures
+}
+dirs["figures"] <- dir.main.figures
+message("\tDirectory for the generic figures: ", dir.main.figures)
+dir.create(dir.main.figures, showWarnings = FALSE, recursive = TRUE)
 
 ## Directory to export result files in tba-separated value (tsv) format
-dirs["tsv"] <- file.path(dirs["diffexpr"], "tsv_files")
-message("\tDirectory to export TSV files:\t", dirs["tsv"])
-dir.create(dirs["tsv"], showWarnings = FALSE, recursive = TRUE)
+dir.tsv <- file.path(dir.out, "tsv_files")
+dirs["tsv"] <- dir.tsv ## Index directory for the report
+message("\tDirectory to export TSV files:\t", dir.tsv)
+dir.create(dir.tsv, showWarnings = FALSE, recursive = TRUE)
 
 ## ----default_parameters--------------------------------------------------
 ## In this chunk, we define a set of default parameters for the display and the analysis. These parameters can be modified but it is not necessary to adapt them to each project.
@@ -269,10 +282,10 @@ if (is.null(parameters$metadata$design)) {
 # infiles["counts"] <- file.path(parameters$dir$diffexpr, paste(sep = "", count.prefix, ".tsv")
 infiles["counts"] <- count.table
 # infiles["counts"] <- file.path(dirs["main"], infiles["counts"])
-if (!file.exists(infiles["counts"])) {
-  stop("Feature count table does not exist: ", infiles["counts"])
+if (!file.exists(count.table)) {
+  stop("Feature count table does not exist: ", count.table)
 } else {
-  message("\tFeature count table: ", infiles["counts"])
+  message("\tFeature count table: ", count.table)
 }
 
 
@@ -296,12 +309,12 @@ thresholds <- parameters$DEG$thresholds
 kable(t(as.data.frame(thresholds)), col.names = "Threshold",
       caption = "Thresholds for the selection of differentially expressed genes. ")
 
-outfiles["threshold"] <- file.path(dirs["tsv"], "thresholds.tsv")
+outfiles["threshold"] <- file.path(dir.tsv, "thresholds.tsv")
 write.table(x = t(as.data.frame(thresholds)),
             file = outfiles["threshold"],
             sep = "\t", row.names = TRUE, col.names = FALSE)
-# list.files(dirs["tsv"])
-# system(paste("open", dirs["tsv"]))
+# list.files(dir.tsv)
+# system(paste("open", dir.tsv))
 
 ## ----read_samples--------------------------------------------------------
 #setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
@@ -473,7 +486,7 @@ stats.per.sample.all <- cbind(
   ColStats(x = all.counts, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.all$Mcounts <- stats.per.sample.all$sum / 1e6
 # View(stats.per.sample.all.all)
-outfiles["stats_per_sample_all_features"] <- file.path(dirs["tsv"], "stats_per_sample_all_features.tsv")
+outfiles["stats_per_sample_all_features"] <- file.path(dir.tsv, "stats_per_sample_all_features.tsv")
 message("\t", outfiles["stats_per_sample_all_features"])
 write.table(x = stats.per.sample.all, file = outfiles["stats_per_sample_all_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
@@ -485,7 +498,7 @@ stats.per.sample.nozero <- cbind(
   sample.desc,
   ColStats(all.counts.nozero, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.nozero$Mcounts <- stats.per.sample.nozero$sum / 1e6
-outfiles["stats_per_sample_no-zero"] <- file.path(dirs["tsv"], "stats_per_sample_no-zero.tsv")
+outfiles["stats_per_sample_no-zero"] <- file.path(dir.tsv, "stats_per_sample_no-zero.tsv")
 message("\t", outfiles["stats_per_sample_no-zero"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-zero"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 # names(stats.per.sample)
@@ -499,7 +512,7 @@ stats.per.sample.filtered <- cbind(
 #stats.per.sample.filtered$Mcounts <- stats.per.sample.filtered$sum / 1e6
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
-outfiles["stats_per_sample_filtered_features"] <- file.path(dirs["tsv"], "stats_per_sample_filtered_features.tsv")
+outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_sample_filtered_features.tsv")
 message("\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.filtered, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
@@ -522,12 +535,12 @@ stdcounts.log10 <- log10(stdcounts) ## Log-10 transformed stdcounts, xwith the e
 stdcounts.log2 <- log2(stdcounts) ## Log-10 transformed stdcounts, with the epsilon for 0 counts
 
 ## Export normalized counts (in log2-transformed counts per million reads)
-outfiles["stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts.tsv")
+outfiles["stdcounts"] <- file.path(dir.tsv, paste(sep = "", count.prefix, "_stdcounts.tsv"))
 message("\tExporting standardized counts: ", outfiles["stdcounts"])
 write.table(x = stdcounts, row.names = TRUE, col.names = NA,
-            file = file.path(dirs["main"], outfiles["stdcounts"]), sep = "\t", quote = FALSE)
+            file = outfiles["stdcounts"], sep = "\t", quote = FALSE)
 
-outfiles["log2stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts_log2.tsv")
+outfiles["log2stdcounts"] <- file.path(dir.tsv, paste(sep = "", count.prefix, "_stdcounts_log2.tsv"))
 message("\tExporting log2-transformed standardized counts: ", outfiles["log2stdcounts"])
 write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA,
             file = outfiles["log2stdcounts"], sep = "\t", quote = FALSE)
@@ -550,7 +563,7 @@ stats.per.sample.filtered$log2.cpm.mean <- apply(stdcounts.log2, 2, mean)
 stats.per.sample.filtered$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
 
 ## ---- Export stats per sample ----
-outfiles["stats_per_sample_filtered_features"] <- file.path(dirs["tsv"], "stats_per_sample_filtered_features.tsv")
+outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_sample_filtered_features.tsv")
 message("\t", "Exporting stats per sample for filtered features")
 message("\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
@@ -583,13 +596,13 @@ par.ori <- par(no.readonly = TRUE) # Store original parameters
 #   main = "Assigned reads per sample (libsum)")
 # par(par.ori) # Restore original parameters
 #
-figfiles["libsize_barplot_all_features"] <- file.path(dirs["figures"], "libsize_barplot_all_features.pdf")
+figfiles["libsize_barplot_all_features"] <- file.path(dir.main.figures, "libsize_barplot_all_features.pdf")
 message("\tLibrary size barplot for all features\t", figfiles["libsize_barplot_all_features"])
 pdf(file = figfiles["libsize_barplot_all_features"], width = 8, height = 8)
 LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "All features")
 silence <- dev.off(); rm(silence)
 
-figfiles["libsize_barplot_filtered_features"] <- file.path(dirs["figures"], "libsize_barplot_filtered_features.pdf")
+figfiles["libsize_barplot_filtered_features"] <- file.path(dir.main.figures, "libsize_barplot_filtered_features.pdf")
 message("\tLibrary size barplot after filtering\t", figfiles["libsize_barplot_filtered_features"])
 pdf(file = figfiles["libsize_barplot_filtered_features"], width = 8, height = 8)
 LibsizeBarplot(counts = filtered.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "After filtering")
@@ -613,7 +626,7 @@ for (m in norm.comparison$method.name) {
   size.factors[,m] <- norm.comparison[[m]]$size.factor
 }
 
-figfiles["size_factors"] <- file.path(dirs["figures"], "norm_size_factor_comparison.pdf")
+figfiles["size_factors"] <- file.path(dir.main.figures, "norm_size_factor_comparison.pdf")
 pdf(file = figfiles["size_factors"], width = 8, height = 8)
 plot(size.factors, main = "Sample size factors", col = sample.desc$color)
 silence <- dev.off(); rm(silence)
@@ -650,7 +663,7 @@ for (i in 1:nrow(design)) {
 
   ## Create a specific directory for the results of this comparison
   comparison.prefix <- comparison.summary$prefixes[i]
-  dir.results <- file.path(dirs["diffexpr"], paste(sep = "", comparison.prefix))
+  dir.results <- file.path(dir.out, paste(sep = "", comparison.prefix))
   dirs[comparison.prefix] <- dir.results ## Index current result dir for the list of directories
   comparison.summary[i, "result.dir"] <- dir.results ## Include current result dir to the comparison summary table
   dir.create(path = file.path(dirs["main"], dir.results), showWarnings = FALSE, recursive = TRUE)
@@ -658,12 +671,12 @@ for (i in 1:nrow(design)) {
   message("\t\tresults:\t", dir.results)
 
   ## Create a specific directory for the figures of this comparison
-  dir.figures <-  file.path(dirs[comparison.prefix], "figures")
-  dirs[paste(sep = "_", comparison.prefix, "figures")] <- dir.figures ## Index current figures dir for the list of directories
-  comparison.summary[i, "figures"] <- dir.figures ## Include current figures dir to the comparison summary table
-  dir.create(path = file.path(dirs["main"], dir.figures), showWarnings = FALSE, recursive = TRUE)
-  prefix["comparison_figure"] <- file.path(dir.figures, comparison.prefix)
-  message("\t\tfigures:\t", dir.figures)
+  dir.figures.current <-  file.path(dirs[comparison.prefix], "figures")
+  dirs[paste(sep = "_", comparison.prefix, "figures")] <- dir.figures.current ## Index current figures dir for the list of directories
+  comparison.summary[i, "figures"] <- dir.figures.current ## Include current figures dir to the comparison summary table
+  dir.create(path = file.path(dirs["main"], dir.figures.current), showWarnings = FALSE, recursive = TRUE)
+  prefix["comparison_figure"] <- file.path(dir.figures.current, comparison.prefix)
+  message("\t\tfigures:\t", dir.figures.current)
   #    paste(sep = "", comparison.prefix, "_",  suffix.deg))
 
 
@@ -693,7 +706,7 @@ for (i in 1:nrow(design)) {
     comparison.prefix = comparison.prefix,
     ref.condition = cond2,
     title = comparison.prefix,
-    dir.figures = dir.figures, verbose = opt$verbose)
+    dir.figures = dir.figures.current, verbose = opt$verbose)
   deg.results[["DESeq2"]] <- deseq2.result
   # names(deg.results[["DESeq2"]])
   #  attributes(deg.results[["DESeq2"]]$dds)
@@ -717,12 +730,12 @@ for (i in 1:nrow(design)) {
 
 
   ## Save the completed DESeq2 result table
-  deseq2.result.file <- paste(sep = "_", prefix["comparison_file"], "DESeq2")
-  comparison.summary[i,"deseq2"] <- paste(sep = ".", deseq2.result.file, "tsv")
-  message("\tExporting DESeq2 result table (tab): ", deseq2.result.file, ".tsv")
+  deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "_DESeq2.tsv")
+  comparison.summary[i,"deseq2"] <- deseq2.result.file
+  message("\tExporting DESeq2 result table (tab): ", deseq2.result.file)
   write.table(
     x = deseq2.result$result.table, row.name    = FALSE,
-    file = paste(sep = ".", deseq2.result.file, "tsv"),
+    file = deseq2.result.file,
     sep = "\t", quote = FALSE)
 
   ## ---- edgeR analysis ----
@@ -739,7 +752,7 @@ for (i in 1:nrow(design)) {
       comparison.prefix = comparison.prefix,
       norm.method = norm.method,
       title = paste(sep = "_", norm.method, comparison.prefix),
-      dir.figures = dir.figures,
+      dir.figures = dir.figures.current,
       verbose = opt$verbose)
     deg.results[[edgeR.prefix]] <- edger.result
 
@@ -759,11 +772,11 @@ for (i in 1:nrow(design)) {
 
 
     ## Export edgeR result table
-    edger.result.file <- paste(sep = "_", prefix["comparison_file"], edgeR.prefix)
-    comparison.summary[i,"edger"] <- paste(sep = ".", edger.result.file, "tsv")
-    message("\tExporting edgeR result table (tab): ", edger.result.file, ".tsv")
+    edger.result.file <- paste(sep = "", prefix["comparison_file"], "_", edgeR.prefix, ".tsv")
+    comparison.summary[i,"edger"] <- edger.result.file
+    message("\tExporting edgeR result table (tab): ", edger.result.file)
     write.table(x = edger.result$result.table,
-                file = paste(sep = ".", edger.result.file, "tsv"),
+                file = edger.result.file,
                 row.names = FALSE,
                 sep = "\t", quote = FALSE)
   }
@@ -772,11 +785,11 @@ for (i in 1:nrow(design)) {
   ## in a tab-separated values (tsv) file
   result.file <- paste(sep = "",
                        prefix["comparison_file"],
-                       "_diffexpr_DESeq2_and_edgeR")
+                       "_diffexpr_DESeq2_and_edgeR.tsv")
   # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
-  message("\tExporting result table (tsv): ", result.file, ".tsv")
+  message("\tExporting result table (tsv): ", result.file)
   write.table(x = result.table, row.names = FALSE,
-              file = paste(sep = "", result.file, ".tsv"), sep = "\t", quote = FALSE)
+              file = result.file, sep = "\t", quote = FALSE)
 
 
   ## Collect results by output statistics
@@ -811,7 +824,7 @@ for (i in 1:nrow(design)) {
 
   ## Comparison between adjusted p-values
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
-  figfiles[prefix] <- file.path(dirs["figures"], paste(sep = "", prefix, ".pdf"))
+  figfiles[prefix] <- file.path(dir.main.figures, paste(sep = "", prefix, ".pdf"))
   message("\tComparison bewteen normalization methods: padj\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 10, height = 10)
   plot(deg.compa$padj, log = "xy",
@@ -823,7 +836,7 @@ for (i in 1:nrow(design)) {
   # system(paste("open", figfiles[prefix]))
 
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_log2FC")
-  figfiles[prefix] <- file.path(dirs["figures"], paste(sep = "", prefix, ".pdf"))
+  figfiles[prefix] <- file.path(dir.main.figures, paste(sep = "", prefix, ".pdf"))
   message("\tComparison bewteen normalization methods: log2FC\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 10, height = 10)
   plot(deg.compa$log2FC,
@@ -839,7 +852,7 @@ for (i in 1:nrow(design)) {
   deg.names <- names(deg.results)
   nb.panels <- n2mfrow(length(deg.names))
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_volcano_plots")
-  figfiles[prefix] <- file.path(dirs["figures"], paste(sep = "", prefix, ".pdf"))
+  figfiles[prefix] <- file.path(dir.main.figures, paste(sep = "", prefix, ".pdf"))
   message("\tComparison bewteen normalization methods: volcano plots\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 1 + nb.panels[2]*3)
   par.ori <- par(no.readonly = TRUE)
@@ -877,7 +890,7 @@ for (i in 1:nrow(design)) {
   # deg.name <- "DESeq2"
   # deg.name <- "edgeR_TMM"
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_pvalue_histograms")
-  figfiles[prefix] <- file.path(dirs["figures"], paste(sep = "", prefix, ".pdf"))
+  figfiles[prefix] <- file.path(dir.main.figures, paste(sep = "", prefix, ".pdf"))
   message("\tComparison bewteen normalization methods: P value histograms\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 2 + nb.panels[2]*4)
   par.ori <- par(no.readonly = TRUE)
@@ -906,7 +919,7 @@ for (i in 1:nrow(design)) {
   selection.thresholds <- thresholds[selection.fields]
   selection.columns <- paste(sep = "", selection.fields, "_", selection.thresholds)
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_Venn_", paste(collapse = "_", selection.fields))
-  figfiles[prefix] <- file.path(dirs["figures"], paste(sep = "", prefix, ".pdf"))
+  figfiles[prefix] <- file.path(dir.main.figures, paste(sep = "", prefix, ".pdf"))
   message("\tComparison bewteen normalization methods: Ven diagrams\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 2 + nb.panels[2]*4)
   par.ori <- par(no.readonly = TRUE)
@@ -922,7 +935,6 @@ for (i in 1:nrow(design)) {
   }
   silence <- dev.off(); rm(silence)
   ## system(paste("open ", figfiles[prefix]))
-
 
 }
 
