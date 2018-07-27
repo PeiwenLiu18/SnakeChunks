@@ -10,6 +10,7 @@
 #' @param comparison.prefix a string with the prefix for output files
 #' @param title=comparison.prefix main title for the plots
 #' @param dir.figures=NULL optional directory to save figures
+#' @param verbose=0 level of verbosity
 #' @param ... additional parameters are passed to DESeq2::DESeq() function
 #' @export
 deseq2.analysis <- function(counts,
@@ -18,11 +19,12 @@ deseq2.analysis <- function(counts,
                             comparison.prefix,
                             title = comparison.prefix,
                             dir.figures = NULL,
+                            verbose = 0,
                             ...) {
 
   require("DESeq2")
 
-  message("\tDESeq2 analysis\t", comparison.prefix)
+  if (verbose >= 1) { message("\tDESeq2 analysis\t", comparison.prefix) }
 
   ## Check that the length of conditions equals the number of columns of the count table
   if (length(condition) != ncol(counts)) {
@@ -63,18 +65,21 @@ deseq2.analysis <- function(counts,
     "padj" = deseq2.res$padj)
 
   ## Add complementary statistics on the DEG table
+  if (verbose >= 2) { message("\t\tDESeq2 post-processing") }
+
   deseq2.result.table <- DEGtablePostprocessing(
     deg.table = deseq2.result.table,
     table.name = paste(sep = "_", "DESeq2", comparison.prefix),
     sort.column = "padj",
     thresholds = thresholds,
     round.digits = 3,
-    dir.figures = dir.figures)
+    dir.figures = dir.figures, verbose = verbose)
 
   result <- list(
     dds = deseq2.dds,
     result.table = deseq2.result.table
   )
 
+  if (verbose >= 2) { message("\t\tFinished DESeq2 analysis") }
   return(result)
 }

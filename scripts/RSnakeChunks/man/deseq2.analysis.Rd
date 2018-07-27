@@ -5,7 +5,7 @@
 \title{DESeq2 analysis}
 \usage{
 deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
-  title = comparison.prefix, dir.figures = NULL, ...)
+  title = comparison.prefix, dir.figures = NULL, verbose = 0, ...)
 }
 \arguments{
 \item{counts}{a count table sent to DESeq2. Must contain raw counts (not normalized).}
@@ -21,6 +21,8 @@ deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 \item{title=comparison.prefix}{main title for the plots}
 
 \item{dir.figures=NULL}{optional directory to save figures}
+
+\item{verbose=0}{level of verbosity}
 }
 \description{
 Detect differentially expressed genes (DEG) using the package DESeq2,

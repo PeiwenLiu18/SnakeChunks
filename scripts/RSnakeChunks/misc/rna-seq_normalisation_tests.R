@@ -623,7 +623,7 @@ for (i in 1:nrow(design)) {
     comparison.prefix = comparison.prefix,
     ref.condition = cond2,
     title = comparison.prefix,
-    dir.figures = file.path(dirs["main"], dir.figures))
+    dir.figures = file.path(dirs["main"], dir.figures), verbose = 2)
   deg.results[["DESeq2"]] <- deseq2.result
   # names(deg.results[["DESeq2"]])
   #  attributes(deg.results[["DESeq2"]]$dds)
@@ -669,7 +669,7 @@ for (i in 1:nrow(design)) {
       comparison.prefix = comparison.prefix,
       norm.method = norm.method,
       title = paste(sep = "_", norm.method, comparison.prefix),
-      dir.figures = file.path(dirs["main"], dir.figures))
+      dir.figures = file.path(dirs["main"], dir.figures), verbose = 2)
     deg.results[[edgeR.prefix]] <- edger.result
 
     ## A tricky way to add edgeR with normalisation in column names

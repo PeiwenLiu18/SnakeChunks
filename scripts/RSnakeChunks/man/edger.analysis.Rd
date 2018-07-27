@@ -6,7 +6,7 @@
 \usage{
 edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
   norm.method = "TMM", title = paste(sep = "_", norm.method,
-  comparison.prefix), dir.figures = NULL, ...)
+  comparison.prefix), dir.figures = NULL, verbose = 0, ...)
 }
 \arguments{
 \item{counts}{a count table sent to edgeR Must contain raw counts (not normalized).}
@@ -24,6 +24,8 @@ edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 \item{dir.figures=NULL}{optional directory to save figures}
 
 \item{norm.method="RLE"}{normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods}
+
+\item{verbose=0}{level of verbosity}
 }
 \description{
 Detect differentially expressed genes (DEG) using the package edgeR,

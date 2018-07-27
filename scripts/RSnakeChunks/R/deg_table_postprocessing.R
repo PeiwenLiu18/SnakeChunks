@@ -125,8 +125,8 @@ DEGtablePostprocessing <- function(deg.table,
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
 
   if (verbose >= 1) {
-    message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
-    message("\t\t\tStarting features\t", nrow(deg.table))
+    message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply),
+            "\tStarting features\t", nrow(deg.table))
   }
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
@@ -167,7 +167,7 @@ DEGtablePostprocessing <- function(deg.table,
   }
   deg.table[,"DEG"] <- 1*(selected.features)
   # table(deg.table[,"DEG"])
-  if (verbose >= 2) {
+  if (verbose >= 3) {
     print(data.frame(col.descriptions))
   }
 

@@ -11,6 +11,7 @@
 #' @param title=comparison.prefix main title for the plots
 #' @param dir.figures=NULL optional directory to save figures
 #' @param norm.method="RLE" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
+#' @param verbose=0 level of verbosity
 #' @param ... additional parameters are passed to edgeR::exactTest() function
 #' @export
 edger.analysis <- function(counts,
@@ -20,11 +21,12 @@ edger.analysis <- function(counts,
                            norm.method = "TMM",
                            title = paste(sep = "_", norm.method, comparison.prefix),
                            dir.figures = NULL,
+                           verbose = 0,
                            ...) {
 
   require(edgeR)
 
-  message("\tedgeR analysis\t", comparison.prefix, "\tnormalisation method: ", norm.method)
+  if (verbose >= 1) { message("\tedgeR analysis\t", comparison.prefix, "\tnormalisation method: ", norm.method) }
 
   ## Check that the length of conditions equals the number of columns of the count table
   if (length(condition) != ncol(counts)) {
@@ -64,7 +66,7 @@ edger.analysis <- function(counts,
     sort.column = "padj",
     thresholds = thresholds,
     round.digits = 3,
-    dir.figures = dir.figures)
+    dir.figures = dir.figures, verbose = verbose)
   # dim(edger.result.table)
   # dim(edger.result.table)
   # names(edger.result.table)
