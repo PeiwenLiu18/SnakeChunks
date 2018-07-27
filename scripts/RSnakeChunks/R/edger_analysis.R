@@ -15,10 +15,10 @@
 #' @export
 edger.analysis <- function(counts,
                            condition,
-                           ref.condition=NULL,
+                           ref.condition = NULL,
                            comparison.prefix,
                            title = comparison.prefix,
-                           dir.figures=NULL,
+                           dir.figures = NULL,
                            norm.method = "TMM",
                            ...) {
 
@@ -60,7 +60,7 @@ edger.analysis <- function(counts,
                                    "padj" = edger.tt$table$FDR)
   edger.result.table <- DEGtablePostprocessing(
     deg.table = edger.result.table,
-    table.name = paste(sep = "_", "edgeR", prefix["comparison"]),
+    table.name = paste(sep = "_", "edgeR", comparison.prefix),
     sort.column = "padj",
     thresholds = thresholds,
     round.digits = 3,
