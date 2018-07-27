@@ -194,7 +194,7 @@ MarginStats <- function(x,
     if (verbose >= 2) { message("\t\tComputing ", margin.name, "-wise mean.median.ratio") }
     margin.stats$mean.median.ratio <- margin.stats$mean / margin.stats$median
   }
-  if (length(intersect(c("below.mean", "frac.below.mean"), selected.stats)) > 0) {
+  if (length(intersect(c("below.mean", "fract.below.mean"), selected.stats)) > 0) {
     if (verbose >= 2) { message("\t\tComputing ", margin.name, "-wise below.mean") }
     margin.stats$below.mean <- apply(t(x) < margin.stats$mean, 1, sum, na.rm = TRUE)
   }
@@ -216,7 +216,8 @@ MarginStats <- function(x,
 
   ## Return selected stats in the specified order
   margin.stats <- margin.stats[, selected.stats]
-
+  # names(margin.stats)
+  # setdiff(selected.stats, names(margin.stats))
   return(margin.stats)
 }
 
