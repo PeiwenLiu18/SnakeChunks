@@ -739,8 +739,9 @@ for (i in 1:nrow(design)) {
   ## ---- Plot comparing DEGs obtained with DESeq2 and edgeR ----
 
   ## Comparison between adjusted p-values
-  prefix <- paste(sep = "", comparison.prefix, "_padj_comparisons")
+  prefix <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
   figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: padj\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 10, height = 10)
   plot(deg.compa$padj, log = "xy",
        #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
@@ -748,9 +749,11 @@ for (i in 1:nrow(design)) {
                            x = deg.compa$padj[,1], y = deg.compa$padj[,2]),
        main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
   silence <- dev.off(); rm(silence)
+  # system(paste("open", figfiles[prefix]))
 
-  prefix <- paste(sep = "", comparison.prefix, "_lof2FC_comparisons")
+  prefix <- paste(sep = "", comparison.prefix, "_norm_compa_log2FC")
   figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: log2FC\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 10, height = 10)
   plot(deg.compa$log2FC,
        #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
@@ -763,11 +766,10 @@ for (i in 1:nrow(design)) {
   # deg.name <- "DESeq2"
   # deg.name <- "edgeR_TMM"
   deg.names <- names(deg.results)
-
   nb.panels <- n2mfrow(length(deg.names))
-
-  prefix <- paste(sep = "", comparison.prefix, "_volcano_plots")
+  prefix <- paste(sep = "", comparison.prefix, "_norm_compa_volcano_plots")
   figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: volcano plots\n\t\t", figfiles[prefix])
   pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 1 + nb.panels[2]*3)
   par.ori <- par(no.readonly = TRUE)
   par(mfrow = nb.panels)
@@ -775,15 +777,14 @@ for (i in 1:nrow(design)) {
 
   for (deg.name in deg.names) {
     message("\tDrawing volcano plot\t", deg.name)
-    deg.result.table <- deg.results[[deg.name]]$result.table
-    table(deg.result.table$DEG)
-    # head(deg.result.table)
-    # names(deg.result.table)
-    table(deg.result.table[c("padj_0.05", "FC_1.14", "DEG")])
-
-    # plot(deg.result.table$log2FC,
-    #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
-    # # # View(deg.result.table)
+    deg.table <- deg.results[[deg.name]]$result.table
+    # table(deg.table$DEG)
+    # head(deg.table)
+    # names(deg.table)
+    # table(deg.table[c("padj_0.05", "FC_1.14", "DEG")])
+    # plot(deg.table$log2FC,
+    #      -log10(deg.table$padj), main = paste(comparison.prefix, deg.name))
+    # # # View(deg.table)
     #degMultiTest <- multipleTestingCorrections(p.values = deg.results[[deg.name]]$result.table$padj)
     VolcanoPlot.MultiTestTable(
       multitest.table = deg.results[[deg.name]]$result.table,
@@ -793,12 +794,65 @@ for (i in 1:nrow(design)) {
       alpha = parameters$DEG$thresholds$padj,
       effect.threshold = log2(parameters$DEG$thresholds$FC),
       legend.corner = "topleft")
-
   }
   par(mfrow = c(1,1))
   par(par.ori)
   silence <- dev.off(); rm(silence)
   ## system(paste("ls -ltr ", figfiles[prefix]))
+
+
+  ## ---- Comparison between p-value histograms -----
+  ## Draw Volcano plots
+  # deg.name <- "DESeq2"
+  # deg.name <- "edgeR_TMM"
+  prefix <- paste(sep = "", comparison.prefix, "_norm_compa_pvalue_histograms")
+  figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: P value histograms\n\t\t", figfiles[prefix])
+  pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 2 + nb.panels[2]*4)
+  par.ori <- par(no.readonly = TRUE)
+  par(mfrow = nb.panels)
+  # deg.name <- "DESeq2"
+  for (deg.name in deg.names) {
+    message("\tDrawing P value histogram\t", deg.name)
+    deg.table <- deg.results[[deg.name]]$result.table
+    degMultiTest <- multipleTestingCorrections(p.values = deg.results[[deg.name]]$result.table$pvalue)
+    PlotPvalDistrib.MultiTestTable(
+      multitest.result = degMultiTest,
+      main = paste(sep = "", deg.name, "\nP-value histogram"),
+      ylab = "Number of features",
+      draw.mean.line = TRUE, legend.corner = "topright"
+    )
+  }
+  par(mfrow = c(1,1))
+  par(par.ori)
+  silence <- dev.off(); rm(silence)
+  ## system(paste("open ", figfiles[prefix]))
+
+
+  ## Draw Venn diagram with number of genes declared significant
+  ## according to the selection criteria (threshold fields).
+  selection.fields <- c("padj", "FC")
+  selection.thresholds <- thresholds[selection.fields]
+  selection.columns <- paste(sep = "", selection.fields, "_", selection.thresholds)
+  prefix <- paste(sep = "", comparison.prefix, "_norm_compa_Venn_", paste(collapse = "_", selection.fields))
+  figfiles[prefix] <- file.path(dir.figures, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: Ven diagrams\n\t\t", figfiles[prefix])
+  pdf(file = figfiles[prefix], width = 1 + nb.panels[1]*3, height = 2 + nb.panels[2]*4)
+  par.ori <- par(no.readonly = TRUE)
+  par(mfrow = nb.panels)
+  # deg.name <- "DESeq2"
+  for (deg.name in deg.names) {
+    message("\tDrawing Venn diagram\t", deg.name)
+    deg.table <- deg.results[[deg.name]]$result.table
+    selection.venn.counts <- vennCounts(deg.table[,selection.columns])
+    limma::vennDiagram(selection.venn.counts, cex = 1,
+                main = paste(deg.name, "selected features"),
+                circle.col = c("orange", "blue"), mar = c(0,0,5,0))
+  }
+  silence <- dev.off(); rm(silence)
+  ## system(paste("open ", figfiles[prefix]))
+
+
 }
 
 ## ----sessioninfo---------------------------------------------------------
