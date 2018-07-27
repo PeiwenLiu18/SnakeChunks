@@ -83,7 +83,7 @@ DEGtablePostprocessing <- function(deg.table,
                        "pvalue" = FALSE,
                        "log2FC" = TRUE)
   if (sort.column != "none") {
-    message("\t\tSorting DEG table by ", sort.column)
+    if (verbose >= 2) { message("\t\tSorting DEG table by ", sort.column) }
     deg.table <- deg.table[order(deg.table[,sort.column],
                                  decreasing = sort.decreasing[sort.column]),]
   }
@@ -124,8 +124,10 @@ DEGtablePostprocessing <- function(deg.table,
     "FC" = "ge")
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
 
-  message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
-  message("\t\t\tStarting features\t", nrow(deg.table))
+  if (verbose >= 1) {
+    message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
+    message("\t\t\tStarting features\t", nrow(deg.table))
+  }
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
   selected.features <- rep(TRUE, length.out = nrow(deg.table))
@@ -151,21 +153,23 @@ DEGtablePostprocessing <- function(deg.table,
 
     deg.table[, selection.columns[s]] <- threshold.passed * 1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    message("\t\t\t", threshold.type[s],
-            " threshold on ", s, ": ", thresholds[s],
-            "\tPassing features: ", sum(threshold.passed),
-            "\tKept features: ", sum(selected.features))
+    if (verbose >= 2) {
+      message("\t\t\t", threshold.type[s],
+              " threshold on ", s, ": ", thresholds[s],
+              "\tPassing features: ", sum(threshold.passed),
+              "\tKept features: ", sum(selected.features))
+    }
   }
 
   ## Select genes passing all thresholds
-  if (verbose  >= 2) {
+  if (verbose  >= 3) {
     message("\t\tSelection columns: ", paste(collapse = ", ", selection.columns))
   }
   deg.table[,"DEG"] <- 1*(selected.features)
   # table(deg.table[,"DEG"])
-  print(data.frame(col.descriptions))
-
-  # table(deg.table[,selection.columns])
+  if (verbose >= 2) {
+    print(data.frame(col.descriptions))
+  }
 
   ## Round columns to a reasonable number of significant digits
   if (!is.na(round.digits)) {
@@ -187,14 +191,15 @@ DEGtablePostprocessing <- function(deg.table,
     ## according to the selection criteria (threshold fields).
     selection.venn.counts <- vennCounts(deg.table[,selection.columns])
     venn.file <- file.path(dir.figures, paste(sep = "", table.name, "selection_Venn.pdf"))
-    message("\t\tVenn diagram\t", paste(collapse = ", ", selection.columns), "\t", venn.file)
+    if (verbose >= 1) { message("\t\tVenn diagram\t", paste(collapse = ", ", selection.columns), "\t", venn.file) }
     pdf(file = venn.file)
-    vennDiagram(selection.venn.counts, cex = 1, main = paste(table.name, "selected genes"))
+    limma::vennDiagram(selection.venn.counts, cex = 1, main = paste(table.name, "selected genes"),
+                       circle.col = c("orange", "blue"), mar = c(0,0,5,0))
     silence <- dev.off()
 
     ## Histogram of the nominal p-values
     pval.hist.file <- file.path(dir.figures, paste(sep = "", table.name, "_pval_hist.pdf"))
-    message("\t\tP-value histogram\t", pval.hist.file)
+    if (verbose >= 1) { message("\t\tP-value histogram\t", pval.hist.file) }
     pdf(file = pval.hist.file, width = 7, height = 5)
     # hist(deg.table$pvalue, breaks = seq(from = 0, to = 1, by = 0.05),
     #      xlab = "Nominal p-value",
@@ -209,7 +214,7 @@ DEGtablePostprocessing <- function(deg.table,
 
     ## Histogram of the log2FC
     log2FC.file <- file.path(dir.figures, paste(sep = "", table.name, "_log2FC_hist.pdf"))
-    message("\t\tP-value histogram\t", log2FC.file)
+    if (verbose >= 1) { message("\t\tP-value histogram\t", log2FC.file) }
     pdf(file = log2FC.file, width = 7, height = 5)
     hist(deg.table$log2FC, breaks = 100,
          xlab = "log2(fold change)",
@@ -220,7 +225,7 @@ DEGtablePostprocessing <- function(deg.table,
 
     ## Volcano plot
     volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
-    message("\t\tVolcano plot\t", volcano.file)
+    if (verbose >= 1) { message("\t\tVolcano plot\t", volcano.file) }
     pdf(file = volcano.file, width = 7, height = 7)
     VolcanoPlot.MultiTestTable(
       multitest.table = deg.table,
