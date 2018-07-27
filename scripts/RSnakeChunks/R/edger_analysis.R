@@ -17,9 +17,9 @@ edger.analysis <- function(counts,
                            condition,
                            ref.condition = NULL,
                            comparison.prefix,
-                           title = comparison.prefix,
-                           dir.figures = NULL,
                            norm.method = "TMM",
+                           title = paste(sep = "_", norm.method, comparison.prefix),
+                           dir.figures = NULL,
                            ...) {
 
   require(edgeR)
@@ -60,7 +60,7 @@ edger.analysis <- function(counts,
                                    "padj" = edger.tt$table$FDR)
   edger.result.table <- DEGtablePostprocessing(
     deg.table = edger.result.table,
-    table.name = paste(sep = "_", "edgeR", comparison.prefix),
+    table.name = paste(sep = "_", "edgeR", norm.method, comparison.prefix),
     sort.column = "padj",
     thresholds = thresholds,
     round.digits = 3,

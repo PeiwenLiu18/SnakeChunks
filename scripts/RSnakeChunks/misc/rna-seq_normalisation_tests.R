@@ -689,8 +689,8 @@ for (i in 1:nrow(design)) {
       condition = current.conditions,
       ref.condition = cond2,
       comparison.prefix = comparison.prefix,
-      title = comparison.prefix,
       norm.method = norm.method,
+      title = paste(sep = "_", norm.method, comparison.prefix),
       dir.figures = file.path(dirs["main"], dir.figures))
     deg.results[[edgeR.prefix]] <- edger.result
 
