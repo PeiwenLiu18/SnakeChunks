@@ -1,4 +1,3 @@
-
 #' @title Post-process differential expression analysis result.
 #'
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
@@ -96,8 +95,11 @@ DEGtablePostprocessing <- function(deg.table,
   ## Beware: for the fold-change we ake the absolute value of log2FC,
   ## to have a fold change irrespective of the up- or -down sense
   deg.table$FC <- 2^abs(deg.table$log2FC)
+  # hist(deg.table$log2FC, breaks=1000)
+  # hist(2^(deg.table$log2FC), breaks = 1000)
+  # hist(deg.table$FC, breaks=1000)
 
-  col.descriptions["FC"] <- "Sense-insensitive fold change (always >= 1)"
+  col.descriptions["FC"] <- "Orientation-insensitive fold change (always >= 1). "
 
   ## Compute E-value
   deg.table$evalue <- deg.table$pvalue * nrow(deg.table)
@@ -115,23 +117,34 @@ DEGtablePostprocessing <- function(deg.table,
 
   ## Label the genes passing the FDR, E-value and fold-change thresholds
   threshold.type <- c(
-    "pvalue" = "upper",
-    "padj" = "upper",
-    "evalue" = "upper",
-    "FC" = "lower")
+    "pvalue" = "le",
+    "padj" = "le",
+    "evalue" = "le",
+    "log2FC" = "abs.ge",
+    "FC" = "ge")
   thresholds.to.apply <- intersect(names(thresholds), names(threshold.type))
 
   message("\t\tApplying thresholds: ", paste(collapse = ", ", thresholds.to.apply))
   message("\t\t\tStarting features\t", nrow(deg.table))
   selection.columns <- paste(sep = "", thresholds.to.apply, "_", thresholds[thresholds.to.apply])
   names(selection.columns) <- thresholds.to.apply
-  s <- thresholds.to.apply[1]
   selected.features <- rep(TRUE, length.out = nrow(deg.table))
+  s <- thresholds.to.apply[1]
   for (s in thresholds.to.apply) {
-    if (threshold.type[s] == "upper") {
-      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] < thresholds[s]
+    if (threshold.type[s] == "le") {
+      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] <= thresholds[s]
+    } else if (threshold.type[s] == "ge") {
+      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] >= thresholds[s]
+    } else if (threshold.type[s] == "abs.le") {
+      threshold.passed <- !is.na(deg.table[, s]) & abs(deg.table[, s]) <= thresholds[s]
+    } else if (threshold.type[s] == "abs.ge") {
+      threshold.passed <- !is.na(deg.table[, s]) & abs(deg.table[, s]) >= thresholds[s]
+    } else if (threshold.type[s] == "abs.log2.ge") {
+      threshold.passed <- !is.na(deg.table[, s]) & abs(log2(deg.table[, s])) <= thresholds[s]
+    } else if (threshold.type[s] == "abs.log2.le") {
+      threshold.passed <- !is.na(deg.table[, s]) & abs(log2(deg.table[, s])) >= thresholds[s]
     } else {
-      threshold.passed <- !is.na(deg.table[, s]) & deg.table[, s] > thresholds[s]
+      stop("Invalid threshold criterion: ", s, ". Supported: ", paste(collapse = ", ", names(threshold.type)))
     }
     # summary(threshold.passed)
     selected.features <- selected.features & threshold.passed
@@ -148,10 +161,9 @@ DEGtablePostprocessing <- function(deg.table,
   if (verbose  >= 2) {
     message("\t\tSelection columns: ", paste(collapse = ", ", selection.columns))
   }
-  deg.table[,"DEG"] <-
-    1*(apply(deg.table[,selection.columns], 1, sum) == length(thresholds.to.apply))
-
-  # print(data.frame(col.descriptions))
+  deg.table[,"DEG"] <- 1*(selected.features)
+  # table(deg.table[,"DEG"])
+  print(data.frame(col.descriptions))
 
   # table(deg.table[,selection.columns])
 
@@ -174,18 +186,52 @@ DEGtablePostprocessing <- function(deg.table,
     ## Draw Venn diagram with number of genes declared significant
     ## according to the selection criteria (threshold fields).
     selection.venn.counts <- vennCounts(deg.table[,selection.columns])
-    pdf(file = file.path(dir.figures, paste(sep = "", table.name, "selection_Venn.pdf")))
+    venn.file <- file.path(dir.figures, paste(sep = "", table.name, "selection_Venn.pdf"))
+    message("\t\tVenn diagram\t", paste(collapse = ", ", selection.columns), "\t", venn.file)
+    pdf(file = venn.file)
     vennDiagram(selection.venn.counts, cex = 1, main = paste(table.name, "selected genes"))
     silence <- dev.off()
 
     ## Histogram of the nominal p-values
-    pdf(file = file.path(dir.figures, paste(sep = "", table.name, "_pval_hist.pdf")), width = 7, height = 5)
-    hist(deg.table$pvalue, breaks = seq(from = 0, to = 1, by = 0.05),
-         xlab = "Nominal p-value",
+    pval.hist.file <- file.path(dir.figures, paste(sep = "", table.name, "_pval_hist.pdf"))
+    message("\t\tP-value histogram\t", pval.hist.file)
+    pdf(file = pval.hist.file, width = 7, height = 5)
+    # hist(deg.table$pvalue, breaks = seq(from = 0, to = 1, by = 0.05),
+    #      xlab = "Nominal p-value",
+    #      ylab = "Number of genes",
+    #      main = paste(table.name, "P value distribution"),
+    #      col = "#BBBBBB")
+    multTestCorr <- multipleTestingCorrections(deg.table$pvalue)
+    PlotPvalDistrib.MultiTestTable(multitest.result = multTestCorr,
+                                   draw.m0.line = TRUE, draw.mean.line = FALSE, draw.lambda = TRUE,
+                                   main = paste(table.name, "\nP value distribution"), legend.cex = 0.9)
+    silence <- dev.off()
+
+    ## Histogram of the log2FC
+    log2FC.file <- file.path(dir.figures, paste(sep = "", table.name, "_log2FC_hist.pdf"))
+    message("\t\tP-value histogram\t", log2FC.file)
+    pdf(file = log2FC.file, width = 7, height = 5)
+    hist(deg.table$log2FC, breaks = 100,
+         xlab = "log2(fold change)",
          ylab = "Number of genes",
-         main = paste(table.name, "pvalue distribution"),
+         main = paste(table.name, "\nlog2FC distribution"),
          col = "#BBBBBB")
     silence <- dev.off()
+
+    ## Volcano plot
+    volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
+    message("\t\tVolcano plot\t", volcano.file)
+    pdf(file = volcano.file, width = 7, height = 7)
+    VolcanoPlot.MultiTestTable(
+      multitest.table = deg.table,
+      effect.size.col = "log2FC",
+      effect.threshold = log2(thresholds$FC),
+      control.type = "padj",
+      alpha = thresholds$padj,
+      main = paste(table.name, "\nVolcano plot"))
+    silence <- dev.off()
+
+
   }
   return(deg.table)
 }
