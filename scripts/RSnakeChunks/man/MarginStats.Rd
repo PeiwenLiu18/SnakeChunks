@@ -44,6 +44,7 @@ a data.frame with one row per entry (row or column) of the input matrix, and one
  \item{mean.median.ratio}{ratio between mean and the median, which can be interpreted as skew indicator. }
  \item{below.mean}{number of values below the mean. }
  \item{fract.below.mean}{fraction of values below the mean. }
+ \item{Mcounts}{Million counts = round(digits=2, sum/1e6). Classically used for Next-Generation Sequencing libraries.  }
 }
 }
 \author{

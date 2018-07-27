@@ -4,7 +4,7 @@
 \alias{statsPerRow}
 \title{Descriptive statistics on each row of the input matrix}
 \usage{
-statsPerRow(x, ...)
+statsPerRow(x, margin, verbose = 0, selected.stats = NULL)
 }
 \arguments{
 \item{x}{A matrix or data frame}
