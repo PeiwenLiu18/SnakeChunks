@@ -806,14 +806,14 @@ for (i in 1:nrow(design)) {
     # plot(deg.result.table$log2FC,
     #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
     # # # View(deg.result.table)
-    degMultiTestTable <- multipleTestingCorrections(p.values = deg.results[[deg.name]]$result.table$padj)
+    #degMultiTest <- multipleTestingCorrections(p.values = deg.results[[deg.name]]$result.table$padj)
     VolcanoPlot.MultiTestTable(
-      multitest.table = degMultiTestTable,
+      multitest.table = deg.results[[deg.name]]$result.table,
       main = deg.name,
       effect.size.col = "log2FC",
       control.type = "padj",
       alpha = parameters$DEG$thresholds$padj,
-      effect.threshold = parameters$DEG$thresholds$FC,
+      effect.threshold = log2(parameters$DEG$thresholds$FC),
       legend.corner = "topleft")
 
   }
