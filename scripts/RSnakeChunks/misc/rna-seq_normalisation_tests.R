@@ -1,20 +1,72 @@
 
+## ---- Parse command-line arguments -------
+#!/path/to/Rscript
+library('getopt')
+#get options, using the spec as defined by the enclosed list.
+#we read the options from the default: commandArgs(TRUE).
+spec = matrix(c(
+  'verbose', 'v', 2, "integer",
+  'help', 'h', 0, "logical",
+  'main_dir', 'm', 1, "character",
+  'config_file', 'c', 1, "character",
+  'count_table', 't', 1, "character"
+), byrow = TRUE, ncol = 4)
+opt = getopt(spec)
+
+# ## For test and debugging
+# opt <- list("main_dir" = "~/ko-rna-seq/", "config_file" = "metadata/config_RNA-seq.yml", "count_table" = "RNA-seq/results/diffexpr/bowtie2_featureCounts_all.tsv")
+
+
+## Help message
+if (!is.null(opt$help) ) {
+  message("\n", getopt(spec, usage = TRUE))
+  q(status = 0)
+}
+
+
+## Check command-line arguments
+if (is.null(opt$verbose) ) {
+  opt$verbose    = 1
+}
+
+if (is.null(opt$main_dir) ) {
+  opt$main_dor      = getwd()
+}
+
+## Mandatory arguments
+if (is.null(opt$config_file) ) {
+  stop("Configuration file is a mandatory argument (-c, --config_file)")
+  }
+if (is.null(opt$count_table) ) {
+  stop("Count table is a mandatory argument (-t1, --count_table)")
+}
+
+
+
+# script.name <- get_Rscript_filename()
+
+
 ## ---- Define the main_parameters -----------------------------------------------------
 
 dirs <- vector()
 
+
 ## Define main parameters to generate this report
-dirs["main"] <- "~/ko-rna-seq/" ## Main directory
+#dirs["main"] <- "~/ko-rna-seq/" ## Main directory
+dirs["main"] <- opt$main_dir
 setwd(dirs["main"])
 message("\tMain directory: ", dirs["main"])
 
 ## Define YAML configuration file
-configFile <- "metadata/config_RNA-seq.yml"
+#configFile <- "metadata/config_RNA-seq.yml"
+configFile <- opt$config_file
 message("\tConfiguration file: ", configFile)
 
 ## Prefix for the count table
-count.prefix <- "bowtie2_featureCounts_all"
-message("\tPrefix for the count table: ", count.prefix)
+#count.prefix <- "bowtie2_featureCounts_all"
+#message("\tPrefix for the count table: ", count.prefix)
+count.table <- opt$count_table
+message("\tCount table: ", count.table)
 
 ## Relative path of the main dir starting from the Rmd file
 dirs["base"] <- ".."
@@ -110,6 +162,16 @@ if (is.null(parameters$dir$snakechunks)) {
 dirs["SnakeChunks"] <- file.path(dirs["main"], parameters$dir$snakechunks)
 message("\tSnakeChunks directory:\t", dirs["SnakeChunks"])
 
+## Compute count prefix
+if (is.null(parameters$dir$count_prefix)) {
+  count.prefix <- basename(path = count.table)
+  for (ext in c(".tsv", ".tab", ".txt", ".csv")) {
+    count.prefix <- sub(pattern = ext, replacement = "", x = count.prefix)
+  }
+} else {
+  count.prefix <- parameters$dir$count_prefix
+}
+message("\tFile prefix normalized count tables ", count.prefix)
 
 
 
@@ -204,14 +266,13 @@ if (is.null(parameters$metadata$design)) {
 }
 
 ## Count table
-infiles["counts"] <- file.path(
-  parameters$dir$diffexpr,
-  paste(sep = "", count.prefix, ".tsv"))
-all.counts.path <- file.path(dirs["main"], infiles["counts"])
-if (!file.exists(all.counts.path)) {
-  stop("Feature count table does not exist: ", all.counts.path)
+# infiles["counts"] <- file.path(parameters$dir$diffexpr, paste(sep = "", count.prefix, ".tsv")
+infiles["counts"] <- count.table
+# infiles["counts"] <- file.path(dirs["main"], infiles["counts"])
+if (!file.exists(infiles["counts"])) {
+  stop("Feature count table does not exist: ", infiles["counts"])
 } else {
-  message("\tFeature count table: ", all.counts.path)
+  message("\tFeature count table: ", infiles["counts"])
 }
 
 
@@ -300,8 +361,8 @@ kable(comparison.summary,
 
 
 ## ----load_count_table----------------------------------------------------
-message("Loading count table: ", all.counts.path)
-ori.counts <- read.delim(all.counts.path, row.names = 1, sep = "\t")
+message("Loading count table: ", infiles["counts"])
+ori.counts <- read.delim(infiles["counts"], row.names = 1, sep = "\t")
 # names(ori.counts)
 # dim(ori.counts)
 # View(ori.counts)
@@ -330,7 +391,7 @@ if (length(ids.not.found) == length(sample.ids)) {
   colnames(all.counts) <- sample.ids
   ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify
 } else if (length(ids.not.found) > 0) {
-  stop(length(ids.not.found), " missing columns in count table\t", all.counts.path,
+  stop(length(ids.not.found), " missing columns in count table\t", infiles["counts"],
        "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
 }
 
@@ -404,10 +465,12 @@ selected.stats <- c("Mcounts",
 
 message("Computing sample-wise statistics on all counts (non-filtered)")
 #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
-# View(stats.per.sample)
+# View(stats.per.sample.all)
+# dim(all.counts)
+# dim(sample.desc)
 stats.per.sample.all <- cbind(
   sample.desc,
-  ColStats(all.counts, verbose = 2, selected.stats = selected.stats))
+  ColStats(x = all.counts, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.all$Mcounts <- stats.per.sample.all$sum / 1e6
 # View(stats.per.sample.all.all)
 outfiles["stats_per_sample_all_features"] <- file.path(dirs["tsv"], "stats_per_sample_all_features.tsv")
@@ -420,7 +483,7 @@ all.counts.nozero <- all.counts
 all.counts.nozero[all.counts.nozero == 0] <- NA
 stats.per.sample.nozero <- cbind(
   sample.desc,
-  ColStats(all.counts.nozero, verbose = 2, selected.stats = selected.stats))
+  ColStats(all.counts.nozero, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.nozero$Mcounts <- stats.per.sample.nozero$sum / 1e6
 outfiles["stats_per_sample_no-zero"] <- file.path(dirs["tsv"], "stats_per_sample_no-zero.tsv")
 message("\t", outfiles["stats_per_sample_no-zero"])
@@ -432,7 +495,7 @@ write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-ze
 message("Computing sample-wise statistics for filtered counts")
 stats.per.sample.filtered <- cbind(
   sample.desc,
-  ColStats(filtered.counts, verbose = 2, selected.stats = selected.stats))
+  ColStats(filtered.counts, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.filtered$Mcounts <- stats.per.sample.filtered$sum / 1e6
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
@@ -538,7 +601,7 @@ norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
 norm.comparison <- NormalizeCountTable(
   counts = filtered.counts, class.labels = sample.conditions, nozero = TRUE,
   method = norm.methods, percentile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
-  verbose = 2)
+  verbose = opt$verbose)
 #names(norm.comparison)
 
 ## ----size_factors, fig.width=8, fig.height=8, fig.cap="Sample size factors for different normalisation methods. "----
@@ -630,7 +693,7 @@ for (i in 1:nrow(design)) {
     comparison.prefix = comparison.prefix,
     ref.condition = cond2,
     title = comparison.prefix,
-    dir.figures = dir.figures, verbose = 2)
+    dir.figures = dir.figures, verbose = opt$verbose)
   deg.results[["DESeq2"]] <- deseq2.result
   # names(deg.results[["DESeq2"]])
   #  attributes(deg.results[["DESeq2"]]$dds)
@@ -677,7 +740,7 @@ for (i in 1:nrow(design)) {
       norm.method = norm.method,
       title = paste(sep = "_", norm.method, comparison.prefix),
       dir.figures = dir.figures,
-      verbose = 2)
+      verbose = opt$verbose)
     deg.results[[edgeR.prefix]] <- edger.result
 
     ## A tricky way to add edgeR with normalisation in column names
@@ -711,7 +774,7 @@ for (i in 1:nrow(design)) {
                        prefix["comparison_file"],
                        "_diffexpr_DESeq2_and_edgeR")
   # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
-  verbose(paste(sep = "", "\tExporting result table (tsv): ", result.file, ".tsv"), 1)
+  message("\tExporting result table (tsv): ", result.file, ".tsv")
   write.table(x = result.table, row.names = FALSE,
               file = paste(sep = "", result.file, ".tsv"), sep = "\t", quote = FALSE)
 
@@ -870,3 +933,4 @@ sessionInfo()
 ## ---- job_done ------------------------------------------------------------
 message("Job done")
 
+# q(status = 0)
