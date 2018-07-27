@@ -1,10 +1,12 @@
 
 ## ---- Define the main_parameters -----------------------------------------------------
 
+dirs <- vector()
+
 ## Define main parameters to generate this report
-dir.main <- "~/ko-rna-seq/" ## Main directory
-setwd(dir.main)
-message("\tMain directory: ", dir.main)
+dirs["main"] <- "~/ko-rna-seq/" ## Main directory
+setwd(dirs["main"])
+message("\tMain directory: ", dirs["main"])
 
 ## Define YAML configuration file
 configFile <- "metadata/config_RNA-seq.yml"
@@ -15,8 +17,8 @@ count.prefix <- "bowtie2_featureCounts_all"
 message("\tPrefix for the count table: ", count.prefix)
 
 ## Relative path of the main dir starting from the Rmd file
-dir.base <- ".."
-message("\tBase directory: ", dir.base)
+dirs["base"] <- ".."
+message("\tBase directory: ", dirs["base"])
 
 ## ---- knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
 
@@ -105,7 +107,7 @@ message("\tLoaded parameters from file ", configFile)
 if (is.null(parameters$dir$snakechunks)) {
   stop("The SnakeChunks directory should be defined in the config file: ", configFile)
 }
-dir.SnakeChunks <- file.path(dir.main, parameters$dir$snakechunks)
+dir.SnakeChunks <- file.path(dirs["main"], parameters$dir$snakechunks)
 message("\tSnakeChunks directory:\t", dir.SnakeChunks)
 
 
@@ -125,18 +127,20 @@ for (f in R.files) {
   source(file.path(R.dir, f))
 }
 
+
+## ----- THIS SHOULD BE MOVED TO THE Rmd TEMPLATE ------
 ## R markdown (Rmd) directory
-if (is.null(parameters$dir$Rmd)) {
-  stop("The Rmd directory should be defined in the config file: ", configFile)
-}
-dir.Rmd <- parameters$dir$Rmd
-message("\tDirectory for the Rmd report: ", dir.Rmd)
-dir.create(dir.Rmd, showWarnings = FALSE, recursive = TRUE)
-opts_knit$set(base.dir = dir.Rmd) ## Set the working directory for knitr (generating HTML and pdf reports)
+# if (is.null(parameters$dir$Rmd)) {
+#   stop("The Rmd directory should be defined in the config file: ", configFile)
+# }
+# dir.Rmd <- parameters$dir$Rmd
+# message("\tDirectory for the Rmd report: ", dir.Rmd)
+# dir.create(dir.Rmd, showWarnings = FALSE, recursive = TRUE)
+# opts_knit$set(base.dir = dir.Rmd) ## Set the working directory for knitr (generating HTML and pdf reports)
 # setwd(dir.Rmd) ## Set the working directory for the console
 
 
-## R markdown (Rmd) directory
+## Directory for Figures
 if (is.null(parameters$dir$figures)) {
   stop("The figures directory should be defined in the config file: ", configFile)
 }
@@ -200,7 +204,7 @@ if (is.null(parameters$metadata$design)) {
 infiles["counts"] <- file.path(
   parameters$dir$diffexpr,
   paste(sep = "", count.prefix, ".tsv"))
-all.counts.path <- file.path(dir.main, infiles["counts"])
+all.counts.path <- file.path(dirs["main"], infiles["counts"])
 if (!file.exists(all.counts.path)) {
   stop("Feature count table does not exist: ", all.counts.path)
 } else {
@@ -236,13 +240,13 @@ write.table(x = t(as.data.frame(thresholds)),
 # system(paste("open", dir.tsv))
 
 ## ----read_samples--------------------------------------------------------
-#setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+#setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Read the sample description file, which indicates the
 ## condition associated to each sample ID.
 message("Reading sample description file: ", infiles["sample descriptions"])
 sample.desc <- read.delim(
-  file.path(dir.main, infiles["sample descriptions"]), sep = "\t",
+  file.path(dirs["main"], infiles["sample descriptions"]), sep = "\t",
   comment = ";", header = TRUE, row.names = 1)
 sample.ids <- row.names(sample.desc)
 message("\tNb of samples = ", length(sample.ids))
@@ -273,13 +277,13 @@ kable(sample.desc, caption = "Sample description table")
 
 
 ## ----read_design, warning=FALSE------------------------------------------
-# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+# setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 ## Read the design file, which indicates the anlayses to be done.
 ## Each row specifies one differential expression analysis, which
 ## consists in comparing two conditions.
 message("Reading design file: ", infiles["design"])
-design <- read.delim(file.path(dir.main, infiles["design"]), sep = "\t",
+design <- read.delim(file.path(dirs["main"], infiles["design"]), sep = "\t",
                      comment = ";", header = T, row.names = NULL)
 message("\tDesign file contains ", nrow(design), " comparisons. ")
 comparison.summary <- design ## Initialize a summary table for each DEG analysis
@@ -376,16 +380,32 @@ filtered.counts.log10 <- log10(filtered.counts.epsilon)
 filtered.counts.log2 <- log2(filtered.counts.epsilon)
 
 
-## ----sample_statistics---------------------------------------------------
+## ---- Compute sample-wise statistics on counts -----
 
-################################################################
-## Compute sample-wise statistics on mapped counts
-################################################################
-message("Computing sample-wise statistics on non-filtered counts")
+## Selected sample statistics
+selected.stats <- c("Mcounts",
+                    "sum",
+                    "min",
+                    "zeros",
+                    "non.null",
+                    "perc05",
+                    "Q1",
+                    "mean",
+                    "median",
+                    "Q3",
+                    "perc95",
+                    "max",
+                    "max.sum.ratio",
+                    "mean.median.ratio",
+                    "fract.below.mean")
+
+message("Computing sample-wise statistics on all counts (non-filtered)")
 #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
 # View(stats.per.sample)
-stats.per.sample.all <- cbind(sample.desc, RowStats(all.counts))
-stats.per.sample.all$Mreads <- stats.per.sample.all$sum / 1e6
+stats.per.sample.all <- cbind(
+  sample.desc,
+  ColStats(all.counts, verbose = 2, selected.stats = selected.stats))
+#stats.per.sample.all$Mcounts <- stats.per.sample.all$sum / 1e6
 # View(stats.per.sample.all.all)
 outfiles["stats_per_sample_all_features"] <- file.path(dir.tsv, "stats_per_sample_all_features.tsv")
 message("\t", outfiles["stats_per_sample_all_features"])
@@ -395,8 +415,10 @@ write.table(x = stats.per.sample.all, file = outfiles["stats_per_sample_all_feat
 message("Computing sample-wise statistics for non-zero counts")
 all.counts.nozero <- all.counts
 all.counts.nozero[all.counts.nozero == 0] <- NA
-stats.per.sample.nozero <- cbind(sample.desc, RowStats(all.counts.nozero))
-stats.per.sample.nozero$Mreads <- stats.per.sample.nozero$sum / 1e6
+stats.per.sample.nozero <- cbind(
+  sample.desc,
+  ColStats(all.counts.nozero, verbose = 2, selected.stats = selected.stats))
+#stats.per.sample.nozero$Mcounts <- stats.per.sample.nozero$sum / 1e6
 outfiles["stats_per_sample_no-zero"] <- file.path(dir.tsv, "stats_per_sample_no-zero.tsv")
 message("\t", outfiles["stats_per_sample_no-zero"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-zero"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
@@ -405,10 +427,15 @@ write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-ze
 
 ## Compute statistics ommitting zero values
 message("Computing sample-wise statistics for filtered counts")
-stats.per.sample.filtered <- cbind(sample.desc, RowStats(filtered.counts))
-stats.per.sample.filtered$Mreads <- stats.per.sample.filtered$sum / 1e6
+stats.per.sample.filtered <- cbind(
+  sample.desc,
+  ColStats(filtered.counts, verbose = 2, selected.stats = selected.stats))
+#stats.per.sample.filtered$Mcounts <- stats.per.sample.filtered$sum / 1e6
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
+outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_sample_filtered_features.tsv")
+message("\t", outfiles["stats_per_sample_filtered_features"])
+write.table(x = stats.per.sample.filtered, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
 ################################################################
 ## Compute the counts per million reads
@@ -420,7 +447,7 @@ message("Computing normalized values with edgeR::cpm")
 ## is to use the 75th percentile, or the median. We use the median, somewhat arbitrarily,
 ## beause it gives a nice alignment on the boxplots.
 stdcounts.libsum <- cpm(filtered.counts.epsilon)    ## Counts per million reads, normalised by library sum
-stdcounts.perc75 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample$perc75)    ## Counts per million reads, normalised by 75th percentile
+stdcounts.perc75 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$perc75)    ## Counts per million reads, normalised by 75th percentile
 stdcounts.perc95 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$perc95)    ## Counts per million reads, normalised by 95th percentile
 stdcounts.median <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$median)    ## Counts per million reads, normalised by sample-wise median count
 
@@ -434,7 +461,7 @@ stdcounts.log2 <- log2(stdcounts) ## Log-10 transformed stdcounts, with the epsi
 outfiles["stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts.tsv")
 message("\tExporting standardized counts: ", outfiles["stdcounts"])
 write.table(x = stdcounts, row.names = TRUE, col.names = NA,
-            file = file.path(dir.main, outfiles["stdcounts"]), sep = "\t", quote = FALSE)
+            file = file.path(dirs["main"], outfiles["stdcounts"]), sep = "\t", quote = FALSE)
 
 outfiles["log2stdcounts"] <- paste(sep = "", count.prefix, "_stdcounts_log2.tsv")
 message("\tExporting log2-transformed standardized counts: ", outfiles["log2stdcounts"])
@@ -468,7 +495,7 @@ message("\t", "Exporting stats per sample for filtered features")
 message("\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 # sample.summary.file <- paste(sep = "", count.prefix, "_summary_per_sample.tsv")
-# sample.summary.file.path <- file.path(dir.main, paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
+# sample.summary.file.path <- file.path(dirs["main"], paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
 # message("\tExporting stats per sample\t", sample.summary.file.path)
 # write.table(x = stats.per.sample,
 #             row.names = TRUE, col.names = NA,
@@ -477,36 +504,26 @@ write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filte
 # if (export.excel.files) {
 #   message(paste(sep = "", "\tSample summary file: ", sample.summary.file.xlsx))
 #   write.xlsx(x = stats.per.sample, row.names = TRUE, col.names=TRUE,
-#              file = file.path(dir.main, sample.summary.file.xlsx))
+#              file = file.path(dirs["main"], sample.summary.file.xlsx))
 # }
 
 
 ## ----print_sample_stats--------------------------------------------------
 ## Statistics per sample
-stats.per.sample.to.print <- c("Mreads",
-                               "sum",
-                               "min",
-                               "zeros",
-                               "non.null",
-                               "perc05",
-                               "Q1",
-                               "mean",
-                               "median",
-                               "Q3",
-                               "perc95",
-                               "max",
-                               "max.sum.ratio",
-                               "median.mean.ratio",
-                               "fract.below.mean")
-# setdiff(stats.per.sample.to.print, names(stats.per.sample))
+# setdiff(selected.stats, names(stats.per.sample))
 
-kable(stats.per.sample[stats.per.sample.to.print], digits = 2,
+# names(stats.per.sample.all)
+kable(stats.per.sample.all[,selected.stats], digits = 2,
       format.args = list(big.mark = ",", decimal.mark = "."),
-      caption = "Sample-wise statistics (zeros included)")
+      caption = "Sample-wise statistics for all features (zeros included)")
 
-kable(stats.per.sample.nozero[stats.per.sample.to.print], digits = 2,
+kable(stats.per.sample.nozero[,selected.stats], digits = 2,
       format.args = list(big.mark = ",", decimal.mark = "."),
-      caption = "Sample-wise statistics (zeros excluded)")
+      caption = "Sample-wise statistics for all features (zeros excluded)")
+
+kable(stats.per.sample.filtered[,selected.stats], digits = 2,
+      format.args = list(big.mark = ",", decimal.mark = "."),
+      caption = "Sample-wise statistics for filtered features")
 
 
 ## ----library_sizes_barplot, fig.width=6, fig.height=6, fig.cap="**Barplot of assigned reads per sample. ** Bars indicate the sum of read counts assigned to features (genes) per sample (library)."----
@@ -554,7 +571,7 @@ plot(size.factors, main = "Sample size factors", col = sample.desc$color)
 silence <- dev.off(); rm(silence)
 
 ## ----differential_expression_analysis, fig.width=8, fig.height=12--------
-# setwd(dir.main) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+# setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
 i <- 1
 
@@ -587,10 +604,10 @@ for (i in 1:nrow(design)) {
   comparison.prefix <- comparison.summary$prefixes[i]
   dir.analysis <- file.path(dir.DEG, paste(sep = "", comparison.prefix))
   comparison.summary[i, "dir.analysis"] <- dir.analysis
-  dir.create(path = file.path(dir.main, dir.analysis), showWarnings = FALSE, recursive = TRUE)
+  dir.create(path = file.path(dirs["main"], dir.analysis), showWarnings = FALSE, recursive = TRUE)
   dir.figures <- file.path(dir.analysis, "figures")
   comparison.summary[i, "dir.figures"] <- dir.figures
-  dir.create(path = file.path(dir.main, dir.figures), showWarnings = FALSE, recursive = TRUE)
+  dir.create(path = file.path(dirs["main"], dir.figures), showWarnings = FALSE, recursive = TRUE)
   prefix["comparison_file"] <- file.path(dir.analysis, comparison.prefix)
   prefix["comparison_figure"] <- file.path(
     dir.figures,
@@ -626,7 +643,7 @@ for (i in 1:nrow(design)) {
     comparison.prefix = comparison.prefix,
     ref.condition = cond2,
     title = comparison.prefix,
-    dir.figures = file.path(dir.main, dir.figures))
+    dir.figures = file.path(dirs["main"], dir.figures))
   deg.results[["DESeq2"]] <- deseq2.result
   # names(deg.results[["DESeq2"]])
   #  attributes(deg.results[["DESeq2"]]$dds)
@@ -655,7 +672,7 @@ for (i in 1:nrow(design)) {
   message("\tExporting DESeq2 result table (tab): ", deseq2.result.file, ".tsv")
   write.table(
     x = deseq2.result$result.table, row.name    = FALSE,
-    file = file.path(dir.main, paste(sep = ".", deseq2.result.file, "tsv")),
+    file = file.path(dirs["main"], paste(sep = ".", deseq2.result.file, "tsv")),
     sep = "\t", quote = FALSE)
 
   ################################################################
@@ -674,7 +691,7 @@ for (i in 1:nrow(design)) {
       comparison.prefix = comparison.prefix,
       title = comparison.prefix,
       norm.method = norm.method,
-      dir.figures = file.path(dir.main, dir.figures))
+      dir.figures = file.path(dirs["main"], dir.figures))
     deg.results[[edgeR.prefix]] <- edger.result
 
     ## A tricky way to add edgeR with normalisation in column names
@@ -697,7 +714,7 @@ for (i in 1:nrow(design)) {
     comparison.summary[i,"edger"] <- paste(sep = ".", edger.result.file, "tsv")
     message("\tExporting edgeR result table (tab): ", edger.result.file, ".tsv")
     write.table(x = edger.result$result.table,
-                file = file.path(dir.main, paste(sep = ".", edger.result.file, "tsv")),
+                file = file.path(dirs["main"], paste(sep = ".", edger.result.file, "tsv")),
                 row.names = FALSE,
                 sep = "\t", quote = FALSE)
   }
@@ -710,7 +727,7 @@ for (i in 1:nrow(design)) {
   # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
   verbose(paste(sep = "", "\tExporting result table (tsv): ", result.file, ".tsv"), 1)
   write.table(x = result.table, row.names = FALSE,
-              file = file.path(dir.main, paste(sep="", result.file, ".tsv")), sep = "\t", quote = FALSE)
+              file = file.path(dirs["main"], paste(sep = "", result.file, ".tsv")), sep = "\t", quote = FALSE)
 
 
   ## Collect results by output statistics
@@ -789,13 +806,15 @@ for (i in 1:nrow(design)) {
     # plot(deg.result.table$log2FC,
     #      -log10(deg.result.table$padj), main = paste(comparison.prefix, deg.name))
     # # # View(deg.result.table)
-    VolcanoPlot(multitest.table = deg.result.table,
-                main = deg.name,
-                effect.size.col = "log2FC",
-                control.type = "padj",
-                alpha = parameters$DEG$thresholds$padj,
-                effect.threshold = parameters$DEG$thresholds$FC,
-                legend.corner = "topleft")
+    degMultiTestTable <- multipleTestingCorrections(p.values = deg.results[[deg.name]]$result.table$padj)
+    VolcanoPlot.MultiTestTable(
+      multitest.table = degMultiTestTable,
+      main = deg.name,
+      effect.size.col = "log2FC",
+      control.type = "padj",
+      alpha = parameters$DEG$thresholds$padj,
+      effect.threshold = parameters$DEG$thresholds$FC,
+      legend.corner = "topleft")
 
   }
   par(mfrow = c(1,1))
