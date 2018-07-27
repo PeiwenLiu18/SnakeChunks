@@ -12,14 +12,13 @@
 #' @param dir.figures=NULL optional directory to save figures
 #' @param ... additional parameters are passed to DESeq2::DESeq() function
 #' @export
-deseq2.analysis <- function(
-  counts,
-  condition,
-  ref.condition=NULL,
-  comparison.prefix,
-  title = comparison.prefix,
-  dir.figures=NULL,
-  ...) {
+deseq2.analysis <- function(counts,
+                            condition,
+                            ref.condition = NULL,
+                            comparison.prefix,
+                            title = comparison.prefix,
+                            dir.figures = NULL,
+                            ...) {
 
   require("DESeq2")
 
