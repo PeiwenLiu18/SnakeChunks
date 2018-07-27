@@ -437,9 +437,7 @@ outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_
 message("\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.filtered, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
-################################################################
-## Compute the counts per million reads
-################################################################
+## ---- Compute the counts per million reads with edgeR, using different lib sizes ----
 message("Computing normalized values with edgeR::cpm")
 ## Note: the default normalization criterion (scaling by libbrary sum)
 ## is questionable because it is stronly sensitive to outliers
@@ -485,27 +483,11 @@ stats.per.sample.filtered$cpm.mean <- apply(stdcounts, 2, mean)
 stats.per.sample.filtered$log2.cpm.mean <- apply(stdcounts.log2, 2, mean)
 stats.per.sample.filtered$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
 
-################################################################
-## Export stats per sample
-#
-# names(stats.per.sample)
-# head(stats.per.sample)
+## ---- Export stats per sample ----
 outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tsv, "stats_per_sample_filtered_features.tsv")
 message("\t", "Exporting stats per sample for filtered features")
 message("\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
-# sample.summary.file <- paste(sep = "", count.prefix, "_summary_per_sample.tsv")
-# sample.summary.file.path <- file.path(dirs["main"], paste(sep = "", count.prefix, "_summary_per_sample.tsv"))
-# message("\tExporting stats per sample\t", sample.summary.file.path)
-# write.table(x = stats.per.sample,
-#             row.names = TRUE, col.names = NA,
-#             file = sample.summary.file.path, sep = "\t", quote = FALSE)
-# sample.summary.file.xlsx <- paste(sep = "", count.prefix, "_summary_per_sample.xlsx")
-# if (export.excel.files) {
-#   message(paste(sep = "", "\tSample summary file: ", sample.summary.file.xlsx))
-#   write.xlsx(x = stats.per.sample, row.names = TRUE, col.names=TRUE,
-#              file = file.path(dirs["main"], sample.summary.file.xlsx))
-# }
 
 
 ## ----print_sample_stats--------------------------------------------------
@@ -633,9 +615,7 @@ for (i in 1:nrow(design)) {
   # View(result.table)
   # dim(result.table)
 
-  ################################################################
-  ## DESeq2 analysis
-  ################################################################
+  ## ---- DESeq2 analysis ----
   message("\tDESeq2 analysis\t", comparison.prefix)
   deseq2.result <- deseq2.analysis(
     counts = current.counts,
@@ -675,9 +655,7 @@ for (i in 1:nrow(design)) {
     file = file.path(dirs["main"], paste(sep = ".", deseq2.result.file, "tsv")),
     sep = "\t", quote = FALSE)
 
-  ################################################################
-  ## edgeR analysis
-  ################################################################
+  ## ---- edgeR analysis ----
   # norm.method <- "TMM" ## For quick test and debugging
   edgeR.norm.methods <- c("TMM","RLE","upperquartile","none")
   for (norm.method in edgeR.norm.methods) {
