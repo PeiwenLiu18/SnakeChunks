@@ -3,6 +3,7 @@
 #' @param x data.frame or matrix
 #' @param margin supported values: 1 (row-wise statistics) or 2 (column-wise)
 #' @param verbose=0 level of verbosity
+#' @param selected.stats=NULL if specified, restrict the computation to a subset of the supported statistics.
 #' @return a data.frame with one row per entry (row or column) of the input matrix, and one column per statistics.
 #' #' \describe{
 #'  \item{mean}{arithmetic mean}
@@ -33,45 +34,146 @@
 #'  \item{fract.below.mean}{fraction of values below the mean. }
 #' }
 #' @export
-MarginStats <- function(x, margin, verbose = 0) {
-    if (margin == 1) {
+MarginStats <- function(x,
+                        margin,
+                        verbose = 0,
+                        selected.stats=NULL) {
+
+  ## Check margin parameter
+  if (margin == 1) {
     margin.name <- "row"
   } else if (margin == 2) {
     margin.name <- "column"
   } else {
-    stop('Invalid margin specification for MarginStats(). Supported: 1 (row-wise) or 2 (column-wise)')
+    stop('invalid margin specification for MarginStats(). Supported: 1 (row-wise) or 2 (column-wise)')
   }
+
+  ## Check selected statistics
+  supported.stats <- c("mean",
+                       "median",
+                       "sum",
+                       "sd",
+                       "iqr",
+                       "var",
+                       "min",
+                       "max",
+                       "perc01",
+                       "perc05",
+                       "perc10",
+                       "Q1",
+                       "Q3",
+                       "perc90",
+                       "perc95",
+                       "perc99",
+                       "zeros",
+                       "na.values",
+                       "infinite.values",
+                       "non.null",
+                       "sdiqr",
+                       "max.mean.ratio",
+                       "max.sum.ratio",
+                       "mean.median.ratio",
+                       "below.mean",
+                       "fract.below.mean"
+  )
+  if (is.null(selected.stats)) {
+    selected.stats <- supported.stats
+  } else {
+    non.supported <- setdiff(selected.stats, supported.stats)
+    if (length(non.supported) > 0) {
+      stop("MarginStats()\tInvalid selection of statistics: ",
+           paste(collapse = ", ", non.supported),
+           "\n\tSupported statistics: ", paste(collapse = ", ", supported.stats)
+      )
+    }
+  }
+
+  ## Verbosity
   if (verbose >= 1) {
     message("\t\t", "Computing ", margin.name, "-wise statistics")
+    message("\t\tStats to compute: ", paste(collapse = ", ", selected.stats))
   }
+
+
+  ## Compute margin statistics
   margin.stats <- data.frame(
-    mean = apply(x, margin, mean, na.rm = TRUE),
-    median = apply(x, margin, quantile, na.rm = TRUE, probs = 0.5),
-    sum = apply(x, margin, sum, na.rm = TRUE),
-    sd = apply(x, margin, sd, na.rm = TRUE),
-    iqr = apply(x, margin, IQR, na.rm = TRUE),
-    var = apply(x, margin, var, na.rm = TRUE),
-    min = apply(x, margin, min, na.rm = TRUE),
-    max = apply(x, margin, max, na.rm = TRUE),
-    perc01 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.01),
-    perc05 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.05),
-    perc10 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.10),
-    Q1 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.25),
-    Q3 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.75),
-    perc90 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.90),
-    perc95 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.95),
-    perc99 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.90),
-    zeros = apply(x == 0, margin, sum, na.rm = TRUE),
-    na.values = apply(is.na(x), margin, sum),
-    infinite.values = apply(is.infinite(as.matrix(x)), margin, sum),
-    non.null = apply(x > 0, margin, sum, na.rm = TRUE)
+    mean = apply(x, margin, mean, na.rm = TRUE)
   )
-  margin.stats$sdiqr = margin.stats$iqr/(2*qnorm(3/4))
-  margin.stats$max.mean.ratio <- margin.stats$max/margin.stats$mean
-  margin.stats$max.sum.ratio <- margin.stats$max/margin.stats$sum
-  margin.stats$median.mean.ratio <- margin.stats$median/margin.stats$mean
-  margin.stats$below.mean <- apply(t(x) < margin.stats$mean, 1, sum, na.rm = TRUE)
-  margin.stats$fract.below.mean <- margin.stats$below.mean/nrow(x)
+  if ("median" %in% selected.stats) {
+    margin.stats$median = apply(x, margin, quantile, na.rm = TRUE, probs = 0.5)
+  }
+  if ("sum" %in% selected.stats) {
+    margin.stats$sum = apply(x, margin, sum, na.rm = TRUE)
+  }
+  if ("sd" %in% selected.stats) {
+    margin.stats$sd = apply(x, margin, sd, na.rm = TRUE)
+  }
+  if ("iqr" %in% selected.stats) {
+    margin.stats$iqr = apply(x, margin, IQR, na.rm = TRUE)
+  }
+  if ("var" %in% selected.stats) {
+    margin.stats$var = apply(x, margin, var, na.rm = TRUE)
+  }
+  if ("min" %in% selected.stats) {
+    margin.stats$min = apply(x, margin, min, na.rm = TRUE)
+  }
+  if ("max" %in% selected.stats) {
+    margin.stats$max = apply(x, margin, max, na.rm = TRUE)
+  }
+  if ("perc01" %in% selected.stats) {
+    margin.stats$perc01 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.01)
+  }
+  if ("perc05" %in% selected.stats) {
+    margin.stats$perc05 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.05)
+  }
+  if ("perc10" %in% selected.stats) {
+    margin.stats$perc10 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.10)
+  }
+  if ("Q1" %in% selected.stats) {
+    margin.stats$Q1 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.25)
+  }
+  if ("Q3" %in% selected.stats) {
+    margin.stats$Q3 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.75)
+  }
+  if ("perc90" %in% selected.stats) {
+    margin.stats$perc90 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.90)
+  }
+  if ("perc95" %in% selected.stats) {
+    margin.stats$perc95 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.95)
+  }
+  if ("perc99" %in% selected.stats) {
+    margin.stats$perc99 = apply(x, margin, quantile, na.rm = TRUE, probs = 0.90)
+  }
+  if ("zeros" %in% selected.stats) {
+    margin.stats$zeros = apply(x == 0, margin, sum, na.rm = TRUE)
+  }
+  if ("na.values" %in% selected.stats) {
+    margin.stats$na.values = apply(is.na(x), margin, sum)
+  }
+  if ("infinite.values" %in% selected.stats) {
+    margin.stats$infinite.values = apply(is.infinite(as.matrix(x)), margin, sum)
+  }
+  if ("non.null" %in% selected.stats) {
+    margin.stats$non.null = apply(x > 0, margin, sum, na.rm = TRUE)
+  }
+  if ("sdiqr" %in% selected.stats) {
+    margin.stats$sdiqr = margin.stats$iqr/(2*qnorm(3/4))
+  }
+  if ("max.mean.ratio" %in% selected.stats) {
+    margin.stats$max.mean.ratio <- margin.stats$max/margin.stats$mean
+  }
+  if ("max.sum.ratio" %in% selected.stats) {
+    margin.stats$max.sum.ratio <- margin.stats$max/margin.stats$sum
+  }
+  if ("mean.median.ratio" %in% selected.stats) {
+    margin.stats$mean.median.ratio <- margin.stats$mean / margin.stats$median
+  }
+  if ("below.mean" %in% selected.stats) {
+    margin.stats$below.mean <- apply(t(x) < margin.stats$mean, 1, sum, na.rm = TRUE)
+  }
+  if ("fract.below.mean" %in% selected.stats) {
+    margin.stats$fract.below.mean <- margin.stats$below.mean/nrow(x)
+  }
 
   ## Assign same names as in data table
   if (margin == 1) {
@@ -87,18 +189,52 @@ MarginStats <- function(x, margin, verbose = 0) {
 #' @author Jacques van Helden
 #' @param x data.frame or matrix
 #' @param verbose=0 level of verbosity
+#' @param selected.stats=NULL if specified, restrict the computation to a subset of the supported statistics.
 #' @description statistics are computed on each row by passing the data frame/matrux to MarginStats() with marrgin=1.
 #' @export
 RowStats <- function(x, verbose = 0) {
-  MarginStats(x, 1, verbose = 0)
+  MarginStats(x, 1, verbose = 0, selected.stats = NULL)
 }
 
 #' @title compute column statistics on a data.frame or matrix.
 #' @author Jacques van Helden
 #' @param x data.frame or matrix
 #' @param verbose=0 level of verbosity
+#' @param selected.stats=NULL if specified, restrict the computation to a subset of the supported statistics.
 #' @description statistics are computed on each column by passing the data frame/matrux to MarginStats() with marrgin=2.
 #' @export
-ColStats <- function(x, verbose = 0) {
+ColStats <- function(x, verbose = 0, selected.stats = NULL) {
   MarginStats(x, 2, verbose = 0)
 }
+
+
+#' @title Descriptive statistics on each row of the input matrix
+#'
+#' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
+#' @description Compute descriptive parameters (central tendency, dispersion)
+#' for each row of a matrix or data frame.
+#'
+#' @details
+#' First version: 2015-03
+#' Replaced by MarginStats: 2018-07-27
+#'
+#' @param x       A matrix or data frame
+#'
+#' @return
+#' A data.frame with one row per row of the input matrix, and one column
+#' per computed statistics.
+#' @examples
+#' ## Load example data set from Den Boer, 2009
+#' library(denboer2009)
+#' data(denboer2009.expr)     ## Load expression table
+#' data(denboer2009.pheno)    ## Load phenotypic data
+#' data(denboer2009.group.labels)    ## Load phenotypic data
+#'
+#' stats.per.row <- RowStats(denboer2009.expr, verbose = 1)
+#' head(stats.per.row)
+#' @export
+statsPerRow <- function(x, ...) {
+  message("statsPerRow() has been replaced by RowStats()")
+  return(RowStats(x, ...))
+}
+
