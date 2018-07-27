@@ -55,7 +55,7 @@ LibsizeBarplot <- function(counts,
 
 #' #' @title Draw a barplot with the number of reads per sample
 #' #' @author Jacques van Helden
-#' #' @param stats.per.sample a table with the sample-wise statistics, which ca n be produced by RowStats().
+#' #' @param stats.per.sample a table with the sample-wise statistics, which ca n be produced by ColStats().
 #' #' @param main Main title for the plot
 #' #' @plot.file=NULL Path of a file to store the figure (pdf format).
 #' libsize.barplot <- function(stats.per.sample,
