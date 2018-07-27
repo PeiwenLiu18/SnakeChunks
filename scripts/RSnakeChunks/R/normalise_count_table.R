@@ -146,8 +146,8 @@ NormalizeCountTable <- function(counts,
     if (verbose >= 2) {
       message("\t\t", "Computing sample-wise statistics with and without zeros")
     }
-    sampleStats$all <- RowStats(counts)
-    sampleStats$nozero <- RowStats(counts.nozero)
+    sampleStats$all <- ColStats(counts)
+    sampleStats$nozero <- ColStats(counts.nozero)
   }
   result$sampleStats <- sampleStats
   # head(self$sampleStats)
