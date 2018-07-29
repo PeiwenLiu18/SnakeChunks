@@ -3,11 +3,12 @@
 
 ## By  default this script is invoked on the command line with options parsed from the arguments.
 ##
-## Alternatively, the options can be defined separately, so that the script can be called from another R script. 
+## Alternatively, the options can be defined separately, so that the script can be called from another R script.
 ##
-## Integration in a snakemake rule will be evaluated soon. 
+## Integration in a snakemake rule will be evaluated soon.
 
 library('rmarkdown')
+library('limma')
 
 if (!exists("opt")) {
   message("Reading parameters from the command line")
@@ -39,10 +40,11 @@ if (is.null(opt$verbose) ) {
   opt$verbose    = 1
 }
 
-## If not specified, 
+## If not specified,
 if (is.null(opt$main_dir) ) {
   opt$main_dir = getwd()
 }
+dir.main <- opt$main_dir
 
 ## Mandatory arguments
 if (is.null(opt$config_file) ) {
@@ -94,8 +96,35 @@ message("\tCount table: ", count.table)
 index.rmd <- "index.Rmd"
 index.socket <- file(index.rmd)
 
+Rmd.header <- '---
+title: "RNA-seq analysis report"
+author:
+  name: "[AUTHOR NAME]"
+  email: "[AUTHOR EMAIL]"
+date: Last update:`r format(Sys.time())`
+output:
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
+  html_document:
+    code_folding: show
+    fig_caption: yes
+    highlight: zenburn
+    self_contained: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  word_document:
+    toc: yes
+    toc_depth: 2
+---
 
-index.text <- "# RNA-seq analysis report"
+'
+
+index.text <- Rmd.header
 
 
 ## ---- knitr_setup, include=FALSE,  eval=TRUE, echo=FALSE, warning=FALSE----
@@ -178,9 +207,9 @@ message("\tLoaded parameters from file ", configFile)
 if (!is.null(parameters$dir$snakechunks)) {
   dirs["SnakeChunks"] <- file.path(dirs["main"], parameters$dir$snakechunks)
   message("\tSnakeChunks directory:\t", dirs["SnakeChunks"])
-  
+
   ## ----  Load R functions from SnakeChunks --------------------
-  
+
   ## NOTE: if the RSnakechunks package has been compiled on this machine
   ## the functions will be loaded with library('RSnakeChunks'). However
   ## for the ime being we do not assume that RSnakeChunks has been
@@ -315,12 +344,12 @@ thresholds <- parameters$DEG$thresholds
 
 ## Print the threshold tables
 ## NOTE: I should evaluate what I do with the kable calls
-index.text <- append(index.text, "\n\n# Parameters\n")
+index.text <- append(index.text, "\n\n## Parameters\n")
 index.text <- append(
-  index.text, 
+  index.text,
   kable(t(as.data.frame(thresholds)), col.names = "Threshold",
         caption = "Thresholds for the selection of differentially expressed genes. "))
-  
+
 outfiles["thresholds"] <- file.path(dir.tables.samples, "thresholds.tsv")
 write.table(x = t(as.data.frame(thresholds)),
             file = outfiles["thresholds"],
@@ -630,8 +659,14 @@ LibsizeBarplot(counts = filtered.counts, sample.labels = sample.desc$label, samp
 silence <- dev.off(); rm(silence)
 
 
-## ----normalisation-------------------------------------------------------
-norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
+## ---- normalisation -------------------------------------------------------
+
+if (is.null(parameters$DEG$norm_method)) {
+  #norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2", "quantiles")
+  norm.methods <- c("none", "mean", "median", "percentile", "TMM", "DESeq2")
+} else {
+  norm.methods <- parameters$DEG$norm_method
+}
 norm.comparison <- NormalizeCountTable(
   counts = filtered.counts, class.labels = sample.conditions, nozero = TRUE,
   method = norm.methods, percentile = 75, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
@@ -765,7 +800,7 @@ for (i in 1:nrow(design)) {
     edgeR.norm.methods <- c("TMM","RLE","upperquartile","none")
     #edgeR.norm.methods <- c("TMM","RLE","upperquartile","none")
   } else {
-    parameters$edgeR$norm_method
+    edgeR.norm.methods <- parameters$edgeR$norm_method
   }
   for (norm.method in edgeR.norm.methods) {
 
@@ -912,7 +947,7 @@ for (i in 1:nrow(design)) {
   ## system(paste("ls -ltr ", figfiles[prefix]))
 
 
-  
+
   ## ---- Comparison between p-value histograms -----
   ## Draw Volcano plots
   # deg.name <- "DESeq2"
@@ -970,19 +1005,19 @@ for (i in 1:nrow(design)) {
 
 ## ---- Index input / output files and directories -----
 index <- data.frame()
-index <- rbind(index, 
+index <- rbind(index,
                data.frame(
                  type = "directory",
                  name = names(dirs),
                  path = dirs
                ))
-index <- rbind(index, 
+index <- rbind(index,
                data.frame(
                  type = "input file",
                  name = names(infiles),
                  path = infiles
                ))
-index <- rbind(index, 
+index <- rbind(index,
                data.frame(
                  type = "output file",
                  name = names(outfiles),
@@ -1044,9 +1079,9 @@ for (filename in names(figfiles)) {
 
 index.text <- append(index.text, paste(sep = "", "\n\nJob done: ", Sys.time()))
 
-writeLines(text = index.text, con = index.socked)
+writeLines(text = index.text, con = index.socket)
 close(index.socket)
-rmarkdown::render(index.rmd)
+rmarkdown::render(index.Rmd)
 
 
 ## ---- job_done ------------------------------------------------------------
