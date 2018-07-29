@@ -10,6 +10,7 @@
 #' @param mean.per.condition=NULL  ## Filter out features for which none of the conditions has a mean count above the threshold
 #' @param black.list=NULL Black-listed" features: a vector of row IDs or row indices indicating a list of features to be filtered out (e.g. 16S, 12S RNA).
 #' @return a data.frame with the same columns (samples) as the input count table, and with rows restricted to the features that pass all the thresholds.
+#' @export
 FilterCountTable <- function(counts,
                              condition = NULL,
                              na.omit = FALSE,
