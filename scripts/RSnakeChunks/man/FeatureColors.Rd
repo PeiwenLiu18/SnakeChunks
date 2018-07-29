@@ -4,8 +4,8 @@
 \alias{FeatureColors}
 \title{define feature colors for scatter plots as a function of either their score or the local density}
 \usage{
-FeatureColors(palette.type = "gray", scores = NULL, x = NULL, y = NULL,
-  levels = 100, end.colors = c("blue", "red"))
+FeatureColors(palette.type = "gray", scores = NULL, x = NULL,
+  y = NULL, levels = 100, end.colors = c("blue", "red"))
 }
 \arguments{
 \item{type="2col"}{type of palette. Suppored: 2col (2-colors gradient), "gray" (gray scale), "dens" (proportional to local density).
@@ -21,6 +21,9 @@ Density palette requires to specify X and Y coordinates.}
 \item{levels=100}{number of palette levels}
 
 \item{end.colors=c('blue', 'red')}{Colors and the two extemes of the palette.}
+}
+\description{
+define feature colors for scatter plots as a function of either their score or the local density
 }
 \author{
 Jacques van Helden

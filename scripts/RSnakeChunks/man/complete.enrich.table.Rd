@@ -5,8 +5,9 @@
 \title{Add some columns to a functional enrichment table in order to ensure that we always have the same statistics.}
 \usage{
 complete.enrich.table(enrich.table, pvalue.column = "Pvalue",
-  thresholds = c(evalue = 1, qvalue = 0.05), nb.tests = nrow(enrich.table),
-  select.positives = FALSE, plot.adjust = TRUE)
+  thresholds = c(evalue = 1, qvalue = 0.05),
+  nb.tests = nrow(enrich.table), select.positives = FALSE,
+  plot.adjust = TRUE)
 }
 \arguments{
 \item{enrich.table}{Enrichment table from GOstats, clusterProfiler or similar programs.}

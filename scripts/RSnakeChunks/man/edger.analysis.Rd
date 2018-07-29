@@ -4,9 +4,10 @@
 \alias{edger.analysis}
 \title{edgeR analysis}
 \usage{
-edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
-  norm.method = "TMM", title = paste(sep = "_", norm.method,
-  comparison.prefix), dir.figures = NULL, verbose = 0, ...)
+edger.analysis(counts, condition, ref.condition = NULL,
+  comparison.prefix, norm.method = "TMM", title = paste(sep = "_",
+  norm.method, comparison.prefix), dir.figures = NULL, verbose = 0,
+  ...)
 }
 \arguments{
 \item{counts}{a count table sent to edgeR Must contain raw counts (not normalized).}

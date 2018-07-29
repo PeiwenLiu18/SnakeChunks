@@ -2,10 +2,11 @@
 % Please edit documentation in R/libsize_barplot.R
 \name{LibsizeBarplot}
 \alias{LibsizeBarplot}
-\title{Draw a barplot with the number of reads per sample}
+\title{Draw a barplot with the number of million reads per sample}
 \usage{
 LibsizeBarplot(counts, sample.labels = colnames(counts),
-  sample.colors = NULL, main = "Library sizes", plot.file = NULL, ...)
+  sample.colors = NULL, main = "Library sizes", plot.file = NULL,
+  ...)
 }
 \arguments{
 \item{counts}{a count table with 1 row per feature and 1 column per sample}
@@ -17,6 +18,9 @@ LibsizeBarplot(counts, sample.labels = colnames(counts),
 \item{sample.colors=NULL}{sample-specific colors (e.g. reflecting conditions)}
 
 \item{plot.file=NULL}{Path of a file to store the figure (pdf format).}
+}
+\description{
+Draw a barplot with the number of million reads per sample
 }
 \author{
 Jacques van Helden

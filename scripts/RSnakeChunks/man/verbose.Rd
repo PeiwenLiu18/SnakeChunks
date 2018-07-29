@@ -2,7 +2,6 @@
 % Please edit documentation in R/deg_lib.R, R/verbose.R
 \name{verbose}
 \alias{verbose}
-\alias{verbose}
 \title{Display messages at a given verbosity level}
 \usage{
 verbose(message.content, level = 1, print.date = TRUE)

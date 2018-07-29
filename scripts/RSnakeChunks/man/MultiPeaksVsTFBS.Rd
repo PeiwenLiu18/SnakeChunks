@@ -4,8 +4,9 @@
 \alias{MultiPeaksVsTFBS}
 \title{Compare several sets of genomic regions (e.g. Chip_seq peaks) with a set of reference genomic sites (e.g. transcription factor binding sites).}
 \usage{
-MultiPeaksVsTFBS(peakFiles, TFBSFile, PNGFile, main = "Mutual coverage plot",
-  peakSetLabels = NULL, verbose = FALSE, drawPlots = FALSE, ...)
+MultiPeaksVsTFBS(peakFiles, TFBSFile, PNGFile,
+  main = "Mutual coverage plot", peakSetLabels = NULL,
+  verbose = FALSE, drawPlots = FALSE, ...)
 }
 \arguments{
 \item{peakFiles}{a vector contianing a list of files. Each file is supposed to contain a set of genomic regions, in bed format.}

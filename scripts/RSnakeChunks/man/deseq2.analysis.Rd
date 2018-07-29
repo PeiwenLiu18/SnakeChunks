@@ -4,8 +4,9 @@
 \alias{deseq2.analysis}
 \title{DESeq2 analysis}
 \usage{
-deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
-  title = comparison.prefix, dir.figures = NULL, verbose = 0, ...)
+deseq2.analysis(counts, condition, ref.condition = NULL,
+  comparison.prefix, title = comparison.prefix, dir.figures = NULL,
+  verbose = 0, ...)
 }
 \arguments{
 \item{counts}{a count table sent to DESeq2. Must contain raw counts (not normalized).}

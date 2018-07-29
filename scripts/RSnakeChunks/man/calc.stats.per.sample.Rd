@@ -11,6 +11,9 @@ calc.stats.per.sample(sample.descriptions, counts)
 
 \item{counts}{a data.frame with one row per feature (gene, transcript, ...) and one column per sample. The columns of the count table must correspond to the rows of the sample descrtiption file.}
 }
+\description{
+Compute sample-wise statistics for a count table
+}
 \author{
 Jcaques van Helden
 }
