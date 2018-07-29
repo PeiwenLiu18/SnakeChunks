@@ -1,10 +1,9 @@
-#' @title scaling RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods)
-#'
+#' @title Between-sample normalisation of RNA-seq count table.
+#' 
 #' @author Jacques van Helden and Mustafa AbuElqumsan
 #'
-#' @description normalisation of RNA-seq count table.
-#' More precisely this function runs a sample-wise scaling so that all the samples
-#' have the same value for a user-defined scaling parameter.
+#' @description Run between-sample normalization of an RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods).
+#' Runs a sample-wise scaling so that all the samples have the same value for a user-defined scaling parameter.
 #' By default, we use the percentile 75 as scaling factor.
 #'
 #' @param counts a data frame with counts per feature, with one feature (gene, transcript) per row and one sample per column.
