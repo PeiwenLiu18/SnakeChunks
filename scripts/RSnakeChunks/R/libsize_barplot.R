@@ -1,10 +1,11 @@
-#' @title Draw a barplot with the number of reads per sample
+#' @title Draw a barplot with the number of million reads per sample
 #' @author Jacques van Helden
 #' @param counts a count table with 1 row per feature and 1 column per sample
 #' @param sample.labels=colnames(counts) sample labels (displayed as y legend)
 #' @param sample.colors=NULL sample-specific colors (e.g. reflecting conditions)
 #' @param main Main title for the plot
 #' @param plot.file=NULL Path of a file to store the figure (pdf format).
+#' @export
 LibsizeBarplot <- function(counts,
                            sample.labels=colnames(counts),
                            sample.colors=NULL,
