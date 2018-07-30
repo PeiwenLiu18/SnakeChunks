@@ -3,14 +3,23 @@
 #' @param counts a count table with 1 row per feature and 1 column per sample
 #' @param sample.labels=colnames(counts) sample labels (displayed as y legend)
 #' @param sample.colors=NULL sample-specific colors (e.g. reflecting conditions)
-#' @param main Main title for the plot
+#' @param main="Library sizes" Main title for the plot
+#' @param xlab="libsum (Million reads per sample)" X axis label
 #' @param plot.file=NULL Path of a file to store the figure (pdf format).
+#' @param cex.names=1 fondt size for sample labels
+#' @param boxplot.lmargin=cex.names*max(nchar(sample.labels))/2.5+5 Adapt margin to the label sizes
+#' @param boxplot.height=length(sample.labels)/3+2 Adapt boxplot height to the number of samples
+#' @param ... additional parameters are passed to barplot
 #' @export
 LibsizeBarplot <- function(counts,
                            sample.labels=colnames(counts),
                            sample.colors=NULL,
                            main = "Library sizes",
+                           xlab = "libsum (Million reads per sample)",
                            plot.file = NULL,
+                           cex.names = 1,
+                           boxplot.lmargin = cex.names * max(nchar(sample.labels))/2.5 + 5,
+                           boxplot.height = length(sample.ids)/3 + 2,
                            ...) {
 
   ## Store original graphical parameters
@@ -25,9 +34,6 @@ LibsizeBarplot <- function(counts,
     sample.colors <- rep(c("#888888", "#DDDDDD"), length.out = length(libsizes))
   }
 
-  ## Adapt boxplot size to the number of samples and label sizes
-  boxplot.lmargin <- max(nchar(sample.labels))/3 + 5
-  boxplot.height <- length(sample.ids)/3 + 2
 
   ## Sample-wise library sizes
   if (!is.null(plot.file)) {
@@ -40,7 +46,7 @@ LibsizeBarplot <- function(counts,
                   names.arg = sample.labels,
                   main = main,
                   horiz = TRUE, las = 1,
-                  xlab = "libsum (Million reads per sample)",
+                  xlab = xlab,
                   col = sample.colors, ...)
   grid(col = "white", lty = "solid", ny = 0)
   text(x = pmax(libsizes, 3),
