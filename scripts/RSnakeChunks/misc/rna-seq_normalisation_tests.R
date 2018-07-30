@@ -7,8 +7,6 @@
 ##
 ## Integration in a snakemake rule will be evaluated soon.
 
-library('rmarkdown')
-library('limma')
 
 if (!exists("opt")) {
   message("Reading parameters from the command line")
@@ -60,17 +58,36 @@ if (is.null(opt$config_file) ) {
 }
 
 
+#' @title generate a figure chunk of R code to insert in an Rmd report
+index.figure <- function(name, file, index.text = NULL, chunk.opt = ", eval=TRUE") {
+  fig.chunk <-  paste(sep = "",
+                      "
+```{r fig='", name, "' ", chunk.opt, " }
+knitr::include_graphics(path = '", file, "', auto_pdf = TRUE)
+```
+                     ")
+  if (is.null(index.text)) {
+    return(fig.chunk)
+  } else {
+    return(append(index.text, fig.chunk))
+  }
+}
+
+
+
 # script.name <- get_Rscript_filename()
 
 
-## ---- Define the main_parameters -----------------------------------------------------
+## ---- Define the main parameters -----------------------------------------------------
 
 ## Prepare a list of input and output files.
 ## This will later serve to generate a report.
+message("\tInitializing indexes and main parameters")
 dirs <- vector()
 infiles <- vector()   ## Input files
 outfiles <- vector()  ## For tab-separated value files
-figfiles <- vector()  ## Store figures
+pdf.files <- vector()  ## Figures in pdf format
+png.files <- vector()  ## Figures in pdf format
 
 ## Define main parameters to generate this report
 #dirs["main"] <- "~/ko-rna-seq/" ## Main directory
@@ -93,8 +110,8 @@ message("\tCount table: ", count.table)
 
 
 ## ---- Initialize the Rmd report (index of input/output file)
-index.rmd <- "index.Rmd"
-index.socket <- file(index.rmd)
+index.Rmd <- "index.Rmd"
+index.socket <- file(index.Rmd)
 
 Rmd.header <- '---
 title: "RNA-seq analysis report"
@@ -109,7 +126,6 @@ output:
     toc: yes
     toc_depth: 3
   html_document:
-    code_folding: show
     fig_caption: yes
     highlight: zenburn
     self_contained: yes
@@ -121,6 +137,22 @@ output:
     toc: yes
     toc_depth: 2
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo=FALSE, 
+  eval=TRUE, 
+  cache=TRUE, 
+  message=FALSE, 
+  warning=FALSE, 
+  comment = "",  
+  fig.align= "center",
+  fig.width = 7, 
+  fig.height = 5,
+  fig.path = "figures/")
+
+```
+
 
 '
 
@@ -141,27 +173,19 @@ knitr::opts_chunk$set(
   warning = FALSE)
 
 ## Load required libraries
-required.libraries <- c("knitr",
-                        "yaml",
-                        "pander",
-                        # "xlsx",
-                        "ascii",
-                        "xtable",
-                        "gplots",
-                        "RColorBrewer",
-                        "devtools"#,
-                        #                        "stats4bioinfo" ## Generic library from Jacques van Helden
+required.cran.libraries <- c("knitr",
+                             "yaml",
+                             "pander",
+                             # "xlsx",
+                             "ascii",
+                             "xtable",
+                             "gplots",
+                             "RColorBrewer",
+                             'rmarkdown',
+                             "devtools"#,
+                             #                        "stats4bioinfo" ## Generic library from Jacques van Helden
 )
-for (lib in required.libraries) {
-  message("\tRequired CRAN library\t", lib)
-  if (!require(lib, character.only = TRUE)) {
-    install.packages(lib)
-    library(lib, character.only = TRUE)
-  }
-}
-
-# library(gplots, warn.conflicts = FALSE, quietly=TRUE) ## Required for heatmaps.2
-#library(RColorBrewer, warn.conflicts = FALSE, quietly=TRUE)
+LoadRequiredCRANPackages(required.cran.libraries, verbose = 1)
 
 required.bioconductor <- c(
   "edgeR",
@@ -169,28 +193,7 @@ required.bioconductor <- c(
   "limma",
   #  "SARTools", ## for SERE coefficient
   "GenomicFeatures")
-
-for (lib in required.bioconductor) {
-  message("\tRequired BioConductor library\t", lib)
-  if (!require(lib, character.only = TRUE)) {
-    ## try http:// if https:// URLs are not supported
-    source("https://bioconductor.org/biocLite.R")
-    biocLite(lib)
-  }
-  if (!require(lib, character.only = TRUE)) {
-    stop("Missing library: ", lib, " could not be installed")
-  }
-}
-
-
-## ## Install SARTools if required
-## message("\tRequired devtools library\t", "SARTools")
-## if (!require("SARTools")) {
-##   library(devtools)
-##   install_github("PF2-pasteur-fr/SARTools", build_vignettes = TRUE)
-## }
-
-
+LoadRequiredBioconductorPackages(required.bioconductor, verbose = 1)
 
 ## ---- Load configuration file (YAML-formatted) ----
 if (!exists("configFile")) {
@@ -232,7 +235,7 @@ if (is.null(parameters$dir$count_prefix)) {
 } else {
   count.prefix <- parameters$dir$count_prefix
 }
-message("\tFile prefix normalized count tables ", count.prefix)
+message("\tFile prefix for normalized count tables ", count.prefix)
 
 
 
@@ -492,7 +495,7 @@ filtered.counts <- FilterCountTable(
 ##---- Log-transform non-normalized counts ----
 
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-message("\tTreating zero-values by adding epsilon =", epsilon)
+message("\tTreating zero-values by adding epsilon = ", epsilon)
 filtered.counts.epsilon <- filtered.counts
 filtered.counts.epsilon[filtered.counts == 0] <- epsilon
 
@@ -532,7 +535,7 @@ stats.per.sample.all <- cbind(
 #stats.per.sample.all$Mcounts <- stats.per.sample.all$sum / 1e6
 # View(stats.per.sample.all.all)
 outfiles["stats_per_sample_all_features"] <- file.path(dir.tables.samples, "stats_per_sample_all_features.tsv")
-message("\t", outfiles["stats_per_sample_all_features"])
+message("\t\t", outfiles["stats_per_sample_all_features"])
 write.table(x = stats.per.sample.all, file = outfiles["stats_per_sample_all_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
 ## Compute statistics ommitting zero values
@@ -544,7 +547,7 @@ stats.per.sample.nozero <- cbind(
   ColStats(all.counts.nozero, verbose = opt$verbose, selected.stats = selected.stats))
 #stats.per.sample.nozero$Mcounts <- stats.per.sample.nozero$sum / 1e6
 outfiles["stats_per_sample_no-zero"] <- file.path(dir.tables.samples, "stats_per_sample_no-zero.tsv")
-message("\t", outfiles["stats_per_sample_no-zero"])
+message("\t\t", outfiles["stats_per_sample_no-zero"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_no-zero"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
@@ -558,11 +561,11 @@ stats.per.sample.filtered <- cbind(
 # names(stats.per.sample)
 # View(stats.per.sample.nozero)
 outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tables.samples, "stats_per_sample_filtered_features.tsv")
-message("\t", outfiles["stats_per_sample_filtered_features"])
+message("\t\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.filtered, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
 ## ---- Compute the counts per million reads with edgeR, using different lib sizes ----
-message("Computing normalized values with edgeR::cpm")
+message("Computing normalized values with edgeR::cpm()")
 ## Note: the default normalization criterion (scaling by libbrary sum)
 ## is questionable because it is stronly sensitive to outliers
 ## (very highly expressed genes).  A more robust normalisation criterion
@@ -610,7 +613,7 @@ stats.per.sample.filtered$log10.cpm.mean <- apply(stdcounts.log10, 2, mean)
 ## ---- Export stats per sample ----
 outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tables.samples, "stats_per_sample_filtered_features.tsv")
 message("\t", "Exporting stats per sample for filtered features")
-message("\t", outfiles["stats_per_sample_filtered_features"])
+message("\t\t", outfiles["stats_per_sample_filtered_features"])
 write.table(x = stats.per.sample.nozero, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
 
@@ -646,17 +649,30 @@ par.ori <- par(no.readonly = TRUE) # Store original parameters
 #   main = "Assigned reads per sample (libsum)")
 # par(par.ori) # Restore original parameters
 #
-figfiles["libsize_barplot_all_features"] <- file.path(dir.figures.samples, "libsize_barplot_all_features.pdf")
-message("\tLibrary size barplot for all features\t", figfiles["libsize_barplot_all_features"])
-pdf(file = figfiles["libsize_barplot_all_features"], width = 8, height = 8)
-LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "All features")
-silence <- dev.off(); rm(silence)
+message("\tLibrary size barplot for all features\t", pdf.files[figname])
+figname <- "libsize_barplot_all_features"
+file.prefix <- file.path(dir.figures.samples, figname)
+pdf.files[figname] <- paste(sep = "", file.prefix, ".pdf"); message("\t\tpdf file\t", pdf.files[figname])
+png.files[figname] <- paste(sep = "", file.prefix, ".png"); message("\t\tpng file\t", png.files[figname])
+#pdf(file = pdf.files[figname], width = 8, height = 8)
+LibsizeBarplot(counts = all.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
+export.plot(file.prefix = file.prefix, export.formats = c("png", "pdf"), verbose = 1)
+# silence <- dev.off(); rm(silence)
+index.text <- index.figure(figname, png.files[figname], index.text)
 
-figfiles["libsize_barplot_filtered_features"] <- file.path(dir.figures.samples, "libsize_barplot_filtered_features.pdf")
-message("\tLibrary size barplot after filtering\t", figfiles["libsize_barplot_filtered_features"])
-pdf(file = figfiles["libsize_barplot_filtered_features"], width = 8, height = 8)
-LibsizeBarplot(counts = filtered.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "After filtering")
+
+message("\tLibrary size barplot after filtering\t", pdf.files["libsize_barplot_filtered_features"])
+figname <- "libsize_barplot_filtered_features"
+file.prefix <- file.path(dir.figures.samples, figname)
+pdf.files[figname] <- paste(sep = "", file.prefix, ".pdf"); message("\t\tpdf file\t", pdf.files[figname])
+png.files[figname] <- paste(sep = "", file.prefix, ".png"); message("\t\tpng file\t", png.files[figname])
+pdf(file = pdf.files[figname], width = 6, height = 8)
+LibsizeBarplot(counts = filtered.counts, sample.labels = sample.desc$label, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
+export.plot(file.prefix = file.prefix, export.formats = c("png", "eps"), verbose = 1)
 silence <- dev.off(); rm(silence)
+index.text <- index.figure(figname, png.files[figname], index.text)
+# system(paste("open", png.files[figname]))
+# system(paste("open", pdf.files[figname]))
 
 
 ## ---- normalisation -------------------------------------------------------
@@ -682,10 +698,15 @@ for (m in norm.comparison$method.name) {
   size.factors[,m] <- norm.comparison[[m]]$size.factor
 }
 
-figfiles["size_factors"] <- file.path(dir.figures.samples, "norm_size_factor_comparison.pdf")
-pdf(file = figfiles["size_factors"], width = 8, height = 8)
+figname <- "size_factors"
+file.prefix <- file.path(dir.figures.samples, figname)
+pdf.files[figname] <- paste(sep = "", file.prefix, ".pdf"); message("\t\tpdf file\t", pdf.files[figname])
+png.files[figname] <- paste(sep = "", file.prefix, ".png"); message("\t\tpng file\t", png.files[figname])
+#pdf(file = pdf.files[figname], width = 8, height = 8)
 plot(size.factors, main = "Sample size factors", col = sample.desc$color)
-silence <- dev.off(); rm(silence)
+export.plot(file.prefix = file.prefix, export.formats = c("png", "pdf"), verbose = 1)
+#silence <- dev.off(); rm(silence)
+index.text <- index.figure(figname, png.files[figname], index.text)
 
 ## ----differential_expression_analysis, fig.width=8, fig.height=12--------
 # setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
@@ -885,21 +906,21 @@ for (i in 1:nrow(design)) {
 
   ## Comparison between adjusted p-values
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
-  figfiles[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
-  message("\tComparison bewteen normalization methods: padj\n\t\t", figfiles[prefix])
-  pdf(file = figfiles[prefix], width = 10, height = 10)
+  pdf.files[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: padj\n\t\t", pdf.files[prefix])
+  pdf(file = pdf.files[prefix], width = 10, height = 10)
   plot(deg.compa$padj, log = "xy",
        #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
                            x = deg.compa$padj[,1], y = deg.compa$padj[,2]),
        main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
   silence <- dev.off(); rm(silence)
-  # system(paste("open", figfiles[prefix]))
+  # system(paste("open", pdf.files[prefix]))
 
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_log2FC")
-  figfiles[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
-  message("\tComparison bewteen normalization methods: log2FC\n\t\t", figfiles[prefix])
-  pdf(file = figfiles[prefix], width = 10, height = 10)
+  pdf.files[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: log2FC\n\t\t", pdf.files[prefix])
+  pdf(file = pdf.files[prefix], width = 10, height = 10)
   plot(deg.compa$log2FC,
        #       col = FeatureColors(palette.type = "2col", scores = feature.scores),
        col = FeatureColors(palette.type = "dens",
@@ -913,9 +934,9 @@ for (i in 1:nrow(design)) {
   deg.names <- names(deg.results)
   nb.panels <- n2mfrow(length(deg.names))
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_volcano_plots")
-  figfiles[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
-  message("\tComparison bewteen normalization methods: volcano plots\n\t\t", figfiles[prefix])
-  pdf(file = figfiles[prefix], height = 1 + nb.panels[1]*3.5, width = 2 + nb.panels[2]*3)
+  pdf.files[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: volcano plots\n\t\t", pdf.files[prefix])
+  pdf(file = pdf.files[prefix], height = 1 + nb.panels[1]*3.5, width = 2 + nb.panels[2]*3)
   par.ori <- par(no.readonly = TRUE)
   par(mfrow = nb.panels)
   # deg.name <- "DESeq2"
@@ -944,7 +965,7 @@ for (i in 1:nrow(design)) {
   par(mfrow = c(1,1))
   par(par.ori)
   silence <- dev.off(); rm(silence)
-  ## system(paste("ls -ltr ", figfiles[prefix]))
+  ## system(paste("ls -ltr ", pdf.files[prefix]))
 
 
 
@@ -953,9 +974,9 @@ for (i in 1:nrow(design)) {
   # deg.name <- "DESeq2"
   # deg.name <- "edgeR_TMM"
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_pvalue_histograms")
-  figfiles[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
-  message("\tComparison bewteen normalization methods: P value histograms\n\t\t", figfiles[prefix])
-  pdf(file = figfiles[prefix], height = 1 + nb.panels[1]*3, width = 1 + nb.panels[2]*4)
+  pdf.files[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: P value histograms\n\t\t", pdf.files[prefix])
+  pdf(file = pdf.files[prefix], height = 1 + nb.panels[1]*3, width = 1 + nb.panels[2]*4)
   par.ori <- par(no.readonly = TRUE)
   par(mfrow = nb.panels)
   # deg.name <- "DESeq2"
@@ -974,7 +995,7 @@ for (i in 1:nrow(design)) {
   par(mfrow = c(1,1))
   par(par.ori)
   silence <- dev.off(); rm(silence)
-  ## system(paste("open ", figfiles[prefix]))
+  ## system(paste("open ", pdf.files[prefix]))
 
 
   ## ---- Draw Venn diagram with number of genes declared significant ----
@@ -983,9 +1004,9 @@ for (i in 1:nrow(design)) {
   selection.thresholds <- thresholds[selection.fields]
   selection.columns <- paste(sep = "", selection.fields, "_", selection.thresholds)
   prefix <- paste(sep = "", comparison.prefix, "_norm_compa_Venn_", paste(collapse = "_", selection.fields))
-  figfiles[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
-  message("\tComparison bewteen normalization methods: Ven diagrams\n\t\t", figfiles[prefix])
-  pdf(file = figfiles[prefix], height = 1 + nb.panels[1]*3, width = 1 + nb.panels[2]*3)
+  pdf.files[prefix] <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, ".pdf"))
+  message("\tComparison bewteen normalization methods: Ven diagrams\n\t\t", pdf.files[prefix])
+  pdf(file = pdf.files[prefix], height = 1 + nb.panels[1]*3, width = 1 + nb.panels[2]*3)
   par.ori <- par(no.readonly = TRUE)
   par(mfrow = nb.panels)
   # deg.name <- "DESeq2"
@@ -998,7 +1019,7 @@ for (i in 1:nrow(design)) {
                        circle.col = c("orange", "blue"), mar = c(0,0,5,0))
   }
   silence <- dev.off(); rm(silence)
-  ## system(paste("open ", figfiles[prefix]))
+  ## system(paste("open ", pdf.files[prefix]))
 
 }
 
@@ -1030,10 +1051,6 @@ write.table(x = index, file = index.file, quote = FALSE,
             sep = "\t", row.names = FALSE, col.names = TRUE)
 
 
-
-## ----sessioninfo---------------------------------------------------------
-## Print the complete list of libraries + versions used in this session
-sessionInfo()
 
 ## ---- Build the file index ----
 
@@ -1071,18 +1088,39 @@ for (filename in names(outfiles)) {
 index.text <- append(index.text, paste(sep = "", "\n\n### Figures"))
 index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
 index.text <- append(index.text, paste(sep = "", "| ---------------------- | -------------------------------------------------- |"))
-for (filename in names(figfiles)) {
-  file <- figfiles[filename]
-  index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
+for (filename in names(pdf.files)) {
+  pdf.file <- pdf.files[filename]
+  png.file <- png.files[filename]
+  index.text <- append(index.text, paste(
+    sep = "", "| ", filename, "|", 
+    "[pdf](", pdf.file, ") |",
+    "[png](", png.file, ") |"))
 }
 
+## ---- Session info ---------------------------------------------------------
+## Print the complete list of libraries + versions used in this session
+index.text <- append(index.text, "\n\n## Session info\n")
+#session.info <- capture.output(sessionInfo())
+session.info <- sessionInfo()
+txt <- print(session.info)
+# print(session.info)
+#library(R.utils)
+#R.utils::captureOutput(session.info)
 
+index.text <- append(index.text, "\n```\n")
+index.text <- append(index.text, capture.output(session.info))
+index.text <- append(index.text, "\n```\n")
+
+
+
+## ---- Generate the HTML index -----
 index.text <- append(index.text, paste(sep = "", "\n\nJob done: ", Sys.time()))
 
 writeLines(text = index.text, con = index.socket)
 close(index.socket)
-rmarkdown::render(index.Rmd)
-
+rmarkdown::render(index.Rmd, output_format = "html_document")
+rmarkdown::render(index.Rmd, output_format = "pdf_document")
+                                    
 
 ## ---- job_done ------------------------------------------------------------
 message("Tables directory\t", dir.tables.samples)
