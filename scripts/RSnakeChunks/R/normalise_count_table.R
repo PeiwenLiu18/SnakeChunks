@@ -280,8 +280,8 @@ NormalizeCountTable <- function(counts,
       ## Normalize the count table using limma::normalizeQuantiles() function
       require("limma")
       normCounts <- limma::normalizeQuantiles(A = counts.to.norm, ties = TRUE)
-      size.factor <- NA
-      scaling.factor <- NA
+      size.factor <- NULL
+      scaling.factor <- NULL
 
     } else if (m == "VSD") {
       # Compute variance stabilizing transformations (VST) via DESeq2 (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010)
@@ -329,7 +329,7 @@ NormalizeCountTable <- function(counts,
     }
 
     ## ---- Compute normalised counts ----
-    if (!is.na(scaling.factor)) {
+    if (!is.null(scaling.factor)) {
       normTarget <- mean(scaling.factor[!discardedSamples]) ## Ensure library eize equality before and after standardization
       scaling.factor <- scaling.factor * normTarget
       normCounts <- t(t(counts.to.norm[, !discardedSamples]) * scaling.factor)
