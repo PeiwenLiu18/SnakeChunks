@@ -26,10 +26,18 @@
 #' @param sort.column="none" Column to sort the result.
 #' Supported: c("none", "mean", "log2FC", "pvalue", "padj").
 #'
-#' @param thresholds=c(pvalue=0.05,padj=0.05,evalue=1,FC=1.5)
+#' @param thresholds=c(padj = 0.05, FC = 2)
+#' 
 #' Thresholds on some specific scores, used for display purpose, and to
 #' add some columns to the result table, indicating if the gene passes the
-#' threshold or not.
+#' threshold or not. Supported threshold fields: 
+#' \itemize{
+#' \itme FC (orientation-insensitive fold change)
+#' \item padj (adjusted p-value)
+#' \item pvalue (nominal p-value)
+#' \item evalue (expected number of false positives)
+#' \item log2FC (absolute value of the log2 fold change)
+#' }
 #'
 #' @param round.digits=3 Significant digits to round the values of the
 #' output table. Set to NA to avoid rounding.
@@ -54,7 +62,7 @@
 DEGtablePostprocessing <- function(deg.table,
                                table.name="DEG_table",
                                sort.column = "none",
-                               thresholds = c(),
+                               thresholds = c(padj = 0.05, FC = 2),
                                round.digits = 3,
                                dir.figures = NULL,
                                verbose = 0) {
@@ -230,9 +238,9 @@ DEGtablePostprocessing <- function(deg.table,
     VolcanoPlot.MultiTestTable(
       multitest.table = deg.table,
       effect.size.col = "log2FC",
-      effect.threshold = log2(thresholds$FC),
+      effect.threshold = log2(thresholds["FC"]),
       control.type = "padj",
-      alpha = thresholds$padj,
+      alpha = thresholds["padj"],
       main = paste(table.name, "\nVolcano plot"))
     silence <- dev.off()
 
