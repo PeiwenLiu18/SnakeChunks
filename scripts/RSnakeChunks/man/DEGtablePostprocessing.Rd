@@ -26,7 +26,7 @@ Supported: c("none", "mean", "log2FC", "pvalue", "padj").}
 
 Thresholds on some specific scores, used for display purpose, and to
 add some columns to the result table, indicating if the gene passes the
-threshold or not. Supported threshold fields: 
+threshold or not. Supported threshold fields:
 \itemize{
 \itme FC (orientation-insensitive fold change)
 \item padj (adjusted p-value)
