@@ -5,8 +5,8 @@
 \title{DESeq2 analysis}
 \usage{
 deseq2.analysis(counts, condition, ref.condition = NULL,
-  comparison.prefix, title = comparison.prefix, dir.figures = NULL,
-  verbose = 0, ...)
+  thresholds = c(padj = 0.05, FC = 2), comparison.prefix,
+  title = comparison.prefix, dir.figures = NULL, verbose = 0, ...)
 }
 \arguments{
 \item{counts}{a count table sent to DESeq2. Must contain raw counts (not normalized).}
@@ -18,6 +18,10 @@ deseq2.analysis(counts, condition, ref.condition = NULL,
 \item{...}{additional parameters are passed to DESeq2::DESeq() function}
 
 \item{ref.condition=NULL}{reference condition for the differential analysis}
+
+\item{thresholds=c(padj=0.05, FC=2)}{thresholds on adjusted p-value (padj) and fold change (FC). 
+The result table will include columns indicating which feature pass these thresholds.
+See DEGtablePostprocessing() for supported thresholds.}
 
 \item{title=comparison.prefix}{main title for the plots}
 
