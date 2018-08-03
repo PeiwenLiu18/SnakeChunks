@@ -11,6 +11,9 @@ CheckRequiredLibraries(required.libraries, required.bioconductor = NULL)
 
 \item{required.bioconductor}{a vector containing the required BioConductor libraries, which will be installed with biocLite}
 }
+\description{
+check required libraries for DEG analysis, and install them if required
+}
 \author{
 Jacques van Helden (\email{Jacques.van-Helden@univ-amu.fr})
 }

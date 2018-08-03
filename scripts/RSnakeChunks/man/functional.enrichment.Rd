@@ -4,9 +4,10 @@
 \alias{functional.enrichment}
 \title{Run functional enrichment for a given gene set}
 \usage{
-functional.enrichment(geneset, allgenes, db, organism.names, ontology = "BP",
-  thresholds = thresholds, select.positives = TRUE, run.GOstats = TRUE,
-  run.clusterProfiler = FALSE, plot.adjust = TRUE)
+functional.enrichment(geneset, allgenes, db, organism.names,
+  ontology = "BP", thresholds = thresholds, select.positives = TRUE,
+  run.GOstats = TRUE, run.clusterProfiler = FALSE,
+  plot.adjust = TRUE)
 }
 \arguments{
 \item{geneset}{Entrez IDs of the gene set of interest.}

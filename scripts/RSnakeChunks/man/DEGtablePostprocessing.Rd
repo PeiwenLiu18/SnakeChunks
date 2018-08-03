@@ -5,8 +5,8 @@
 \title{Post-process differential expression analysis result.}
 \usage{
 DEGtablePostprocessing(deg.table, table.name = "DEG_table",
-  sort.column = "none", thresholds = c(), round.digits = 3,
-  dir.figures = NULL, verbose = 0)
+  sort.column = "none", thresholds = c(padj = 0.05, FC = 2),
+  round.digits = 3, dir.figures = NULL, verbose = 0)
 }
 \arguments{
 \item{deg.table}{Table with the results of differential expression analysis
@@ -22,9 +22,18 @@ Additional columns can be provided but will be ignored for the analysis.}
 \item{sort.column="none"}{Column to sort the result.
 Supported: c("none", "mean", "log2FC", "pvalue", "padj").}
 
-\item{thresholds=c(pvalue=0.05, padj=0.05, evalue=1, FC=1.5)}{Thresholds on some specific scores, used for display purpose, and to
+\item{thresholds=c(padj}{= 0.05, FC = 2)
+
+Thresholds on some specific scores, used for display purpose, and to
 add some columns to the result table, indicating if the gene passes the
-threshold or not.}
+threshold or not. Supported threshold fields:
+\itemize{
+\itme FC (orientation-insensitive fold change)
+\item padj (adjusted p-value)
+\item pvalue (nominal p-value)
+\item evalue (expected number of false positives)
+\item log2FC (absolute value of the log2 fold change)
+}}
 
 \item{round.digits=3}{Significant digits to round the values of the
 output table. Set to NA to avoid rounding.}

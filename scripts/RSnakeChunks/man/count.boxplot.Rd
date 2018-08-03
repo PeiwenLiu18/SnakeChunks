@@ -21,6 +21,9 @@ count.boxplot(counts, sample.desc, sample.label.col = NULL,
 
 \item{plot.file=NULL}{if specified, the graph will be stored in a pdf-formatted file.}
 }
+\description{
+Draw boxplots with read counts per genes for each sample
+}
 \author{
 Jacques van Helden
 }

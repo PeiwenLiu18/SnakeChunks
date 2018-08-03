@@ -9,21 +9,24 @@
 #' @param min.count=NULL Filter out features for which the  max count (across all samples) is lower than the specified threshold.
 #' @param mean.per.condition=NULL  ## Filter out features for which none of the conditions has a mean count above the threshold
 #' @param black.list=NULL Black-listed" features: a vector of row IDs or row indices indicating a list of features to be filtered out (e.g. 16S, 12S RNA).
+#' @param verbose=1 level of verbosity
 #' @return a data.frame with the same columns (samples) as the input count table, and with rows restricted to the features that pass all the thresholds.
+#' @export
 FilterCountTable <- function(counts,
                              condition = NULL,
                              na.omit = FALSE,
                              mean.count = NULL,
                              min.count = NULL,
                              mean.per.condition = NULL,
-                             black.list = NULL
+                             black.list = NULL,
+                             verbose = 1
                             ) {
-  message("Filtering count table with ", nrow(counts), " features x ", ncol(counts), " samples. ")
+  if (verbose >= 1) { message("\tFiltering count table with ", nrow(counts), " features x ", ncol(counts), " samples. ") }
 
   if (na.omit) {
     na.rows <- apply(is.na(counts), 1, sum) > 0
     counts <- counts[!na.rows, ]
-    message("\tomitted NA values; discarded features: ", sum(na.rows), "; kept features: ", nrow(counts))
+    if (verbose >= 1) { message("\t\tomitted NA values; discarded features: ", sum(na.rows), "; kept features: ", nrow(counts)) }
     
   }
   
@@ -31,14 +34,14 @@ FilterCountTable <- function(counts,
   if (!is.null(min.count)) {
     discarded <- apply(counts, 1, min, na.rm = TRUE) < min.count
     counts <- counts[!discarded, ]
-    message("\tMin count per row >= ", min.count, "; discarded features: ", sum(discarded), "; kept features: ", nrow(counts))
+    if (verbose >= 1) { message("\t\tMin count per row >= ", min.count, "; discarded features: ", sum(discarded), "; kept features: ", nrow(counts)) }
   }
   
   ## Mean count per rpw  
   if (!is.null(mean.count)) {
     discarded <- apply(counts, 1, mean, na.rm = TRUE) < mean.count
     counts <- counts[!discarded, ]
-    message("\tMean count per row >= ", mean.count, "; discarded features: ", sum(discarded), "; kept features: ", nrow(counts))
+    if (verbose >= 1) { message("\t\tMean count per row >= ", mean.count, "; discarded features: ", sum(discarded), "; kept features: ", nrow(counts)) }
   }
 
 
@@ -46,9 +49,9 @@ FilterCountTable <- function(counts,
   if (!is.null(black.list)) {
     kept <- setdiff(row.names(counts), black.list)
     counts <- counts[kept, ]
-    message("\tBlack-listed features: ", length(black.list), "; kept features: ", nrow(counts))
+    if (verbose >= 1) { message("\t\tBlack-listed features: ", length(black.list), "; kept features: ", nrow(counts)) }
   }
   
-  message("Returning filtered count table with ", nrow(counts), " features x ", ncol(counts), " samples. ")
+  if (verbose >= 1) { message("\tReturning from filtered count table with ", nrow(counts), " features x ", ncol(counts), " samples. ") }
   return(counts)
 }

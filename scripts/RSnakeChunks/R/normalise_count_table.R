@@ -1,10 +1,9 @@
-#' @title scaling RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods)
+#' @title Between-sample normalisation of RNA-seq count table.
 #'
 #' @author Jacques van Helden and Mustafa AbuElqumsan
 #'
-#' @description normalisation of RNA-seq count table.
-#' More precisely this function runs a sample-wise scaling so that all the samples
-#' have the same value for a user-defined scaling parameter.
+#' @description Run between-sample normalization of an RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods).
+#' Runs a sample-wise scaling so that all the samples have the same value for a user-defined scaling parameter.
 #' By default, we use the percentile 75 as scaling factor.
 #'
 #' @param counts a data frame with counts per feature, with one feature (gene, transcript) per row and one sample per column.
@@ -93,7 +92,7 @@ NormalizeCountTable <- function(counts,
     epsilon = epsilon
   )
 
-  #### Measure size of input matrix ####
+  ## ---- Measure size of input matrix ----
   result$raw.features <- nrow(counts)
   result$raw.samples <- ncol(counts)
 
@@ -102,7 +101,7 @@ NormalizeCountTable <- function(counts,
             "\tRaw counts: ", result$raw.features, " features x ", result$raw.samples, " samples. ")
   }
 
-  #### Compute non-zero counts ####
+  ## ---- Compute non-zero counts ----
   counts.nozero <- counts
   counts.nozero[counts  == 0] <- NA
   if (nozero) {
@@ -116,7 +115,7 @@ NormalizeCountTable <- function(counts,
   }
 
 
-  #### Compute sample-wise statistics ####
+  ## ---- Compute sample-wise statistics ----
   sampleStats <- data.frame(
     zeros = apply(counts == 0, 2, sum),
     na.values = apply(is.na(counts), 2, sum),
@@ -152,10 +151,10 @@ NormalizeCountTable <- function(counts,
   result$sampleStats <- sampleStats
   # head(self$sampleStats)
 
-  #### Apply normalization method(s) ####
+  ## ---- Apply normalization method(s) ----
   method.names <- vector()
   for (m in method) {
-    #### Define method name ####
+    ## Define method name
     if (m == "percentile") {
       if (!exists("percentile")) {
         stop("NormalizeSamples()\tMissing required parameter: standardization percentile")
@@ -277,6 +276,13 @@ NormalizeCountTable <- function(counts,
       scaling.factor <- 1/size.factor
       # plot(size.factor, sampleStats$sum) ## THE DIFFERENCE IS QUITE IMPRESSIVE
 
+    } else if (m == "quantiles") {
+      ## Normalize the count table using limma::normalizeQuantiles() function
+      require("limma")
+      normCounts <- limma::normalizeQuantiles(A = counts.to.norm, ties = TRUE)
+      size.factor <- NULL
+      scaling.factor <- NULL
+
     } else if (m == "VSD") {
       # Compute variance stabilizing transformations (VST) via DESeq2 (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010)
       if (verbose >= 3) {
@@ -307,7 +313,7 @@ NormalizeCountTable <- function(counts,
       stop(method, " is not a valid method for NormalizeSamples()")
     }
 
-    #### Discarded samples ####
+    ## ---- Discarded samples ## ----
     ## Detect problems related to null scaling factors, which may happen in some datasets due to a very large number of zeros.
     discardedSamples <-
       (size.factor == 0) |
@@ -322,12 +328,14 @@ NormalizeCountTable <- function(counts,
       }
     }
 
-    #### Compute normalised counts ####
-    normTarget <- mean(scaling.factor[!discardedSamples]) ## Ensure library eize equality before and after standardization
-    scaling.factor <- scaling.factor * normTarget
-    normCounts <- t(t(counts.to.norm[, !discardedSamples]) * scaling.factor)
+    ## ---- Compute normalised counts ----
+    if (!is.null(scaling.factor)) {
+      normTarget <- mean(scaling.factor[!discardedSamples]) ## Ensure library eize equality before and after standardization
+      scaling.factor <- scaling.factor * normTarget
+      normCounts <- t(t(counts.to.norm[, !discardedSamples]) * scaling.factor)
+    }
 
-    #### log2 transformation (if required) ####
+    ## ---- log2 transformation (if required) ----
     if (log2) {
       normCounts <- log2(normCounts + epsilon)
     }

@@ -6,7 +6,7 @@
 \usage{
 FilterCountTable(counts, condition = NULL, na.omit = FALSE,
   mean.count = NULL, min.count = NULL, mean.per.condition = NULL,
-  black.list = NULL)
+  black.list = NULL, verbose = 1)
 }
 \arguments{
 \item{counts}{A data frame with counts (one row per feature and one column per sample).}
@@ -22,6 +22,8 @@ FilterCountTable(counts, condition = NULL, na.omit = FALSE,
 \item{mean.per.condition=NULL}{## Filter out features for which none of the conditions has a mean count above the threshold}
 
 \item{black.list=NULL}{Black-listed" features: a vector of row IDs or row indices indicating a list of features to be filtered out (e.g. 16S, 12S RNA).}
+
+\item{verbose=1}{level of verbosity}
 }
 \value{
 a data.frame with the same columns (samples) as the input count table, and with rows restricted to the features that pass all the thresholds.

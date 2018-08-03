@@ -26,10 +26,18 @@
 #' @param sort.column="none" Column to sort the result.
 #' Supported: c("none", "mean", "log2FC", "pvalue", "padj").
 #'
-#' @param thresholds=c(pvalue=0.05,padj=0.05,evalue=1,FC=1.5)
+#' @param thresholds=c(padj = 0.05, FC = 2)
+#'
 #' Thresholds on some specific scores, used for display purpose, and to
 #' add some columns to the result table, indicating if the gene passes the
-#' threshold or not.
+#' threshold or not. Supported threshold fields:
+#' \itemize{
+#' \itme FC (orientation-insensitive fold change)
+#' \item padj (adjusted p-value)
+#' \item pvalue (nominal p-value)
+#' \item evalue (expected number of false positives)
+#' \item log2FC (absolute value of the log2 fold change)
+#' }
 #'
 #' @param round.digits=3 Significant digits to round the values of the
 #' output table. Set to NA to avoid rounding.
@@ -54,7 +62,7 @@
 DEGtablePostprocessing <- function(deg.table,
                                table.name="DEG_table",
                                sort.column = "none",
-                               thresholds = c(),
+                               thresholds = c(padj = 0.05, FC = 2),
                                round.digits = 3,
                                dir.figures = NULL,
                                verbose = 0) {
@@ -63,6 +71,8 @@ DEGtablePostprocessing <- function(deg.table,
   if (verbose >= 1) {
     message("\tDEGtablePostprocessing()\tTable name: ", table.name, "\t", nrow(deg.table), " features (rows)")
   }
+
+  thresholds <- unlist(thresholds)
 
   col.descriptions <- vector() ## Initialize vector with column descriptions
 
@@ -153,7 +163,7 @@ DEGtablePostprocessing <- function(deg.table,
 
     deg.table[, selection.columns[s]] <- threshold.passed * 1
     col.descriptions[selection.columns[s]] <- paste("Passing", threshold.type[s], "threshold on", s)
-    if (verbose >= 2) {
+    if (verbose >= 1) {
       message("\t\t\t", threshold.type[s],
               " threshold on ", s, ": ", thresholds[s],
               "\tPassing features: ", sum(threshold.passed),
@@ -214,7 +224,7 @@ DEGtablePostprocessing <- function(deg.table,
 
     ## Histogram of the log2FC
     log2FC.file <- file.path(dir.figures, paste(sep = "", table.name, "_log2FC_hist.pdf"))
-    if (verbose >= 1) { message("\t\tP-value histogram\t", log2FC.file) }
+    if (verbose >= 1) { message("\t\tLog2-FC histogram\t", log2FC.file) }
     pdf(file = log2FC.file, width = 7, height = 5)
     hist(deg.table$log2FC, breaks = 100,
          xlab = "log2(fold change)",
@@ -224,15 +234,18 @@ DEGtablePostprocessing <- function(deg.table,
     silence <- dev.off()
 
     ## Volcano plot
+    message("thresholds['FC']\t", thresholds["FC"])
+    message("log2(thresholds['FC'])\t", log2(thresholds["FC"]))
+    nona.deg <- na.omit(deg.table)
     volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
     if (verbose >= 1) { message("\t\tVolcano plot\t", volcano.file) }
     pdf(file = volcano.file, width = 7, height = 7)
     VolcanoPlot.MultiTestTable(
-      multitest.table = deg.table,
+      multitest.table = nona.deg,
       effect.size.col = "log2FC",
-      effect.threshold = log2(thresholds$FC),
+      effect.threshold = log2(thresholds["FC"]),
       control.type = "padj",
-      alpha = thresholds$padj,
+      alpha = thresholds["padj"],
       main = paste(table.name, "\nVolcano plot"))
     silence <- dev.off()
 

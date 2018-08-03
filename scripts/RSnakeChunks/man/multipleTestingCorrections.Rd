@@ -4,9 +4,9 @@
 \alias{multipleTestingCorrections}
 \title{Multiple corrections for multiple testing}
 \usage{
-multipleTestingCorrections(p.values, feature.names = NULL, lambda = 0.5,
-  alpha = 0.05, main = "Multitesting corrections", run.qvalue = FALSE,
-  plots = FALSE)
+multipleTestingCorrections(p.values, feature.names = NULL,
+  lambda = 0.5, alpha = 0.05, main = "Multitesting corrections",
+  run.qvalue = FALSE, plots = FALSE)
 }
 \arguments{
 \item{p.values}{list of p-values}

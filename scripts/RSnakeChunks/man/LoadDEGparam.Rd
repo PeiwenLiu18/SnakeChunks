@@ -6,6 +6,9 @@
 \usage{
 LoadDEGparam(yamlFile)
 }
+\description{
+Load parameters and required libraries
+}
 \author{
 Jacques van Helden (\email{Jacques.van-Helden@univ-amu.fr})
 }

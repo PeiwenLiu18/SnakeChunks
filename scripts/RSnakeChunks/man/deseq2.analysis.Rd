@@ -4,7 +4,8 @@
 \alias{deseq2.analysis}
 \title{DESeq2 analysis}
 \usage{
-deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
+deseq2.analysis(counts, condition, ref.condition = NULL,
+  thresholds = c(padj = 0.05, FC = 2), comparison.prefix,
   title = comparison.prefix, dir.figures = NULL, verbose = 0, ...)
 }
 \arguments{
@@ -17,6 +18,10 @@ deseq2.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 \item{...}{additional parameters are passed to DESeq2::DESeq() function}
 
 \item{ref.condition=NULL}{reference condition for the differential analysis}
+
+\item{thresholds=c(padj=0.05, FC=2)}{thresholds on adjusted p-value (padj) and fold change (FC). 
+The result table will include columns indicating which feature pass these thresholds.
+See DEGtablePostprocessing() for supported thresholds.}
 
 \item{title=comparison.prefix}{main title for the plots}
 

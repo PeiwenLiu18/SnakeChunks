@@ -4,8 +4,9 @@
 \alias{edger.analysis}
 \title{edgeR analysis}
 \usage{
-edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
-  norm.method = "TMM", title = paste(sep = "_", norm.method,
+edger.analysis(counts, condition, test.condition = 1,
+  ref.condition = 2, norm.method = "TMM", thresholds = c(padj = 0.05,
+  FC = 2), comparison.prefix, title = paste(sep = "_", norm.method,
   comparison.prefix), dir.figures = NULL, verbose = 0, ...)
 }
 \arguments{
@@ -17,13 +18,19 @@ edger.analysis(counts, condition, ref.condition = NULL, comparison.prefix,
 
 \item{...}{additional parameters are passed to edgeR::exactTest() function}
 
-\item{ref.condition=NULL}{reference condition for the differential analysis}
+\item{test.condition=1}{first condition for edegR::exactTest()}
+
+\item{ref.condition=2}{second condition for edgeR::exactTest(}
 
 \item{title=comparison.prefix}{main title for the plots}
 
 \item{dir.figures=NULL}{optional directory to save figures}
 
-\item{norm.method="RLE"}{normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods}
+\item{norm.method="TMM"}{normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods}
+
+\item{thresholds=c(padj=0.05, FC=2)}{thresholds on adjusted p-value (padj) and fold change (FC). 
+The result table will include columns indicating which feature pass these thresholds.
+See DEGtablePostprocessing() for supported thresholds.}
 
 \item{verbose=0}{level of verbosity}
 }

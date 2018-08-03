@@ -6,10 +6,11 @@
 \usage{
 PlotPvalDistrib.MultiTestTable(multitest.result,
   main = "P-value distribution", plot.legend = TRUE, legend.cex = 1,
-  legend.corner = "topright", breaks = seq(from = 0, to = 1, by = 0.05),
-  draw.lambda = "arrow", draw.m0.line = TRUE, draw.mean.line = TRUE,
-  overlay = NULL, col = "#FFEEDD", overlay.col = "#CCCCCC",
-  mean.line.col = "darkred", m0.line.col = "blue", ...)
+  legend.corner = "topright", breaks = seq(from = 0, to = 1, by =
+  0.05), draw.lambda = "arrow", draw.m0.line = TRUE,
+  draw.mean.line = TRUE, overlay = NULL, col = "#FFEEDD",
+  overlay.col = "#CCCCCC", mean.line.col = "darkred",
+  m0.line.col = "blue", ...)
 }
 \arguments{
 \item{multitest.result}{the list returned by the function multipleTestingCorrections().}

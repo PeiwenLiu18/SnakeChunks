@@ -47,6 +47,9 @@ a data.frame with one row per entry (row or column) of the input matrix, and one
  \item{Mcounts}{Million counts = round(digits=2, sum/1e6). Classically used for Next-Generation Sequencing libraries.  }
 }
 }
+\description{
+compute margin statistics (per row or column) on a data.frame or matrix.
+}
 \author{
 Jacques van Helden
 }

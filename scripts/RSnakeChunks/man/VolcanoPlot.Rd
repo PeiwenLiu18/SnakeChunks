@@ -5,14 +5,15 @@
 \title{Draw a Volcano plot.}
 \usage{
 VolcanoPlot(multitest.table, effect.size.col, control.type = "p.value",
-  nb.tests = nrow(multitest.table), alpha = 0.05, effect.threshold = NULL,
-  sort.by.pval = FALSE, plot.points = TRUE, plot.ci = FALSE,
-  xlab = "Effect size", ylab = paste(sep = "", "-log10(", control.type,
-  ")"), density.colors = FALSE, col.points = "#888888",
-  col.positive = "#4455DD", col.grid = "#AAAAAA", col.lines = "blue",
-  col.alpha = "darkred", lty.lines = "solid", lty.alpha = "dashed",
-  lty.grid = "dotted", pch.positive = 3, pch.negative = 1, xlim = NULL,
-  ylim = NULL, cex = 0.6, legend.corner = "top", full.legend = FALSE,
+  nb.tests = nrow(multitest.table), alpha = 0.05,
+  effect.threshold = NULL, sort.by.pval = FALSE, plot.points = TRUE,
+  plot.ci = FALSE, xlab = "Effect size", ylab = paste(sep = "",
+  "-log10(", control.type, ")"), density.colors = FALSE,
+  col.points = "#888888", col.positive = "#4455DD",
+  col.grid = "#AAAAAA", col.lines = "blue", col.alpha = "darkred",
+  lty.lines = "solid", lty.alpha = "dashed", lty.grid = "dotted",
+  pch.positive = 3, pch.negative = 1, xlim = NULL, ylim = NULL,
+  cex = 0.6, legend.corner = "top", full.legend = FALSE,
   legend.cex = 1, tick.size = 0.05, ...)
 }
 \arguments{

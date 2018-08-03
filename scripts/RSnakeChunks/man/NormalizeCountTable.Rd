@@ -2,10 +2,10 @@
 % Please edit documentation in R/normalise_count_table.R
 \name{NormalizeCountTable}
 \alias{NormalizeCountTable}
-\title{scaling RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods)}
+\title{Between-sample normalisation of RNA-seq count table.}
 \usage{
-NormalizeCountTable(counts, class.labels, nozero = TRUE, method = "TMM",
-  percentile = 75, log2 = FALSE, epsilon = 0.1,
+NormalizeCountTable(counts, class.labels, nozero = TRUE,
+  method = "TMM", percentile = 75, log2 = FALSE, epsilon = 0.1,
   detailed.sample.stats = FALSE, verbose = 1)
 }
 \arguments{
@@ -64,9 +64,8 @@ Each normalisation results contains.
 }
 }
 \description{
-normalisation of RNA-seq count table.
-More precisely this function runs a sample-wise scaling so that all the samples
-have the same value for a user-defined scaling parameter.
+Run between-sample normalization of an RNA-seq count table with a variety of methods (including edgeR and DESeq2 methods).
+Runs a sample-wise scaling so that all the samples have the same value for a user-defined scaling parameter.
 By default, we use the percentile 75 as scaling factor.
 }
 \author{

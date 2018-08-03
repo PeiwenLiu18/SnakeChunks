@@ -5,7 +5,8 @@
 \title{Compute principal components and draw a plot with the first components}
 \usage{
 PCplot(x, PCs = c(1, 2), sample.desc, main = "PC plot",
-  sample.labels = row.names(sample.desc), sample.col = sample.desc$color)
+  sample.labels = row.names(sample.desc),
+  sample.col = sample.desc$color)
 }
 \arguments{
 \item{x}{a data frame with genes as rows and samples as columns}
