@@ -77,7 +77,8 @@ deseq2.analysis <- function(counts,
     sort.column = "padj",
     thresholds = thresholds,
     round.digits = 3,
-    dir.figures = dir.figures, verbose = verbose)
+    dir.figures = dir.figures, 
+    verbose = verbose)
 
   result <- list(
     dds = deseq2.dds,

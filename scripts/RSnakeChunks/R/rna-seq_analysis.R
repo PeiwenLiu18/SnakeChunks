@@ -28,6 +28,18 @@ RNAseqAnalysis <- function(count.table,
                            verbose = 1) {
 
 
+  ## ---- TO DO ----
+  ##
+  ## Check non-used variables: suppress or use them
+  ## - cols.heatmap
+  ## - DEG.selection.criterion
+  ## - filtered.counts.log10
+  ## - filtered.counts.log2
+  ## - stdcounts.libsum
+  ## - stdcounts.perc95
+  ## - stdcounts.median
+  ## - current.labels
+  
   ## ---- Define the main parameters -----------------------------------------------------
 
   ## Prepare a list of input and output files.
@@ -114,7 +126,7 @@ knitr::opts_chunk$set(
 
   quick.test <- FALSE ## For debug
 
-  ## I guess these options are not required when running R script without Rmd
+  ## To do: check if these options are taken into account at rendering
   knitr::opts_chunk$set(
     fig.path = "figures/",
     echo = FALSE,
@@ -281,7 +293,7 @@ knitr::opts_chunk$set(
 
   ## Read the sample description file, which indicates the
   ## condition associated to each sample ID.
-  message("Reading sample description file: ", infiles["sample descriptions"])
+  message("\tReading sample description file: ", infiles["sample descriptions"])
   if (!file.exists(infiles["sample descriptions"])) {
     stop("Sample description file does not exist\t", infiles["sample descriptions"])
   }
@@ -290,7 +302,7 @@ knitr::opts_chunk$set(
     sep = "\t",
     comment = ";", header = TRUE, row.names = 1)
   sample.ids <- row.names(sample.desc)
-  message("\tNb of samples = ", length(sample.ids))
+  message("\t\tNb of samples = ", length(sample.ids))
   # head(sample.desc)
 
 
@@ -310,7 +322,6 @@ knitr::opts_chunk$set(
     sample.labels <- as.vector(unlist(sample.desc$Label))
   }
   # print(sample.labels)
-  message("\tNb of samples = ", length(sample.labels))
 
 
   ## Define a specific color for each distinct condition
@@ -318,8 +329,8 @@ knitr::opts_chunk$set(
   cols.conditions <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
   names(cols.conditions) <- conditions
   # print(cols.conditions)
-  message("\tNb of conditions = ", length(conditions))
-  message("\tConditions = ", paste(collapse = ", ", conditions))
+  message("\t\tNb of conditions = ", length(conditions))
+  message("\t\tConditions = ", paste(collapse = ", ", conditions))
 
 
 
@@ -337,17 +348,18 @@ knitr::opts_chunk$set(
   index.text <- append(index.text, "\n\n### Samples per condition\n")
   index.text <- append(index.text, kable(samples.per.condition, caption = "Samples per condition",
                                          col.names = c("Condition", "Nb samples")))
-
+  if (verbose >= 2) { print(as.data.frame(samples.per.condition)) }
+  
   ## ----read_design, warning=FALSE------------------------------------------
   # setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
   ## Read the design file, which indicates the anlayses to be done.
   ## Each row specifies one differential expression analysis, which
   ## consists in comparing two conditions.
-  message("Reading design file: ", infiles["design"])
+  message("\tReading design file: ", infiles["design"])
   design <- read.delim(file.path(dirs["main"], infiles["design"]), sep = "\t",
                        comment = c(";"), header = T, row.names = NULL)
-  message("\tDesign file contains ", nrow(design), " comparisons. ")
+  message("\t\tDesign file contains ", nrow(design), " comparisons. ")
   comparison.summary <- design ## Initialize a summary table for each DEG analysis
   comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
 
@@ -361,7 +373,7 @@ knitr::opts_chunk$set(
 
 
   ## ----load_count_table----------------------------------------------------
-  message("Loading count table: ", infiles["counts"])
+  message("\tLoading count table: ", infiles["counts"])
   ori.counts <- read.delim(infiles["counts"], row.names = 1, sep = "\t")
   # names(ori.counts)
   # dim(ori.counts)
@@ -381,7 +393,7 @@ knitr::opts_chunk$set(
   if (quick.test) {
     all.counts <- all.counts[sample(x = 1:nrow(all.counts), size = 1000, replace = FALSE),]
   }
-  message("\tLoaded counts: ",
+  message("\t\tLoaded counts: ",
           nrow(all.counts), " features x ",
           ncol(all.counts), " samples")
 
@@ -436,12 +448,12 @@ knitr::opts_chunk$set(
   ##---- Log-transform non-normalized counts ----
 
   ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-  message("\tTreating zero-values by adding epsilon = ", epsilon)
+  message("\t\tTreating zero-values by adding epsilon = ", epsilon)
   filtered.counts.epsilon <- filtered.counts
   filtered.counts.epsilon[filtered.counts == 0] <- epsilon
 
   ## Log-transformed data for some plots.
-  message("\tComputing log-transformed values")
+  message("\t\tComputing log-transformed values")
   filtered.counts.log10 <- log10(filtered.counts.epsilon)
   filtered.counts.log2 <- log2(filtered.counts.epsilon)
 
@@ -465,7 +477,7 @@ knitr::opts_chunk$set(
                       "mean.median.ratio",
                       "fract.below.mean")
 
-  message("Computing sample-wise statistics on all counts (non-filtered)")
+  message("\tComputing sample-wise statistics on all counts (non-filtered)")
   #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
   # View(stats.per.sample.all)
   # dim(all.counts)
@@ -480,7 +492,7 @@ knitr::opts_chunk$set(
   write.table(x = stats.per.sample.all, file = outfiles["stats_per_sample_all_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
   ## Compute statistics ommitting zero values
-  message("Computing sample-wise statistics for non-zero counts")
+  message("\tComputing sample-wise statistics for non-zero counts")
   all.counts.nozero <- all.counts
   all.counts.nozero[all.counts.nozero == 0] <- NA
   stats.per.sample.nozero <- cbind(
@@ -494,7 +506,7 @@ knitr::opts_chunk$set(
   # View(stats.per.sample.nozero)
 
   ## Compute statistics ommitting zero values
-  message("Computing sample-wise statistics for filtered counts")
+  message("\tComputing sample-wise statistics for filtered counts")
   stats.per.sample.filtered <- cbind(
     sample.desc,
     ColStats(filtered.counts, verbose = verbose, selected.stats = selected.stats))
@@ -506,7 +518,7 @@ knitr::opts_chunk$set(
   write.table(x = stats.per.sample.filtered, file = outfiles["stats_per_sample_filtered_features"], quote = FALSE, sep = "\t", row.names = TRUE, col.names = NA)
 
   ## ---- Compute the counts per million reads with edgeR, using different lib sizes ----
-  message("Computing normalized values with edgeR::cpm()")
+  message("\tComputing normalized values with edgeR::cpm()")
   ## Note: the default normalization criterion (scaling by libbrary sum)
   ## is questionable because it is stronly sensitive to outliers
   ## (very highly expressed genes).  A more robust normalisation criterion
@@ -740,7 +752,8 @@ knitr::opts_chunk$set(
       ref.condition = cond2,
       thresholds = as.vector(thresholds),
       title = comparison.prefix,
-      dir.figures = dir.figures.diffexpr, verbose = verbose)
+      dir.figures = dir.figures.diffexpr, 
+      verbose = verbose)
     deg.results[["DESeq2"]] <- deseq2.result
     # names(deg.results[["DESeq2"]])
     #  attributes(deg.results[["DESeq2"]]$dds)

@@ -72,7 +72,7 @@ DEGtablePostprocessing <- function(deg.table,
     message("\tDEGtablePostprocessing()\tTable name: ", table.name, "\t", nrow(deg.table), " features (rows)")
   }
 
-  thresholds <- as.vector(thresholds)
+  thresholds <- unlist(thresholds)
 
   col.descriptions <- vector() ## Initialize vector with column descriptions
 
@@ -234,19 +234,20 @@ DEGtablePostprocessing <- function(deg.table,
     silence <- dev.off()
 
     ## Volcano plot
-    # message("thresholds['FC']\t", thresholds["FC"])
-    # nona.deg <- na.omit(deg.table)
-    # volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
-    # if (verbose >= 1) { message("\t\tVolcano plot\t", volcano.file) }
-    # pdf(file = volcano.file, width = 7, height = 7)
-    # VolcanoPlot.MultiTestTable(
-    #   multitest.table = nona.deg,
-    #   effect.size.col = "log2FC",
-    #   effect.threshold = log2(thresholds["FC"]),
-    #   control.type = "padj",
-    #   alpha = thresholds["padj"],
-    #   main = paste(table.name, "\nVolcano plot"))
-    # silence <- dev.off()
+    message("thresholds['FC']\t", thresholds["FC"])
+    message("log2(thresholds['FC'])\t", log2(thresholds["FC"]))
+    nona.deg <- na.omit(deg.table)
+    volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
+    if (verbose >= 1) { message("\t\tVolcano plot\t", volcano.file) }
+    pdf(file = volcano.file, width = 7, height = 7)
+    VolcanoPlot.MultiTestTable(
+      multitest.table = nona.deg,
+      effect.size.col = "log2FC",
+      effect.threshold = log2(thresholds["FC"]),
+      control.type = "padj",
+      alpha = thresholds["padj"],
+      main = paste(table.name, "\nVolcano plot"))
+    silence <- dev.off()
 
 
   }
