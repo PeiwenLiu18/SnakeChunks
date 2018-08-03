@@ -108,7 +108,7 @@ rule subread_featureCounts:
 #  subread:
 #    index: "genome/Glossina_morsitans/subread/Glossina-morsitans-Yale_CONTIGS_GmorY1"
 #    gtf_attrtype: "gene_id"     ## Attribute to extract from the GTF file
-#    feature_type: "transcript"  ## Feature type for subread featureCounts
+#    feature_type: "gene"  ## Feature type for subread featureCounts
 #    paired_ends: "TRUE"
 #    multi_overlaps: "TRUE"
 
@@ -131,7 +131,7 @@ rule subread_featureCounts:
 
 ## Set defaults params in case they were not defined in config file. 
 #if not "feature_type" in config["subread"].keys():
-#    config["subread"]["feature_type"] = "transcript"
+#    config["subread"]["feature_type"] = "gene"
 
 #if not "gtf_attrtype" in config["subread"].keys():
 #    config["subread"]["gtf_attrtype"] = "gene_id"
