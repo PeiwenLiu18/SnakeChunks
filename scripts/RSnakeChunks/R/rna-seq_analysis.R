@@ -605,7 +605,8 @@ knitr::opts_chunk$set(
   figname <- "libsize_barplot_all_features"
   file.prefix <- file.path(dir.figures.samples, figname)
   message("\t\tGenerating figure\t", figname)
-  for (fig.format in figure.formats) {
+  for (f in 1:length(figure.formats)) {
+    fig.format <- figure.formats[f]
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
@@ -614,7 +615,9 @@ knitr::opts_chunk$set(
     LibsizeBarplot(counts = all.counts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
 
     silence <- dev.off(); rm(silence)
-    index.text <- index.figure(figname, figure.file, index.text)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text)
+    }
     # system(paste("open", figure.file))
   }
 
@@ -622,7 +625,8 @@ knitr::opts_chunk$set(
   figname <- "libsize_barplot_filtered_features"
   file.prefix <- file.path(dir.figures.samples, figname)
   message("\t\tGenerating figure\t", figname)
-  for (fig.format in figure.formats) {
+  for (f in 1:length(figure.formats)) {
+    fig.format <- figure.formats[f]
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
@@ -631,7 +635,9 @@ knitr::opts_chunk$set(
     LibsizeBarplot(counts = filtered.counts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
 
     silence <- dev.off(); rm(silence)
-    index.text <- index.figure(figname, figure.file, index.text)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text)
+    }
     # system(paste("open", figure.file))
   }
 
@@ -663,7 +669,8 @@ knitr::opts_chunk$set(
   figname <- "size_factors"
   file.prefix <- file.path(dir.figures.samples, figname)
   message("\t\tGenerating figure\t", figname)
-  for (fig.format in figure.formats) {
+  for (f in 1:length(figure.formats)) {
+    fig.format <- figure.formats[f]
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     # message("\t\t\t", fig.format, " plot\t", figname)
@@ -672,7 +679,9 @@ knitr::opts_chunk$set(
     plot(size.factors, main = "Sample size factors", col = sample.desc$color)
 
     silence <- dev.off(); rm(silence)
-    index.text <- index.figure(figname, figure.file, index.text)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text)
+    }
     # system(paste("open", figure.file))
   }
 
@@ -874,7 +883,8 @@ knitr::opts_chunk$set(
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
-    for (fig.format in figure.formats) {
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
@@ -887,14 +897,17 @@ knitr::opts_chunk$set(
            main = paste(sep = "", comparison.prefix, "\nAdjusted p-values"))
 
       silence <- dev.off(); rm(silence)
-      index.text <- index.figure(figname, figure.file, index.text)
+      if (f == 1) {
+        index.text <- index.figure(figname, figure.file, index.text)
+      }
       # system(paste("open", figure.file))
     }
 
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_log2FC")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
-    for (fig.format in figure.formats) {
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
@@ -907,7 +920,9 @@ knitr::opts_chunk$set(
            main = paste(sep = "", comparison.prefix, "\nlog2(fold change)"))
 
       silence <- dev.off(); rm(silence)
-      index.text <- index.figure(figname, figure.file, index.text)
+      if (f == 1) {
+        index.text <- index.figure(figname, figure.file, index.text)
+      }
       # system(paste("open", figure.file))
     }
 
@@ -922,7 +937,8 @@ knitr::opts_chunk$set(
 
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
-    for (fig.format in figure.formats) {
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
@@ -946,7 +962,9 @@ knitr::opts_chunk$set(
       par(mfrow = c(1,1))
       par(par.ori)
       silence <- dev.off(); rm(silence)
-      index.text <- index.figure(figname, figure.file, index.text)
+      if (f == 1) {
+        index.text <- index.figure(figname, figure.file, index.text)
+      }
       # system(paste("open", figure.file))
     }
 
@@ -963,7 +981,8 @@ knitr::opts_chunk$set(
 
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
-    for (fig.format in figure.formats) {
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
@@ -989,7 +1008,9 @@ knitr::opts_chunk$set(
       par(par.ori)
 
       silence <- dev.off(); rm(silence)
-      index.text <- index.figure(figname, figure.file, index.text)
+      if (f == 1) {
+        index.text <- index.figure(figname, figure.file, index.text)
+      }
       # system(paste("open", figure.file))
     }
 
@@ -1004,7 +1025,8 @@ knitr::opts_chunk$set(
 
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
-    for (fig.format in figure.formats) {
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
@@ -1023,7 +1045,9 @@ knitr::opts_chunk$set(
                            circle.col = c("orange", "blue"), mar = c(0,0,5,0))
       }
       silence <- dev.off(); rm(silence)
-      index.text <- index.figure(figname, figure.file, index.text)
+      if (f == 1) {
+        index.text <- index.figure(figname, figure.file, index.text)
+      }
       # system(paste("open", figure.file))
     }
 
@@ -1070,7 +1094,7 @@ knitr::opts_chunk$set(
 
   index.text <- append(index.text, paste(sep = "", "\n\n### Directories\n"))
   index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "| ---------------------- | -------------------------------------------------- |"))
+  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (dirname in names(dirs)) {
     dir <- dirs[dirname]
     index.text <- append(index.text, paste(sep = "", "| ", dirname, " | ", "[", dir, "](", dir, ") |"))
@@ -1078,7 +1102,7 @@ knitr::opts_chunk$set(
 
   index.text <- append(index.text, paste(sep = "", "\n\n### Input files\n"))
   index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "| ---------------------- | -------------------------------------------------- |"))
+  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (filename in names(infiles)) {
     file <- infiles[filename]
     index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
@@ -1086,17 +1110,19 @@ knitr::opts_chunk$set(
 
   index.text <- append(index.text, paste(sep = "", "\n\n### Output files"))
   index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "| ---------------------- | -------------------------------------------------- |"))
+  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (filename in names(outfiles)) {
     file <- outfiles[filename]
     index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
   }
 
-  for (fig.format in names(figure.files)) {
-    figfiles <- figure.files[fig.format]
+  f <- 1
+  for (f in 1:length(figure.formats)) {
+    fig.format <- figure.formats[f]
+    figfiles <- unlist(figure.files[fig.format])
     index.text <- append(index.text, paste(sep = "", "\n\n### Figures (", fig.format,")"))
     index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-    index.text <- append(index.text, paste(sep = "", "| ---------------------- | -------------------------------------------------- |"))
+    index.text <- append(index.text, paste(sep = "", "|----------------------|--------------------------------------------------|"))
     for (filename in names(figfiles)) {
       file <- figfiles[filename]
       index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
