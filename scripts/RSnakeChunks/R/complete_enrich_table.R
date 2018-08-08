@@ -12,6 +12,7 @@
 #' @param enrich.table Enrichment table from GOstats, clusterProfiler or similar programs.
 #' @param pvalue.column Name or number of the column containing the p-values (this depends on the program).
 #' @param thresholds=c("evalue"=1) thresholds on one or several fields.
+#' @param verbose=1 verbosity
 #' @examples
 #'
 #' @export
@@ -20,7 +21,8 @@ complete.enrich.table <- function(enrich.table,
                                   thresholds = c("evalue" = 1, "qvalue" = 0.05),
                                   nb.tests = nrow(enrich.table),
                                   select.positives = FALSE,
-                                  plot.adjust = TRUE
+                                  plot.adjust = TRUE,
+                                  verbose = 1
 ) {
 
   ## Ensure homogeneous column names exist in all results even if it duplicates the p-value column.
@@ -56,11 +58,15 @@ complete.enrich.table <- function(enrich.table,
         enrich.table[, selection.column] <- 1*(enrich.table[,s] > thresholds[s])
       }
       sum(enrich.table[, selection.column])
-      verbose(paste(sep = "", "\t",
-                    sum(enrich.table[selection.column]), "/", nb.tests, " tests passed ",
-                    s, " threshold = ", thresholds[s]), 2)
+      if (verbose >= 2) { 
+        message(paste(sep = "", "\t",
+                      sum(enrich.table[selection.column]), "/", nb.tests, " tests passed ",
+                      s, " threshold = ", thresholds[s])) 
+      }
       enrich.table$positive <- enrich.table$positive * enrich.table[,selection.column]
-      verbose(paste(sep = "", "\t", sum(enrich.table$positive), "/", nb.tests, " positive tests"), 3)
+      if (verbose >= 3) { 
+        message(paste(sep = "", "\t", sum(enrich.table$positive), "/", nb.tests, " positive tests")) 
+      }
     }
   }
 
@@ -91,13 +97,16 @@ complete.enrich.table <- function(enrich.table,
   ## Select only the GO classes passing the e-value
   if (select.positives) {
     enrich.table <- enrich.table[enrich.table$positive, ]
-    verbose(paste("\tGO over-representation. Returning",
-                  sum(enrich.table$evalue.selection), "significant associations."), 2)
+    if (verbose >= 2) { 
+      message("\tGO over-representation. Returning", sum(enrich.table$evalue.selection), "significant associations.") 
+    }
   } else {
-    verbose(paste(sep = "", "\tGO over-representation. Returning table with all associations (",
-                  nrow(enrich.table), " among which ",
-                  sum(enrich.table$positive), " significant)."), 2)
+    if (verbose >= 2) { 
+      message("\tGO over-representation. Returning table with all associations (",
+              nrow(enrich.table), " among which ",
+              sum(enrich.table$positive), " significant).") 
+    }
   }
-
+  
   return(enrich.table)
 }

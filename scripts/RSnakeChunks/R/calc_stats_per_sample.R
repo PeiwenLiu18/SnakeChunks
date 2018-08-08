@@ -3,9 +3,10 @@
 #' @author Jcaques van Helden
 #' @param sample.descriptions a data.frame with one row per sample, in the same order as the columns of the count table.
 #' @param counts a data.frame with one row per feature (gene, transcript, ...) and one column per sample. The columns of the count table must correspond to the rows of the sample descrtiption file.
+#' @param verbose=1 verbosity
 calc.stats.per.sample <- function(sample.descriptions,
-                                  counts) {
-  verbose("Computing statistics per sample", 2)
+                                  counts, verbose = 1) {
+  if (verbose >= 2) { message("Computing statistics per sample") }
 
   stats.per.sample <- cbind(
     sample.descriptions[names(counts), ],
