@@ -95,6 +95,7 @@ RNAseqAnalysis <- function(count.table,
   }
   parameters <- yaml.load_file(configFile)
   message("\tLoaded parameters from file ", configFile)
+  # View(parameters)
   
   
   ## ---- Define the main parameters -----------------------------------------------------
@@ -114,7 +115,12 @@ RNAseqAnalysis <- function(count.table,
   setwd(dirs["main"])
   message("\tMain directory: ", dirs["main"])
 
-
+  
+  ## Directory to store differential expression results
+  dirs["output"] <- result.dir ## Index dir for the report
+  message("\tOutput directory: ", result.dir)
+  dir.create(result.dir, showWarnings = FALSE, recursive = TRUE)
+  
   ## Prefix for the count table
   #count.prefix <- "bowtie2_featureCounts_all"
   #message("\tPrefix for the count table: ", count.prefix)
@@ -143,11 +149,6 @@ RNAseqAnalysis <- function(count.table,
   } else {
     edgeR.norm.methods <- parameters$edgeR$norm_method
   }
-  
-  ## Directory to store differential expression results
-  dirs["output"] <- result.dir ## Index dir for the report
-  message("\tOutput directory: ", result.dir)
-  dir.create(result.dir, showWarnings = FALSE, recursive = TRUE)
 
   ## Directory for Figures
   dir.figures.samples <- file.path(result.dir, "figures")
@@ -179,7 +180,13 @@ RNAseqAnalysis <- function(count.table,
     parameters$DEG$epsilon <- 0.1 # passed to file parameters.R, 2017-03-15
   }
   epsilon <- parameters$DEG$epsilon
-
+  
+  ## A trick: to enable log-scaled plots for 0 values, I add an epsilon increment
+  if (is.null(parameters$DEG$out_width)) {
+    parameters$DEG$out_width <- "75%" # passed to file parameters.R, 2017-03-15
+  }
+  epsilon <- parameters$DEG$epsilon
+  
   ## Default method for the selection of the final list of DEG
   ## Since DESeq2 seems more conservative, we use it by default
   if (is.null(parameters$DEG$selection_criterion)) {
@@ -224,7 +231,7 @@ RNAseqAnalysis <- function(count.table,
   }
   thresholds <- as.vector(parameters$DEG$thresholds)
 
-  ## ---- Initialize the Rmd report (index of input/output file)
+  ## ---- Initialize the Rmd report (index of input/output file) ----
   index.Rmd <- "index.Rmd"
   index.socket <- file(index.Rmd)
 
@@ -233,22 +240,23 @@ RNAseqAnalysis <- function(count.table,
   if (is.null(parameters$title)) {
     parameters$title <- "RNA-seq analysis report"
   }
-  if (is.null(parameters$title)) {
-    parameters$title <- "RNA-seq analysis report"
+  if (is.null(parameters$description)) {
+    parameters$description <- "Analysis workflow for RNA-seq data: sample normalisation, descriptive statistics, differential analysis. "
+  }
+  if (is.null(parameters$author)) {
+    parameters$author <- "[AUTHORS] "
   }
   
   Rmd.header <- paste(
     sep = '', 
     '---
-title: "', parameters$title,'"
-author:
-  name: "[AUTHOR NAME]"
-  email: "[AUTHOR EMAIL]"
+title:  "', parameters$title,'"
+author: "', parameters$author,'"
 date: Last update:`r format(Sys.time())`
 output:
   html_document:
     fig_caption: yes
-    highlight: zenburn
+    highlight: kate
     self_contained: yes
     theme: cerulean
     toc: yes
@@ -256,7 +264,7 @@ output:
     toc_float: yes
   pdf_document:
     fig_caption: yes
-    highlight: zenburn
+    highlight: kate
     toc: yes
     toc_depth: 3
   word_document:
@@ -273,15 +281,17 @@ knitr::opts_chunk$set(
     warning = FALSE,
     comment = "",
     fig.align = "center",
-    fig.width = 7,
-    fig.height = 5,
     fig.path = "figures/")
 ```
 ')
   
   index.text <- Rmd.header
   
-  
+  ## Print the description
+  if (!is.null(parameters$description)) {
+    index.text <- append(index.text, "\n\n## Parameters\n")
+    index.dex <- append(index.text, parameters$description)    
+  }
   
   ## Print the threshold tables
   ## NOTE: I should evaluate what I do with the kable calls
@@ -335,9 +345,9 @@ knitr::opts_chunk$set(
   message("\t\tConditions = ", paste(collapse = ", ", conditions))
   
   ## ---- Define condition-specific colors and apply them to each sample ----
-  cols.conditions <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
-  names(cols.conditions) <- conditions
-  sample.desc$color <- cols.conditions[sample.conditions]
+  color.per.condition <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
+  names(color.per.condition) <- conditions
+  sample.desc$color <- color.per.condition[sample.conditions]
 
   # print(sample.conditions)
 
@@ -386,7 +396,29 @@ knitr::opts_chunk$set(
   message("\t\tDesign file contains ", nrow(design), " comparisons. ")
   comparison.summary <- design ## Initialize a summary table for each DEG analysis
   comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
+  
+  ## Identify reference column in the design file
+  if ("reference" %in% (tolower(colnames(design)))) {
+    reference.column <- which(tolower(colnames(design)) == "reference")
+    if (length (reference.column) != 1) {
+      stop("The design file contains several columns entitled 'reference'. ")
+    }
+  } else {
+    message("The headers of the design table do not contain 'reference' column -> taking 1st column as reference")
+    reference.column <- 1
+  }
 
+  ## Identify test column in the design file
+  if ("test" %in% (tolower(colnames(design)))) {
+    test.column <- which(tolower(colnames(design)) == "test")
+    if (length (test.column) != 1) {
+      stop("The design file contains several columns entitled 'test'. ")
+    }
+  } else {
+    message("The headers of the design table do not contain 'test' column -> taking 1st column as test")
+    test.column <- 2
+  }
+  
   ## Print out the design table (pairs of conditions to be compared)
   index.text <- append(index.text, "\n\n## Design\n")
   index.text <- append(index.text, kable(
@@ -615,13 +647,6 @@ knitr::opts_chunk$set(
 
   ## ----library_sizes_barplot, fig.width=6, fig.height=6, fig.cap="**Barplot of assigned reads per sample. ** Bars indicate the sum of read counts assigned to features (genes) per sample (library)."----
   par.ori <- par(no.readonly = TRUE) # Store original parameters
-  # par(c("mar", "mai"))
-  # libsize.barplot(
-  #   stats.per.sample,
-  #   plot.file = NULL,
-  #   main = "Assigned reads per sample (libsum)")
-  # par(par.ori) # Restore original parameters
-  #
   figname <- "libsize_barplot_all_features"
   file.prefix <- file.path(dir.figures.samples, figname)
   message("\t\tGenerating figure\t", figname)
@@ -636,7 +661,7 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text)
+      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
@@ -656,12 +681,46 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text)
+      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
 
-
+  ## ---- Barplot comparing library sizes before and after filtering ----
+  figname <- "libsize_barplot_all_vs_filtered_features"
+  file.prefix <- file.path(dir.figures.samples, figname)
+  message("\t\tGenerating figure\t", figname)
+  for (f in 1:length(figure.formats)) {
+    fig.format <- figure.formats[f]
+    figure.file <- paste(sep = "", file.prefix, ".", fig.format)
+    figure.files[[fig.format]][figname] <- figure.file
+    message("\t\t\t", fig.format, " plot\t", figname)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 7, height = 8)
+    
+    x <- data.frame(
+      "filtered" = stats.per.sample.filtered$Mcounts,
+      "all" = stats.per.sample.all$Mcounts)
+    row.names(x) <- row.names(stats.per.sample.all)
+    x <- x[nrow(x):1,]
+    indices <- sort(rep(1:nrow(x), times = 2))
+    barplot.densities <- rep(c(50, -1), length.out = 2 * nrow(x))
+    bplt <- barplot(as.matrix(t(x)), horiz = TRUE, beside = TRUE, las=1,
+            col = sample.desc$color[indices],
+            density = barplot.densities, xlab = "Million reads", 
+            main = "Library sizes\nbefore/after filtering")
+    barplot.Mreads <- round(digits=1, as.vector(unlist(t(x))))
+    text(x=pmax(barplot.Mreads, 3), labels =  barplot.Mreads, y = bplt, pos = 2, font = 2)
+    sample.type <- rep(c("Filtered", "All"), length.out = 2 * nrow(x))
+    text(x = 0, labels = sample.type, y = bplt, pos = 4, font = 1)
+    
+    
+    silence <- dev.off(); rm(silence)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+    }
+    # system(paste("open", figure.file))
+  }
+  
 
   ## ---- Between-sample normalisation -------------------------------------------------------
 
@@ -700,7 +759,7 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text)
+      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
@@ -709,6 +768,9 @@ knitr::opts_chunk$set(
   ## ----differential_expression_analysis, fig.width=8, fig.height=12--------
   # setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
 
+  index.text <- append(index.text, "\n\n## Differential analysis\n")
+  
+  
   # i <- 1  # for quick test
   for (i in 1:nrow(design)) {
 
@@ -718,22 +780,33 @@ knitr::opts_chunk$set(
     deg.results <- list()
 
     ## Identify samples for the first condition
-    cond1 <- as.vector(design[i,1])  ## First condition for the current comparison
-    samples1 <- sample.ids[sample.conditions == cond1]
-    if (length(samples1) < 2) {
-      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond1))
+    ref.condition <- as.vector(design[i, reference.column])  ## First condition for the current comparison
+    ref.samples <- sample.ids[sample.conditions == ref.condition]
+    if (length(ref.samples) < 2) {
+      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", ref.condition))
     }
 
     ## Identify samples for the second condition
-    cond2 <- as.vector(design[i,2])  ## Second condition for the current comparison
-    samples2 <- sample.ids[sample.conditions == cond2]
-    if (length(samples2) < 2) {
-      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond2))
+    test.condition <- as.vector(design[i,test.column])  ## Second condition for the current comparison
+    test.samples <- sample.ids[sample.conditions == test.condition]
+    if (length(test.samples) < 2) {
+      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", test.condition))
     }
 
-    #  stop("HELLO", "\tprefix = ", prefix)
 
-    message("\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2)
+    index.text <- append(index.text, paste(sep= "", "\n\n### ", test.condition, " versus ", ref.condition, "\n\n"))
+#    index.text <- append(index.text, paste(sep= "", "Test condition : ",  test.condition, "\n"))
+#    index.text <- append(index.text, paste(sep= "", "Reference condition :",  ref.condition, "\n"))
+    compa.table <- data.frame(
+      type = c("Reference", "Test"),
+      condition = c(ref.condition, test.condition),
+      samples = c(length(ref.samples), length(test.samples))
+    )
+    index.text <- append(index.text, 
+                         kable(compa.table))
+    
+    
+    message("\tDifferential analysis\t", i , "/", nrow(design), "\t", ref.condition, " vs ", test.condition)
 
     ## Create a specific directory for the results of this comparison
     comparison.prefix <- comparison.summary$prefixes[i]
@@ -755,7 +828,7 @@ knitr::opts_chunk$set(
 
 
     ## Select counts for the samples belonging to the two conditions
-    current.samples <- c(samples1, samples2)
+    current.samples <- c(ref.samples, test.samples)
     current.counts <- data.frame(filtered.counts[,current.samples])
     # dim(current.counts)  ## For test
     # names(current.counts)
@@ -768,21 +841,26 @@ knitr::opts_chunk$set(
     current.conditions <- sample.conditions[current.samples]
     current.labels <- paste(current.conditions, names(current.counts), sep = "_")
 
-    result.table <- init.deg.table(stdcounts, samples1, samples2, stats = FALSE)
+    ## A big result table with all features and all statistics
+    result.table <- init.deg.table(stdcounts, ref.samples, test.samples, stats = FALSE)
     # View(result.table)
     # dim(result.table)
-
+    
+    ## A synthetic table with significant featrues only 
+    result.table.synthetic <- data.frame(row.names = row.names(result.table),"feature_id" = row.names(result.table))
+    
     ## ---- DESeq2 analysis ----
     message("\tDESeq2 analysis\t", comparison.prefix)
     deseq2.result <- deseq2.analysis(
       counts = current.counts,
+      # head(counts)
       condition = current.conditions,
-      ref.condition = cond2,
+      ref.condition = test.condition,
       comparison.prefix = comparison.prefix,
       thresholds = as.vector(thresholds),
-      title = comparison.prefix,
-      dir.figures = dir.figures.diffexpr, 
-      verbose = verbose)
+      title = comparison.prefix, 
+#      verbose = verbose,
+      dir.figures = dir.figures.diffexpr)
     deg.results[["DESeq2"]] <- deseq2.result
     # names(deg.results[["DESeq2"]])
     #  attributes(deg.results[["DESeq2"]]$dds)
@@ -797,7 +875,12 @@ knitr::opts_chunk$set(
     result.table <- cbind(
       result.table,
       "DESeq2" = deseq2.result$result.table[row.names(result.table),])
+    
+    result.table.synthetic <- cbind(
+      result.table.synthetic,
+      "DESeq2" = deseq2.result$result.table[row.names(result.table),c("padj", "FC")])
     # names(result.table)
+    # names(result.table.synthetic)
     # dim(deseq2.result$result.table)
     # dim(deseq2.result$result.table)
     # names(deseq2.result$result.table)
@@ -809,6 +892,7 @@ knitr::opts_chunk$set(
     deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "_DESeq2.tsv")
     comparison.summary[i,"deseq2"] <- deseq2.result.file
     message("\tExporting DESeq2 result table (tab): ", deseq2.result.file)
+    outfiles["DESeq2"]  <- deseq2.result.file
     write.table(
       x = deseq2.result$result.table, row.name    = FALSE,
       file = deseq2.result.file,
@@ -823,41 +907,82 @@ knitr::opts_chunk$set(
       edger.result <- edger.analysis(
         counts = current.counts,
         condition = current.conditions,
-        test.condition = cond1,
-        ref.condition = cond2,
+        test.condition = test.condition,
+        ref.condition = ref.condition,
         thresholds = as.vector(thresholds),
         comparison.prefix = comparison.prefix,
         norm.method = norm.method,
         title = paste(sep = "_", norm.method, comparison.prefix),
-        dir.figures = dir.figures.diffexpr,
-        verbose = verbose)
+#        verbose = verbose,
+        dir.figures = dir.figures.diffexpr)
       deg.results[[edgeR.prefix]] <- edger.result
 
       ## A tricky way to add edgeR with normalisation in column names
       edger.to.bind <- edger.result$result.table[row.names(result.table),]
       colnames(edger.to.bind) <- paste(sep = "_", edgeR.prefix, colnames(edger.to.bind))
       # names(edger.to.bind)
-      # View(x)
-      # x <- rownames(result.table)
-      # y <- rownames(edger.to.bind)
-      # sum(x != y)
-      # names (result.table)
+      # View(edger.to.bind)
       result.table <- cbind(
         result.table,
         edger.to.bind)
-      # names (result.table)
+      # names(result.table)
 
-
+      colnames.synthetic <- paste(sep = "_", edgeR.prefix, c("padj", "FC"))
+      result.table.synthetic <- cbind(
+        result.table.synthetic,
+        edger.to.bind[, colnames.synthetic])
+      # names(edger.to.bind)
+      
       ## Export edgeR result table
       edger.result.file <- paste(sep = "", prefix["comparison_file"], "_", edgeR.prefix, ".tsv")
       comparison.summary[i,"edger"] <- edger.result.file
       message("\tExporting edgeR result table (tab): ", edger.result.file)
+      outfiles[edgeR.prefix] <- edger.result.file
       write.table(x = edger.result$result.table,
                   file = edger.result.file,
                   row.names = FALSE,
                   sep = "\t", quote = FALSE)
     }
 
+    ## ----  Select significant genes by combining DESeq2 and edgeR results ----
+    padj.columns <- grep(colnames(result.table.synthetic), pattern = "padj", value = TRUE)
+    FC.columns <- grep(colnames(result.table.synthetic), pattern = "FC", value = TRUE)
+    if (is.null(parameters$DEG$selection_criterion)) {
+      parameters$DEG$selection_criterion <- "union"
+    }
+    
+    pval.passed <- result.table.synthetic[, padj.columns] <= thresholds$padj
+    # table(is.na(pval.passed))
+    pval.passed[is.na(pval.passed)] <- FALSE
+    #  table(is.na(pval.passed))
+    # table(unlist(pval.passed))
+    FC.passed <- result.table.synthetic[, FC.columns] >= thresholds$FC
+    positive <- pval.passed & FC.passed 
+    colnames(positive) <- names(deg.results)
+    # View(positive)
+    # table(positive[,1], positive[,2])
+    
+    positive.col.name <- paste(sep = "", "positive_", parameters$DEG$selection_criterion)
+    
+    if (parameters$DEG$selection_criterion == "union") {
+      combined.positive <- apply(positive, 1, sum) > 0
+    } else if (parameters$DEG$selection_criterion == "intersection") {
+      combined.positive <- apply(!positive, 1, sum) == 0
+    } else if (parameters$DEG$selection_criterion == "DESeq2") {
+      combined.positive <- positive[, "DESeq2"]
+    } else if (parameters$DEG$selection_criterion == "edgeR") {
+      ## In case several normalisation methods would have been selected for edgeR, take the intersection between them (but ignore DESeq2)
+      combined.positive <- apply(as.matrix(!positive[, setdiff(colnames(positive), "DESeq2")]), 1, sum) == 0
+    }
+    # nrow(result.table.synthetic)
+    # table(result.table.synthetic[, positive.col.name])
+    result.table[, positive.col.name] <- combined.positive
+    result.table.synthetic[, positive.col.name] <- combined.positive
+    result.table.synthetic <- result.table.synthetic[result.table.synthetic[, positive.col.name],]
+    # nrow(result.table.synthetic)
+    
+    ## ---- Export DEG result tables ----
+    
     ## Export full result table (DESeq2 + edgeR with different normalisation methods)
     ## in a tab-separated values (tsv) file
     result.file <- paste(sep = "",
@@ -865,10 +990,22 @@ knitr::opts_chunk$set(
                          "_diffexpr_DESeq2_and_edgeR.tsv")
     # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
     message("\tExporting result table (tsv): ", result.file)
+    outfiles["Complete result table"] <- result.file
     write.table(x = result.table, row.names = FALSE,
                 file = result.file, sep = "\t", quote = FALSE)
-
-
+    
+    ## Export synthetic table with positive features, and only the most relevant stats
+    deg.file <- paste(sep = "",
+                         prefix["comparison_file"],
+                         "_diffexpr_DESeq2_and_edgeR_DEG.tsv")
+    # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
+    message("\tExporting table of differentially expressed genes (tsv): ", deg.file)
+    outfiles["Synthetic result table"] <- deg.file
+    write.table(x = result.table.synthetic, row.names = FALSE,
+                file = deg.file, sep = "\t", quote = FALSE)
+    
+    
+    
     ## Collect results by output statistics
     deg.compa <- list()
     feature.ids <- row.names(current.counts)
@@ -888,6 +1025,8 @@ knitr::opts_chunk$set(
       #    View(deg.compa[[stat]])
     }
 
+
+    
 
     ## Define feature colors according to their level of expression (count means)
     # feature.scores <- log2(apply(filtered.counts.epsilon, 1, median))
@@ -918,7 +1057,7 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text)
+        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -941,7 +1080,7 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text)
+        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -962,7 +1101,9 @@ knitr::opts_chunk$set(
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
-      OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, height = 2 + nb.panels[1]*3, width = 2 + nb.panels[2]*3.5)
+      height <- 2 + nb.panels[1]*3
+      width <- 2 + nb.panels[2]*3.5
+      OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, height = height, width = width)
 
       par.ori <- par(no.readonly = TRUE)
       par(mfrow = nb.panels)
@@ -983,7 +1124,7 @@ knitr::opts_chunk$set(
       par(par.ori)
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text)
+        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -1029,7 +1170,7 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text)
+        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -1050,7 +1191,9 @@ knitr::opts_chunk$set(
       figure.file <- paste(sep = "", file.prefix, ".", fig.format)
       figure.files[[fig.format]][figname] <- figure.file
       # message("\t\t\t", fig.format, " plot\t", figname)
-      OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, height = 2 + nb.panels[1]*3, width = 2 + nb.panels[2]*3.5)
+      height <- 2 + nb.panels[1]*3
+      width <- 2 + nb.panels[2]*3.5
+      OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, height = height, width = width)
 
       par.ori <- par(no.readonly = TRUE)
       par(mfrow = nb.panels)
@@ -1066,7 +1209,7 @@ knitr::opts_chunk$set(
       }
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text)
+        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
