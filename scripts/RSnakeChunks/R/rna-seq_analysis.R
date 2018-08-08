@@ -289,8 +289,8 @@ knitr::opts_chunk$set(
   
   ## Print the description
   if (!is.null(parameters$description)) {
-    index.text <- append(index.text, "\n\n## Parameters\n")
-    index.dex <- append(index.text, parameters$description)    
+    index.text <- append(index.text, "\n\n## Description\n")
+    index.text <- append(index.text, parameters$description)    
   }
   
   ## Print the threshold tables
@@ -360,10 +360,10 @@ knitr::opts_chunk$set(
     message("\t\tSample description file has no column with heading 'Label'. ")
     sample.labels <- paste(sep = "_", sample.ids, sample.conditions)
     if (is.null(sample.desc$Replicate)) {
+      message("\t\tBuilding labels from sample IDs and conditions. ")
+    } else {
       message("\t\tBuilding labels from sample IDs, conditions and replicate nb. ")
       sample.labels <- paste(sep = "_", sample.labels, sample.desc$Replicate)
-    } else {
-      message("\t\tBuilding labels from sample IDs and conditions. ")
     }
     sample.desc$Label <- sample.labels
   }
@@ -695,28 +695,49 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 7, height = 8)
+    plot.height <- max(2 + 0.4 * nrow(sample.desc), 6)
     
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
+    
+    par.ori <- par(no.readonly = TRUE)
+
+    ## Prepare data frame for the comparative barplot    
     x <- data.frame(
       "filtered" = stats.per.sample.filtered$Mcounts,
       "all" = stats.per.sample.all$Mcounts)
-    row.names(x) <- row.names(stats.per.sample.all)
+    row.names(x) <- sample.labels
+    
+    label.sizes <- nchar(row.names(x))
+    left.margin <- 2 + max(label.sizes)*0.5
+    # par("mar")
+    par(mar=c(5.1, left.margin, 4.1, 1))
+    
     x <- x[nrow(x):1,]
     indices <- sort(rep(1:nrow(x), times = 2))
     barplot.densities <- rep(c(50, -1), length.out = 2 * nrow(x))
-    bplt <- barplot(as.matrix(t(x)), horiz = TRUE, beside = TRUE, las=1,
-            col = sample.desc$color[indices],
-            density = barplot.densities, xlab = "Million reads", 
-            main = "Library sizes\nbefore/after filtering")
+    bplt <- barplot(
+      as.matrix(t(x)), 
+      horiz = TRUE, 
+      beside = TRUE, 
+      las=1,
+      cex.names = 0.9,
+      col = rev(sample.desc$color[indices]),
+      density = barplot.densities, xlab = "Million reads", 
+      main = "Library sizes\nbefore/after filtering",
+      xlim = c(0, max(x) * 1.3))
     barplot.Mreads <- round(digits=1, as.vector(unlist(t(x))))
-    text(x=pmax(barplot.Mreads, 3), labels =  barplot.Mreads, y = bplt, pos = 2, font = 2)
-    sample.type <- rep(c("Filtered", "All"), length.out = 2 * nrow(x))
-    text(x = 0, labels = sample.type, y = bplt, pos = 4, font = 1)
+    text(x=pmax(barplot.Mreads, 3), labels =  barplot.Mreads, y = bplt, pos = 2, font = 2, cex=0.8)
+    #sample.type <- rep(c("Filtered", "All"), length.out = 2 * nrow(x))
+    #text(x = 0, labels = sample.type, y = bplt, pos = 4, font = 1, cex=0.5)
+    legend("topright", legend = c("All genes", "Filtered"), col = "gray", density = c(-1, 50), cex = 0.7)
     
+    par(par.ori)
     
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      index.text <- index.figure(
+        figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      #, chunk.opt = paste(sep = "", ", out.height = ", plot.height))
     }
     # system(paste("open", figure.file))
   }
