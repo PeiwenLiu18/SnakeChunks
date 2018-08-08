@@ -892,7 +892,7 @@ knitr::opts_chunk$set(
     deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "_DESeq2.tsv")
     comparison.summary[i,"deseq2"] <- deseq2.result.file
     message("\tExporting DESeq2 result table (tab): ", deseq2.result.file)
-    outfiles["DESeq2"]  <- deseq2.result.file
+    outfiles[paste(sep="_", comparison.prefix, "DESeq2")]  <- deseq2.result.file
     write.table(
       x = deseq2.result$result.table, row.name    = FALSE,
       file = deseq2.result.file,
@@ -937,7 +937,7 @@ knitr::opts_chunk$set(
       edger.result.file <- paste(sep = "", prefix["comparison_file"], "_", edgeR.prefix, ".tsv")
       comparison.summary[i,"edger"] <- edger.result.file
       message("\tExporting edgeR result table (tab): ", edger.result.file)
-      outfiles[edgeR.prefix] <- edger.result.file
+      outfiles[paste(sep="_", comparison.prefix, edgeR.prefix)] <- edger.result.file
       write.table(x = edger.result$result.table,
                   file = edger.result.file,
                   row.names = FALSE,
@@ -990,7 +990,7 @@ knitr::opts_chunk$set(
                          "_diffexpr_DESeq2_and_edgeR.tsv")
     # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
     message("\tExporting result table (tsv): ", result.file)
-    outfiles["Complete result table"] <- result.file
+    outfiles[paste(sep = "", comparison.prefix, "_complete_result_table")] <- result.file
     write.table(x = result.table, row.names = FALSE,
                 file = result.file, sep = "\t", quote = FALSE)
     
@@ -1000,7 +1000,7 @@ knitr::opts_chunk$set(
                          "_diffexpr_DESeq2_and_edgeR_DEG.tsv")
     # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
     message("\tExporting table of differentially expressed genes (tsv): ", deg.file)
-    outfiles["Synthetic result table"] <- deg.file
+    outfiles[paste(sep = "", comparison.prefix, "_synthetic_result_table")] <- deg.file
     write.table(x = result.table.synthetic, row.names = FALSE,
                 file = deg.file, sep = "\t", quote = FALSE)
     
