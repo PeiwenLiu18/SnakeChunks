@@ -39,7 +39,11 @@ RNAseqAnalysis <- function(count.table,
   ## - stdcounts.perc95
   ## - stdcounts.median
   ## - current.labels
-  ## Problem with relevel : deseq2 and edgeR compute log2-ratios in opposite directions !
+  ## 
+  ## - Add PCA
+  ## - Add multi-group differential analysis
+  ## - Comparison between different anlayses of the design file 
+  ## - Clustering
 
   
   ## ---- Load required libraries ----
@@ -695,7 +699,7 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    plot.height <- max(2 + 0.4 * nrow(sample.desc), 6)
+    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
     
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
     
