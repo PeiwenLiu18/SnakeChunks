@@ -60,7 +60,7 @@ if (is.null(opt$main_dir) ) {
 
 ## Result directory
 if (is.null(opt$result_dir)) {
-  opt$result_dir <- file.path(opt$main_dir, "results")
+  opt$result_dir <- "results"
   message("Result dir defined from main directory\t", opt$result_dir)
 }
 
