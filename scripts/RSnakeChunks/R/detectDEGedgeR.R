@@ -1,5 +1,5 @@
-detectDEGedgeR <- function(dir.figures=NULL) {
-  verbose("\t\tedgeR analysis", 2)
+detectDEGedgeR <- function(dir.figures=NULL, verbose = 1) {
+  if (verbose >= 2) { message("\t\tedgeR analysis") }
 
   prefix["edgeR_file"] <- paste(sep="", prefix["comparison_file"], "_", suffix.edgeR)
   prefix["edgeR_figure"] <- paste(sep="", prefix["comparison_figure"], "_", suffix.edgeR)

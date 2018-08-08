@@ -2,9 +2,11 @@
 #' @author Jacques van Helden (\email{Jacques.van-Helden@@univ-amu.fr})
 #' @param required.libraries a vector contianing the names of required CRAN libraries, which will be installed with install.packages()
 #' @param required.bioconductor a vector containing the required BioConductor libraries, which will be installed with biocLite
+#' @param verbose=1 verbosity
 #' @export
 CheckRequiredLibraries <- function(required.libraries,
-                                   required.bioconductor = NULL) {
+                                   required.bioconductor = NULL,
+                                   verbose = 1) {
   for (lib in required.libraries) {
     if (!require(lib, character.only = TRUE)) {
       install.packages(lib)
@@ -49,10 +51,10 @@ LoadDEGparam <- function(yamlFile) {
 #' verbosity <- 1 ## Define level of verbosity
 #'
 #' ## This message will be printed because the level is <= verbosity
-#' verbose("This is printed", 1)
+#' if (verbose >= 2) { message("This is printed")
 #'
 #' ## This message will not be printed because the verbosity is inferior to the specified level
-#' verbose("This is not printed", 2)
+#' if (verbose >= 2) { message("This is not printed")
 #'
 #' @export
 verbose <- function(message.content,
@@ -340,7 +342,7 @@ sample.description.plots <- function (sample.desc,
 
   ## Exploratory plots, should not be done for all projects.
   if (exploratory.plots) {
-    verbose("Drawing generic plots from the whole count table", 1)
+    if (verbose >= 2) { message("Drawing generic plots from the whole count table") }
 
     ## Plot the impact of the normalization factor (library sum , median or percentile 75)
     plot.file <- file.path(dir.diffexpr, paste(sep = "", "CPM_libsum_vs_median_vs_perc75.png"))
