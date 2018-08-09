@@ -6,7 +6,7 @@
 ## Alternatively, the options can be defined separately, so that the script can be called from another R script.
 ##
 ## Integration in a snakemake rule will be evaluated soon.
-# 
+#
 
 if (!exists("opt")) {
   message("Reading parameters from the command line")
@@ -21,8 +21,9 @@ if (!exists("opt")) {
     'main_dir', 'm', 1, "character",
     'config_file', 'c', 1, "character",
     'count_table', 't', 1, "character",
-    'result_dir', 'r', 1, "character",
-    'snakechunks_dir', 's', 1, 'character'
+    'output_dir', 'o', 1, "character",
+    'snakechunks_dir', 's', 1, 'character',
+    'rsnakechunks_dir', 'r', 1, 'character'
   ), byrow = TRUE, ncol = 4)
   opt = getopt(spec)
 }
@@ -59,21 +60,24 @@ if (is.null(opt$main_dir) ) {
 }
 
 ## Result directory
-if (is.null(opt$result_dir)) {
-  opt$result_dir <- "results"
-  message("Result dir defined from main directory\t", opt$result_dir)
+if (is.null(opt$output_dir)) {
+  opt$output_dir <- "results"
+  message("Result dir defined from main directory\t", opt$output_dir)
 }
 
 ## ----  Load R functions from SnakeChunks directory if specified ----
-if (!is.null(opt$snakechunks)) {
-  message("Reading R functions from SnakeChunks\t", opt$SnakeChunks)
-  
+if ((!is.null(opt$snakechunks_dir)) & (is.null(opt$rsnakechunks_dir))) {
+  opt$rsnakechunks_dir <- file.path(opt$snakechunks_dir, "scripts", "RSnakeChunks")
+}
+if (!is.null(opt$rsnakechunks_dir)) {
+  message("Reading R functions from RSnakeChunks\t", opt$SnakeChunks)
+
   ## NOTE: if the RSnakechunks package has been compiled on this machine
   ## the functions will be loaded with library('RSnakeChunks'). However
   ## for the ime being we do not assume that RSnakeChunks has been
   ## compiled with SnakeChunks installation, so we souce all the files
   ## containing R functions.
-  R.dir <- file.path(opt$snakechunks, "scripts/RSnakeChunks/R")
+  R.dir <- file.path(opt$rsnakechunks, "R")
   message("R directory\t", R.dir)
   R.files <- list.files(R.dir)
   for (f in R.files) {
@@ -84,10 +88,10 @@ if (!is.null(opt$snakechunks)) {
 
 ## ---- Run the analysis ----
 RNAseqAnalysis(
-  count.table = opt$count_table, 
-  configFile = opt$config_file, 
-  main.dir = opt$main_dir, 
-  result.dir = opt$result_dir,
+  count.table = opt$count_table,
+  configFile = opt$config_file,
+  main.dir = opt$main_dir,
+  result.dir = opt$output_dir,
   verbose = opt$verbose)
 
 # script.name <- get_Rscript_filename()
