@@ -75,7 +75,7 @@ sampleDescriptionPlots <- function (sample.desc,
 
   ## Exploratory plots, should not be done for all projects.
   if (exploratory.plots) {
-    verbose("Drawing generic plots from the whole count table", 1)
+    message.verbose("Drawing generic plots from the whole count table", 1)
 
     ## Plot the impact of the normalization factor (library sum , median or percentile 75)
     plot.file <- file.path(dir.DEG, paste(sep = "", "CPM_libsum_vs_median_vs_perc75.png"))

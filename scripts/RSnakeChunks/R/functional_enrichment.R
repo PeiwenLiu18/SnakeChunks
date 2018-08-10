@@ -38,7 +38,7 @@ functional.enrichment <- function(geneset,
                                   run.clusterProfiler = FALSE,
                                   plot.adjust = TRUE) {
   #library("ALL")
-  verbose(paste(sep = "", "Go over-representation analysis. ",
+  message.verbose(paste(sep = "", "Go over-representation analysis. ",
                 length(geneset), " input genes (among ", length(allgenes), ")"), 2)
 
   ## Prepare the result

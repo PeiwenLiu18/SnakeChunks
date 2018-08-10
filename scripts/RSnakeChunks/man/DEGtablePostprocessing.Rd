@@ -28,7 +28,7 @@ Thresholds on some specific scores, used for display purpose, and to
 add some columns to the result table, indicating if the gene passes the
 threshold or not. Supported threshold fields:
 \itemize{
-\itme FC (orientation-insensitive fold change)
+\item FC (orientation-insensitive fold change)
 \item padj (adjusted p-value)
 \item pvalue (nominal p-value)
 \item evalue (expected number of false positives)

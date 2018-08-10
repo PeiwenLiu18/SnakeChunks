@@ -7,7 +7,7 @@
 complete.enrich.table(enrich.table, pvalue.column = "Pvalue",
   thresholds = c(evalue = 1, qvalue = 0.05),
   nb.tests = nrow(enrich.table), select.positives = FALSE,
-  plot.adjust = TRUE)
+  plot.adjust = TRUE, verbose = 1)
 }
 \arguments{
 \item{enrich.table}{Enrichment table from GOstats, clusterProfiler or similar programs.}
@@ -15,6 +15,8 @@ complete.enrich.table(enrich.table, pvalue.column = "Pvalue",
 \item{pvalue.column}{Name or number of the column containing the p-values (this depends on the program).}
 
 \item{thresholds=c("evalue"=1)}{thresholds on one or several fields.}
+
+\item{verbose=1}{verbosity}
 }
 \description{
 Add some columns to a functional enrichment table in order to ensure that we always have the same statistics.

@@ -4,12 +4,15 @@
 \alias{CheckRequiredLibraries}
 \title{check required libraries for DEG analysis, and install them if required}
 \usage{
-CheckRequiredLibraries(required.libraries, required.bioconductor = NULL)
+CheckRequiredLibraries(required.libraries, required.bioconductor = NULL,
+  verbose = 1)
 }
 \arguments{
 \item{required.libraries}{a vector contianing the names of required CRAN libraries, which will be installed with install.packages()}
 
 \item{required.bioconductor}{a vector containing the required BioConductor libraries, which will be installed with biocLite}
+
+\item{verbose=1}{verbosity}
 }
 \description{
 check required libraries for DEG analysis, and install them if required

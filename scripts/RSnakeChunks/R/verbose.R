@@ -16,13 +16,13 @@
 #' verbosity <- 1 ## Define level of verbosity
 #'
 #' ## This message will be printed because the level is <= verbosity
-#' verbose("This is printed", 1)
+#' message.verbose("This is printed", 1)
 #'
 #' ## This message will not be printed because the verbosity is inferior to the specified level
-#' verbose("This is not printed", 2)
+#' message.verbose("This is not printed", 2)
 #'
 #' @export
-verbose <- function(message.content,
+message.verbose <- function(message.content,
                     level=1,
                     print.date=TRUE) {
   if (!exists("verbosity")) {

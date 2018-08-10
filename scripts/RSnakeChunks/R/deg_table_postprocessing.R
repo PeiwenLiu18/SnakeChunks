@@ -32,7 +32,7 @@
 #' add some columns to the result table, indicating if the gene passes the
 #' threshold or not. Supported threshold fields:
 #' \itemize{
-#' \itme FC (orientation-insensitive fold change)
+#' \item FC (orientation-insensitive fold change)
 #' \item padj (adjusted p-value)
 #' \item pvalue (nominal p-value)
 #' \item evalue (expected number of false positives)
@@ -183,10 +183,10 @@ DEGtablePostprocessing <- function(deg.table,
 
   ## Round columns to a reasonable number of significant digits
   if (!is.na(round.digits)) {
-    verbose(paste("Rounding values to", round.digits, "digits"), 2)
+    message.verbose(paste("Rounding values to", round.digits, "digits"), 2)
     for (col in setdiff(names(deg.table), selection.columns)) {
       if (is.numeric(deg.table[,col])) {
-        verbose(paste("Rounding", col), 2)
+        message.verbose(paste("Rounding", col), 2)
         deg.table[,col] <- signif(digits = 3, deg.table[,col])
       }
     }
@@ -194,7 +194,7 @@ DEGtablePostprocessing <- function(deg.table,
 
   ## Export figures
   if (!is.null(dir.figures)) {
-    verbose(paste("\tSaving figures in directory", dir.figures), 2)
+    message.verbose(paste("\tSaving figures in directory", dir.figures), 2)
     dir.create(dir.figures, showWarnings = FALSE, recursive = TRUE)
 
     ## Draw Venn diagram with number of genes declared significant

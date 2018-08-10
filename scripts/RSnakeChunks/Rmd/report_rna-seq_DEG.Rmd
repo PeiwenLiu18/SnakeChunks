@@ -135,7 +135,7 @@ if (exists("gtf.file")) {
   ## In principle it should be possible since this info is in the GTF file. 
   ## If not, we migh rewite a parser for GTF. 
   
-  verbose(paste("Loading gene annotations from GTF file: ", gtf.file), 2)
+  message.verbose(paste("Loading gene annotations from GTF file: ", gtf.file), 2)
   #   library(rtracklayer)  # for the import() function
   #   gr <- import(gtf.file)
   txdb <- makeTxDbFromGFF(file=file.path(dir.base, gtf.file),
@@ -154,7 +154,7 @@ if (exists("gtf.file")) {
   gene.info$entrez.id <- NA
   gene.info$description <- "no description"
 } else {
-  verbose(paste("No GTF file has been specified"))
+  message.verbose(paste("No GTF file has been specified"))
   g <- nrow(all.counts)
   gene.info <- data.frame("seqnames"=rep(NA, times=g),
                           "start"=rep(NA, times=g),
@@ -175,7 +175,7 @@ if (exists("gtf.file")) {
 ## TEMPORARY: load additional gene information from a tab-delimited file generated with RSAT, 
 ## because for bacterial genomes there is no obvious way to obtain EntrezIDs.
 if (exists("gene.info.file")) {
-  verbose(paste("Loading gene information from tab-delimited file", gene.info.file))
+  message.verbose(paste("Loading gene information from tab-delimited file", gene.info.file))
   
   gene.info.rsat <- read.delim(file.path(dir.base, gene.info.file), sep="\t", skip=3, header=1)  
   ## A bit tricky: we need to discard rows starting with ";", but we cannot use ";" as comment.char since it is found in descriptions and as separator for names
@@ -198,19 +198,19 @@ if (exists("gene.info.file")) {
 
 ## Export the gene information table to keep a trace of what has been used. 
 gene.info.out <- paste(sep="", prefix["general.file"], "_gene_descriptions.tab")
-verbose(paste("Exporting gene information table", gene.info.out), 1)
+message.verbose(paste("Exporting gene information table", gene.info.out), 1)
 write.table(x = gene.info, row.names = FALSE,
             file = file.path(dir.base, gene.info.out), sep = "\t", quote=FALSE)
-verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
+message.verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
 
 
 
 ## Export the gene information table to keep a trace of what has been used. 
 gene.info.out <- paste(sep="", prefix["general.file"], "_gene_descriptions.tab")
-verbose(paste("Exporting gene information table", gene.info.out), 1)
+message.verbose(paste("Exporting gene information table", gene.info.out), 1)
 write.table(x = gene.info, row.names = FALSE,
             file = file.path(dir.base, gene.info.out), sep = "\t", quote=FALSE)
-verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
+message.verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
 
 
 ```
@@ -235,7 +235,7 @@ verbose(paste(sep="", "\tGene info table\t", gene.info.out), 1)
 
 ## Read the sample description file, which indicates the 
 ## condition associated to each sample ID.
-verbose(paste("Reading sample description file: ", sample.description.file), 2)
+message.verbose(paste("Reading sample description file: ", sample.description.file), 2)
 sample.desc <- read.delim(file.path(dir.base, sample.description.file), sep="\t", 
                           comment=";", header = TRUE, row.names=1)
 sample.ids <- row.names(sample.desc)
@@ -271,7 +271,7 @@ sample.desc$color <- cols.conditions[sample.conditions]
 
 ################################################################
 ## Read the count table
-verbose("Loading count table", 2)
+message.verbose("Loading count table", 2)
 all.counts <- read.delim(file.path(dir.base, all.counts.table), row.names=1, sep="\t")
 # names(all.counts)
 # dim(all.counts)
@@ -291,7 +291,7 @@ all.counts <- all.counts[, sample.ids]
 ########################################################################
 ## Treatment of 0 values.
 ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-verbose(paste("Treating zero-values by adding epsilon =", epsilon), 2)
+message.verbose(paste("Treating zero-values by adding epsilon =", epsilon), 2)
 all.counts.epsilon <- all.counts
 all.counts.epsilon[all.counts==0] <- epsilon
 
@@ -316,7 +316,7 @@ stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
 ################################################################
 ## Compute the counts per million reads 
 ################################################################
-verbose("Computing CPMs", 1)
+message.verbose("Computing CPMs", 1)
 ## Note: the default normalization criterion (scaling by libbrary sum) 
 ## is questionable because it is stronly sensitive to outliers 
 ## (very highly expressed genes).  A more robust normalisation criterion 
@@ -341,11 +341,11 @@ stats.per.sample$log10.cpm.mean <- apply(cpms.log10, 2, mean)
 #
 # names(stats.per.sample)
 # head(stats.per.sample)
-verbose("Exporting stats per sample", 1)
+message.verbose("Exporting stats per sample", 1)
 sample.summary.file <- paste(sep="", prefix["general.file"], "_summary_per_sample.tab")
 write.table(x = stats.per.sample, row.names = TRUE, col.names=NA, 
             file = file.path(dir.base, sample.summary.file), sep = "\t", quote=FALSE)
-verbose(paste(sep="", "\tSummary per sample\t", sample.summary.file), 1)
+message.verbose(paste(sep="", "\tSummary per sample\t", sample.summary.file), 1)
 ```
 
 ```{r print stats per sample}
@@ -413,12 +413,12 @@ I should develop a method to tag the irreproducible features and/or filter them 
 ################################################################
 ## Analyse between-replicate reproducibility
 ################################################################
-verbose("Plotting betwen-replicate comparisons", 2)
+message.verbose("Plotting betwen-replicate comparisons", 2)
 #conditions.with.replicate <- setdiff(conditions, "CI_CI_0H")
 cond <- conditions[1] ## Choose first condition for testing without the loop
 for (cond in conditions) {
 #for (cond in conditions.with.replicate) {
-  verbose(paste(sep="", "\tcondition\t", cond), 3)
+  message.verbose(paste(sep="", "\tcondition\t", cond), 3)
   
   min.rep.to.plot <- 2 ## Not worth plotting replicates for conditions without replicate
   max.rep.to.plot <- 5 ## Restrict the number of replicates to plot, for the sale of readability
@@ -494,7 +494,7 @@ for (cond in conditions) {
 ## Read the design file, which indicates the anlayses to be done.
 ## Each row specifies one differential expression analysis, which 
 ## consists in comparing two conditions. 
-verbose(paste("Reading design file: ", design.file), 2)
+message.verbose(paste("Reading design file: ", design.file), 2)
 design <- read.delim(file.path(dir.base, design.file), sep="\t", 
                      comment=";", header = T, row.names=NULL)
 ```
@@ -524,7 +524,7 @@ for (i in 1:nrow(design)) {
      stop(paste("Cannot perform differential analysis. The count table contains less than 2 samples for condition", cond2))
    }
   
-  verbose(paste(sep="", "\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2), 1)
+  message.verbose(paste(sep="", "\tDifferential analysis\t", i , "/", nrow(design), "\t", cond1, " vs ", cond2), 1)
   
   ## Create a specific result directory for this differential analysis
   prefix["comparison"] <- comparison.summary$prefixes[i]
@@ -574,7 +574,7 @@ for (i in 1:nrow(design)) {
   comparison.summary[i,"deseq2"] <- deseq2.result.file
   write.table(x = deseq2.result.table, row.names = FALSE, 
               file = file.path(dir.base, deseq2.result.file), sep = "\t", quote=FALSE)
-  verbose(paste(sep="", "\t\tDESeq2 result file\t", deseq2.result.file), 1)
+  message.verbose(paste(sep="", "\t\tDESeq2 result file\t", deseq2.result.file), 1)
   
 
   ################################################################
@@ -590,7 +590,7 @@ for (i in 1:nrow(design)) {
   
   write.table(x = edger.result.table, row.names = FALSE, 
               file = file.path(dir.base, edger.result.file), sep = "\t", quote=FALSE)
-  verbose(paste(sep="", "\t\tedgeR result file\t", edger.result.file), 1)
+  message.verbose(paste(sep="", "\t\tedgeR result file\t", edger.result.file), 1)
 
   ################################################################
   ## Compute main stats from edgeR and DESeq2
@@ -615,7 +615,7 @@ for (i in 1:nrow(design)) {
   comparison.summary[i,"result.table"] <- result.file
   write.table(x = result.table, row.names = FALSE,
               file = file.path(dir.base, result.file), sep = "\t", quote=FALSE)
-  verbose(paste(sep="", "\t\tMerged result file\t", result.file), 1)
+  message.verbose(paste(sep="", "\t\tMerged result file\t", result.file), 1)
   
   
   ################################################
@@ -631,23 +631,23 @@ for (i in 1:nrow(design)) {
   selected.genes <- up.genes + down.genes
   sum(selected.genes)
   
-  verbose("Exporting tables with up-regulated genes only")
+  message.verbose("Exporting tables with up-regulated genes only")
   deg.file.up <- paste(sep = "", 
                     prefix["comparison_file"], 
                     "_", suffix.deg, "_selected_DEG_up.tab")
   comparison.summary[i,"deg.table.up"] <- deg.file.up
   write.table(x = result.table[up.genes, selected.columns], row.names = FALSE,
               file = file.path(dir.base, deg.file.up), sep = "\t", quote=FALSE)
-  verbose(paste(sep="", "\t\tSelected DEG file with up-regulated genes\t", deg.file.up), 1)
+  message.verbose(paste(sep="", "\t\tSelected DEG file with up-regulated genes\t", deg.file.up), 1)
 
-  verbose("Exporting tables with down-regulated genes only")
+  message.verbose("Exporting tables with down-regulated genes only")
   deg.file.down <- paste(sep = "", 
                     prefix["comparison_file"], 
                     "_", suffix.deg, "_selected_DEG_down.tab")
   comparison.summary[i,"deg.table.down"] <- deg.file.down
   write.table(x = result.table[down.genes, selected.columns], row.names = FALSE,
               file = file.path(dir.base, deg.file.down), sep = "\t", quote=FALSE)
-  verbose(paste(sep="", "\t\tSelected DEG file with down-regulated genes\t", deg.file.down), 1)
+  message.verbose(paste(sep="", "\t\tSelected DEG file with down-regulated genes\t", deg.file.down), 1)
 
 }
 

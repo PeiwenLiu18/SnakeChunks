@@ -7,15 +7,15 @@
 RnaSeqExploreCounts(config.file, count.file)
 }
 \arguments{
-\item{config.file}{a yaml-formatted file describing the parameters 
+\item{config.file}{a yaml-formatted file describing the parameters
 of the workflow.}
 
-\item{count.file}{file containing the counts of reads per feature, 
+\item{count.file}{file containing the counts of reads per feature,
 tab-separated value text file.}
 }
 \description{
-Compute descriptive statistics for each sample of a 
-RNA-seq count table. The table contains one row per feature 
+Compute descriptive statistics for each sample of a
+RNA-seq count table. The table contains one row per feature
 (gene, transcript) and one column per sample.
 }
 \author{
