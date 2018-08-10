@@ -299,7 +299,7 @@ output:
     self_contained: yes
     theme: cerulean
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
     toc_float: yes
   pdf_document:
     fig_caption: yes
@@ -507,7 +507,7 @@ knitr::opts_chunk$set(
   # (zeros <- sum(all.counts == 0))
   # (zero.rows <- sum(apply(all.counts, 1, sum, na.rm=TRUE) == 0))
   # zeros/ zero.rows
-  
+
 
   ##---- Feature filtering ----
 
@@ -543,7 +543,7 @@ knitr::opts_chunk$set(
     black.list = black.listed.features)
   ## dim(filtered.counts)
   ## sum(filtered.counts == 0)
-  
+
   ##---- Log-transform non-normalized counts ----
 
   ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
@@ -675,17 +675,6 @@ knitr::opts_chunk$set(
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for all features (zeros included)"))
 
-  index.text <- append(index.text, "\n\n### All features, non-zero counts\n")
-  index.text <- append(index.text, kable(stats.per.sample.nozero[,selected.stats], digits = 2,
-                                         format.args = list(big.mark = ",", decimal.mark = "."),
-                                         caption = "Sample-wise statistics for all features (zeros excluded)"))
-
-  index.text <- append(index.text, "\n\n### Filtered features, non-zero counts\n")
-  index.text <- append(index.text, kable(stats.per.sample.filtered[,selected.stats], digits = 2,
-                                         format.args = list(big.mark = ",", decimal.mark = "."),
-                                         caption = "Sample-wise statistics for filtered features"))
-
-
   ## ----library_sizes_barplot, fig.width=6, fig.height=6, fig.cap="**Barplot of assigned reads per sample. ** Bars indicate the sum of read counts assigned to features (genes) per sample (library)."----
   par.ori <- par(no.readonly = TRUE) # Store original parameters
   figname <- "libsize_barplot_all_features"
@@ -706,6 +695,16 @@ knitr::opts_chunk$set(
     }
     # system(paste("open", figure.file))
   }
+
+  index.text <- append(index.text, "\n\n### All features, non-zero counts\n")
+  index.text <- append(index.text, kable(stats.per.sample.nozero[,selected.stats], digits = 2,
+                                         format.args = list(big.mark = ",", decimal.mark = "."),
+                                         caption = "Sample-wise statistics for all features (zeros excluded)"))
+
+  index.text <- append(index.text, "\n\n### Filtered features, non-zero counts\n")
+  index.text <- append(index.text, kable(stats.per.sample.filtered[,selected.stats], digits = 2,
+                                         format.args = list(big.mark = ",", decimal.mark = "."),
+                                         caption = "Sample-wise statistics for filtered features"))
 
 
   figname <- "libsize_barplot_filtered_features"
@@ -1096,7 +1095,7 @@ knitr::opts_chunk$set(
 
     ## Comparison between adjusted p-values
     index.text <- append(index.text, "\n\n#### Adjusted p-values\n\n")
-    
+
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
