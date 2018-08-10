@@ -51,10 +51,10 @@ LoadDEGparam <- function(yamlFile) {
 #' verbosity <- 1 ## Define level of verbosity
 #'
 #' ## This message will be printed because the level is <= verbosity
-#' if (verbose >= 2) { message("This is printed")
+#' message.verbose("This is printed")
 #'
 #' ## This message will not be printed because the verbosity is inferior to the specified level
-#' if (verbose >= 2) { message("This is not printed")
+#' message.verbose("This is not printed", 2)
 #'
 #' @export
 verbose <- function(message.content,
