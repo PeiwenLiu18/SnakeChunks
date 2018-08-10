@@ -1,10 +1,13 @@
 #' @title generate a figure chunk of R code to insert in an Rmd report
 #' @author Jacques van Helden
+#' @description generate a figure chunk of R code to insert in an Rmd report.
+#'
 #' @param name name of the chunk
 #' @param file file continaing the figure
-#' @param out.width="75%" figure width, relative to page width
-#' @param index.text=NULL if spcified, the chunk will be appended to it
-#' @param chunk_opt=", eval=TRUE" a string specifying one or more options to append to the chunk declaration line. Must start with a comma.
+#' @param out.width="75\%" figure width, relative to page width
+#' @param index.text=NULL if specified, the chunk will be appended to it
+#' @param chunk_opt=",eval=TRUE" a string specifying one or more options to append to the chunk declaration line. Must start with a comma.
+#'
 #' @export
 index.figure <- function(name, file,
                          index.text = NULL,
