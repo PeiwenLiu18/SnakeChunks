@@ -4,7 +4,7 @@
 ## Detect differentially expressed genes (DEG) using the package DESeq2,
 ## and add a few custom columns (e-value, ...) to the result table.
 detectDegDESeq2 <- function(dir.figures=NULL) {
-  verbose("\t\tDESeq2 analysis", 2)
+  message.verbose("\t\tDESeq2 analysis", 2)
 
   ## Path prefix to save DESeq2 result files
   prefix["DESeq2_file"] <- paste(sep="", prefix["comparison_file"], "_", suffix.DESeq2)
