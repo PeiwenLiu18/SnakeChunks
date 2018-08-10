@@ -74,6 +74,17 @@ NormalizeCountTable <- function(counts,
   result$raw.counts <- counts
   result$class.labels <- class.labels
 
+  supported.norm.methods <- c(
+    "sum", "mean", 
+    "median", "percentile", 
+    "quantiles", ## quantile normalization via limma::normalizeQuantiles()
+    "none", "TMM", "RLE", "upperquartile", ## Methods from edgeR
+    "DESeq2")
+  not.supported <- setdiff(method, supported.norm.methods)
+  if (length(not.supported) > 0) {
+    stop("Invalid method for NormalizeCountTable(): ", paste(collapse = ", ", not.supported),
+         "\n\tSupported methods: ", paste(collapse = ", ", supported.norm.methods))
+  }
 
   ## if required, discard the zero counts before computing size factors
   if (is.null(nozero)) {
@@ -97,8 +108,11 @@ NormalizeCountTable <- function(counts,
   result$raw.samples <- ncol(counts)
 
   if (verbose >= 1) {
-    message("\t", "Library size normalization\tMethod: ", paste(collapse=", ", method),
-            "\tRaw counts: ", result$raw.features, " features x ", result$raw.samples, " samples. ")
+    message("\t", "Library size normalization",
+            "\n\t\tMethod: ", 
+            paste(collapse = ", ", method),
+            "\n\t\tRaw counts: ", result$raw.features, " features x ", 
+            result$raw.samples, " samples. ")
   }
 
   ## ---- Compute non-zero counts ----
@@ -153,14 +167,16 @@ NormalizeCountTable <- function(counts,
 
   ## ---- Apply normalization method(s) ----
   method.names <- vector()
+  # m <- method[1]
+  # m <- "upperquartile"
   for (m in method) {
     ## Define method name
     if (m == "percentile") {
       if (!exists("percentile")) {
-        stop("NormalizeSamples()\tMissing required parameter: standardization percentile")
+        stop("NormalizeCountTable()\tMissing required parameter: standardization percentile")
       }
       if (is.null(percentile)) {
-        stop("NormalizeSamples()\tpercentile-based scaling requires a non-null percentile parameter.")
+        stop("NormalizeCountTable()\tpercentile-based scaling requires a non-null percentile parameter.")
       }
       if (percentile == 25) {
         method.name <- "Q1"
@@ -188,8 +204,25 @@ NormalizeCountTable <- function(counts,
       scaling.factor <- rep(x = 1, length.out = ncol(counts))
       size.factor <-  rep(x = 1, length.out = ncol(counts))
 
+    } else if (m == "upperquartile") {
+      current.percentile <- 75
+      current.quantile <- current.percentile/100
+      
+      ## Compute quantile-based scaling factor via edgeR
+      ## NOTE (2018-07-21) : with single-cell data containing MANY zeros, this returns Inf scaling factors for almost all the samples
+      if (verbose >= 2) {
+        message("\t\tNormalizing counts with edgeR::calcNormFactors(method=upperquartile, p=", current.quantile,")")
+      }
+      d <- DGEList(counts = counts, group = class.labels)
+      # d$samples$group <- relevel(d$samples$group)
+      d <- calcNormFactors(d, method = "upperquartile", p = current.quantile)                 ## Compute normalizing factors
+      scaling.factor <- d$samples$norm.factors
+      size.factor <- 1/scaling.factor
+      
+      # plot(scaling.factor, apply(counts, 2, quantile, p = current.quantile))
+      
     } else if (m %in% c("percentile", "median")) {
-        ## Median will be treated as percentile 0.5
+      ## Median will be treated as percentile 0.5
       if (m == "median") {
         current.percentile <- 50
       } else {
@@ -198,35 +231,20 @@ NormalizeCountTable <- function(counts,
       current.quantile <- current.percentile/100
 
       percentile.method <- "custom" ## alternative: compute percentile-based scaling factors via edgeR
-      if (percentile.method == "edgeR") {
-
-        ## Compute quantile-based scaling factor via edgeR
-        ## NOTE (2018-07-21) : with single-cell data containing MANY zeros, this returns Inf scaling factors for almost all the samples
-        if (verbose >= 3) {
-          message("\t\tNormalizing counts with edgeR::calcNormFactors(method=upperquartile, p=", current.quantile,")")
-        }
-        d <- DGEList(counts = counts, group = class.labels)
-        # d$samples$group <- relevel(d$samples$group)
-        d <- calcNormFactors(d, method = "upperquartile", p = current.quantile)                 ## Compute normalizing factors
-        scaling.factor <- d$samples$norm.factors
-        size.factor <- 1/scaling.factor
-
-      } else {
-        if (verbose >= 3) {
-          message("\t\tScaling factor: sample percentile ", current.percentile)
-        }
-        sampleStats$norm.percentile <- apply(counts.to.norm, 2, quantile, na.rm = TRUE, probs = current.quantile)
-        size.factor <-  sampleStats$norm.percentile
-        scaling.factor <- 1 / sampleStats$norm.percentile
-        # mean(scaling.factor[!is.infinite(scaling.factor)])
-        # hist(scaling.factor, breaks = 1000)
+      if (verbose >= 3) {
+        message("\t\tScaling factor: sample percentile ", current.percentile)
       }
+      sampleStats$norm.percentile <- apply(counts.to.norm, 2, quantile, na.rm = TRUE, probs = current.quantile)
+      size.factor <-  sampleStats$norm.percentile
+      scaling.factor <- 1 / sampleStats$norm.percentile
+      # mean(scaling.factor[!is.infinite(scaling.factor)])
+      # hist(scaling.factor, breaks = 1000)
       null.scaling <- sum(size.factor == 0)
       # inf.scaling <- sum(is.infinite(scaling.factor))
       if (null.scaling > 1) {
         message("\t\tdiscarding ", null.scaling, " samples with null value for percentile ", percentile)
       }
-
+      
     } else if (m %in% c("mean", "libsum", "TC", "sum")) {
       if (verbose >= 3) {
         message("\t\tScaling factor: library size (equivalent for sum, mean, total counts).  ")
@@ -310,7 +328,8 @@ NormalizeCountTable <- function(counts,
       #    rld <- rlog(dds, blind=FALSE)
 
     } else {
-      stop(method, " is not a valid method for NormalizeSamples()")
+      stop(m, " is not a valid method for NormalizeCountTable(). Supported methods: ", 
+           paste(collapse = ", ", supported.norm.methods))
     }
 
     ## ---- Discarded samples ## ----
