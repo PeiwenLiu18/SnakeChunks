@@ -11,26 +11,24 @@
 #' \item export of figures in pdf and png formats
 #' \item automatic generation of an HTML report (via Rmd) with links to result files and figures
 #' }
-#' @param count.table file containing a table with counts of reads per feature (row) in each sample (column).
+#' @param countFile file containing a table with counts of reads per feature (row) in each sample (column).
 #' @param configFile a yaml-formatted file defining the mandatory + some optional parameteres
 #' @param main.dir=getwd()  directory from which the script runs. Paths are defined relative to this directory.
 #' @param result.dir="results" directory where the results will be stored. Should be defined relative to main directory.
-#' @param count.prefix=NULL basename to export the transformed count tables. If not specified, computed automatically from the name of the count table file.
-#' @param norm.methods="TMM" vector with one or more normalisation methods. Supported: DESeq2, percentile, quantile, TMM, RLE, upperquartile, none.
 #' @param norm.percentile=75 default percentile to estimate sample-wise scaling factors. By default, set to the upper quartile. Will also be converted as p parameter (between 0 and 1) to tune edgeR upperquartile normalisation.
 #' @param verbose=1 level of verbosity
 #'
 #' @export
-RNAseqAnalysis <- function(count.table,
+RNAseqAnalysis <- function(countFile,
                            configFile,
                            main.dir = getwd(),
                            result.dir = "results",
-                           norm.methods = c("DESeq2", "TMM", "percentile"),
-                           count.prefix = NULL,
                            verbose = 1) {
 
 
   ## ---- TO DO ----
+  ##
+  ## Suppress norm.methods from arguments, since they should be specified in the config file.
   ##
   ## Check non-used variables: suppress or use them
   ## - cols.heatmap
@@ -86,69 +84,72 @@ RNAseqAnalysis <- function(count.table,
   ## This will later serve to generate the report.
   message("\tInitializing indexes and main parameters")
   dirs <- vector()
-  infiles <- vector()   ## Input files
-  outfiles <- vector()  ## For tab-separated value files
-
-
-  ## ---- Load configuration file (YAML-formatted) ----
-  infiles["config"] <- configFile
-  message("\tConfiguration file: ", configFile)
-  if (!exists("configFile")) {
-    ## The prompt does not seem to work with the Rmd documents
-    #   message("Choose the parameter file")
-    #   parameter.file <- file.choose()
-    stop("This report requires to specify a variable named configFile, containing the path to an YAML-formatted file describing the parameters for this analysis.")
-  }
-  parameters <- yaml.load_file(configFile)
-  message("\tLoaded parameters from file ", configFile)
-  # View(parameters)
-
-
-  ## ---- Define the main parameters -----------------------------------------------------
-
-
-  ## Figures in different format
-  figure.formats <- c("png", "pdf")
-  figure.files <- list()
-  for (fig.format in figure.formats) {
-    figure.files[[fig.format]] <- vector()
-  }
-
-
-  ## Define main parameters to generate this report
-  #dirs["main"] <- "~/ko-rna-seq/" ## Main directory
   dirs["main"] <- main.dir
-  setwd(dirs["main"])
-  message("\tMain directory: ", dirs["main"])
-
-
+  if (!dir.exists(main.dir)) {
+    stop("Cannot set working directory to\t", main.dir)
+  }
+  setwd(main.dir)
+  message("\tMain directory: ", main.dir)
+  
+  
   ## Directory to store differential expression results
   dirs["output"] <- result.dir ## Index dir for the report
   message("\tOutput directory: ", result.dir)
   dir.create(result.dir, showWarnings = FALSE, recursive = TRUE)
 
-  ## Prefix for the count table
-  #count.prefix <- "bowtie2_featureCounts_all"
-  #message("\tPrefix for the count table: ", count.prefix)
-  infiles["count_table"] <- count.table
-  message("\tCount table: ", count.table)
-
+  ## Input files
+  infiles <- vector()   ## Input files
+  
+  ## Configuration file
+  infiles["config"] <- configFile
+  message("\tConfiguration file: ", configFile)
+  
+  ## Count table
+  infiles["count_table"] <- countFile
+  message("\tCount table file: ", countFile)
+  
+  
+  
+  ## Output files
+  outfiles <- vector()  ## For tab-separated value files
+  
+  
+  ## ---- Load RNA-seq data, metadata and configuration ----
+  dataset <- LoadRNAseqDataset(countFile, configFile)
+  parameters <- dataset$parameters
+  
+  ## Make the dataset fields available as variables (to avoid prepending "dataset" everywhere)
+  attach(dataset)
+  # detach(dataset)
+  
+  ## Instantiate some local variables for some frequently used parameters,
+  ## for the readability.
+  norm.methods <- parameters$DEG$norm_method
+  norm.percentile <- parameters$DEG$norm_percentile
+  thresholds <- as.vector(parameters$DEG$thresholds)
+  epsilon <- parameters$DEG$epsilon
+  
+  ## Index input files
+  infiles["sample descriptions"] <- parameters$metadata$samples
+  infiles["design"] <- parameters$metadata$design
+  
+  ## ---- Define some output parameters -----------------------------------------------------
 
   ## Compute count prefix, i.e. the basename to export various transformations of the count tables
   if (is.null(parameters$dir$count_prefix)) {
     ## use the basename of the count table as prefix for output file
-    count.prefix <- basename(path = count.table)
-
+    parameters$dir$count.prefix <- basename(path = countFile)
+    
     ## Suppress usual extensions from the basename
+    ext <- ".tsv"
     for (ext in c(".tsv", ".tab", ".txt", ".csv")) {
-      count.prefix <- sub(pattern = ext, replacement = "", x = count.prefix)
+      parameters$dir$count_prefix <- sub(
+        pattern = ext, replacement = "", x = parameters$dir$count.prefix)
     }
-  } else {
-    count.prefix <- parameters$dir$count_prefix
-  }
+  } 
+  count.prefix <- parameters$dir$count.prefix
   message("\tFile prefix for normalized count tables ", count.prefix)
-
-
+  
 
   ## Directory for Figures
   dir.figures.samples <- file.path(result.dir, "figures")
@@ -156,6 +157,14 @@ RNAseqAnalysis <- function(count.table,
   message("\tDirectory for the sample-related figures: ", dir.figures.samples)
   dir.create(dir.figures.samples, showWarnings = FALSE, recursive = TRUE)
 
+  ## Create output file lists for the different figure formats
+  figure.formats <- parameters$figure_formats
+  figure.files <- list()
+  for (fig.format in figure.formats) {
+    figure.files[[fig.format]] <- vector()
+  }
+  
+  
   ## Directory to export result files in tba-separated value (tsv) format
   dir.tables.samples <- file.path(result.dir, "samples/tables")
   dirs["tsv"] <- dir.tables.samples ## Index directory for the report
@@ -164,11 +173,6 @@ RNAseqAnalysis <- function(count.table,
 
   ## ---- Set some default parameters ----
 
-  ## In this chunk, we define a set of default parameters for the display and the analysis. These parameters can be modified but it is not necessary to adapt them to each project.
-  if ((!exists("verbosity")) || (is.null(verbosity))) {
-    verbosity <- 1
-  }
-
   ## Color palette for heatmaps. I like this Red-Blue palette because
   ## - it suggests a subjective feeling of warm (high correlation)/cold (low correlation)
   ## - it can be seen by people suffering from red–green color blindness.
@@ -176,116 +180,13 @@ RNAseqAnalysis <- function(count.table,
     cols.heatmap <- rev(colorRampPalette(brewer.pal(9,"RdBu"))(100))
   }
 
-  ## A trick: to enable log-scaled plots for 0 values, I add an epsilon increment
-  if (is.null(parameters$DEG$epsilon)) {
-    parameters$DEG$epsilon <- 0.1 # passed to file parameters.R, 2017-03-15
-  }
-  epsilon <- parameters$DEG$epsilon
 
-  ## A trick: to enable log-scaled plots for 0 values, I add an epsilon increment
-  if (is.null(parameters$DEG$out_width)) {
-    parameters$DEG$out_width <- "75%" # passed to file parameters.R, 2017-03-15
-  }
-  epsilon <- parameters$DEG$epsilon
-
-  ## Default method for the selection of the final list of DEG
-  ## Since DESeq2 seems more conservative, we use it by default
-  if (is.null(parameters$DEG$selection_criterion)) {
-    parameters$DEG$selection_criterion <- "DESeq2"
-  }
-  DEG.selection.criterion <- parameters$DEG$selection_criterion
-
-  ## Sample description file
-  if (is.null(parameters$metadata$samples)) {
-    stop("The sample file must be defined in the metadata seection of the yaml config file: ", configFile)
-  } else {
-    infiles["sample descriptions"] <- parameters$metadata$samples
-  }
-
-  ## Design file
-  if (is.null(parameters$metadata$design)) {
-    stop("The design file must be defined in the metadata seection of the yaml config file: ", configFile)
-  } else {
-    infiles["design"] <- parameters$metadata$design
-  }
-
-  ## Count table
-  infiles["counts"] <- count.table
-  if (!file.exists(count.table)) {
-    stop("Feature count table does not exist: ", count.table)
-  } else {
-    message("\tFeature count table: ", count.table)
-  }
-
-
-
-  ## ---- Normalisation methods ----
-  if (is.null(parameters$DEG$norm_method)) {
-    parameters$DEG$norm_method <- c("DESeq2", "TMM")
-  }
-  norm.methods <- parameters$DEG$norm_method
-
-  ## Select normalisation method(s) that will be used for edgeR differential analysis.
-  edgeR.supported.norm.methods <- c("TMM", "RLE", "upperquartile", "none")
-  if (is.null(parameters$edgeR$norm_method)) {
-    # If not defined in config file, use the norm methods specified in the arguments that are supporte by edgeR
-    parameters$edgeR$norm_method <- intersect(norm.methods, edgeR.supported.norm.methods)
-  } else {
-    ## Take edgeR normalisation methods from config file
-    edgeR.norm.methods <- parameters$edgeR$norm_method
-    ## Check that edgeR norm methods provided in config files are all supported by edgeR
-    edgeR.not.supported <- setdiff(edgeR.norm.methods, edgeR.supported.norm.methods)
-    if (length(edgeR.not.supported) > 0) {
-      stop("Invalid normalisation method for edgeR: ",
-           paste(collapse = ", ", edgeR.not.supported),
-           ". Supported: ", paste(collapse = ",", edgeR.supported.norm.methods), ".")
-    }
-  }
-
-  ## ---- Normalisation percentiles ----
-  if (is.null(parameters$DEG$norm_percentile)) {
-    parameters$DEG$norm_percentile <- 0.75
-  }
-  norm.percentile <- parameters$DEG$norm_percentile
-
-  ## Convert our percentile parameter into edgeR p parameter
-  ## (comprized between 0 and 1, which is actually a quantile rather than a percentile).
-  parameters$edgeR$norm.p <- parameters$DEG$norm_percentile/100
-
-
-  ## ---- Define thresholds ----
-  if (is.null(parameters$DEG$thresholds)) {
-    message("\tDEG thresholds were not defined in config file -> using default values")
-    if (is.null(parameters$DEG)) {
-      parameters$DEG <- list()
-    }
-    parameters$DEG$thresholds <- list(
-      min.count = 1,
-      mean.count = 5,
-      padj = 0.05,
-      FC = 2)
-  }
-  thresholds <- as.vector(parameters$DEG$thresholds)
-
+  
   ## ---- Initialize the Rmd report (index of input/output file) ----
   index.Rmd <- "index.Rmd"
   index.socket <- file(index.Rmd)
 
-
-  ## Get some elements from the  config file (if defined)
-  if (is.null(parameters$title)) {
-    parameters$title <- "RNA-seq analysis report"
-  }
-  if (is.null(parameters$description)) {
-    parameters$description <- "Analysis workflow for RNA-seq data: sample normalisation, descriptive statistics, differential analysis. "
-  }
-  if (is.null(parameters$author)) {
-    parameters$author <- "[AUTHOR] "
-  }
-  if (is.null(parameters$author_email)) {
-    parameters$author_email <- "[AUTHOR_EMAIL] "
-  }
-
+  
   Rmd.header <- paste(
     sep = '',
     '---
@@ -348,70 +249,6 @@ knitr::opts_chunk$set(
   # list.files(dir.tables.samples)
   # system(paste("open", dir.tables.samples))
 
-  ## ---- Read sample description table ----
-
-  ## Read the sample description file, which indicates the
-  ## condition associated to each sample ID.
-  message("\tReading sample description file: ", infiles["sample descriptions"])
-  if (!file.exists(infiles["sample descriptions"])) {
-    stop("Sample description file does not exist\t", infiles["sample descriptions"])
-  }
-  sample.desc <- read.delim(
-    file = infiles["sample descriptions"],
-    sep = "\t",
-    comment = ";", header = TRUE, row.names = 1)
-  sample.ids <- row.names(sample.desc)
-  message("\t\tNb of samples = ", length(sample.ids))
-
-
-  ## ---- Extract conditions from the sample table
-
-  ## Identify if the sample description file contains a column with heading "condition"(case-insensitive)
-  condition.column <- grep(pattern = "condition",
-            x = colnames(sample.desc),
-            ignore.case = TRUE)
-  if (length(condition.column) != 1) {
-    ## If not column contains "condition" in the sample descriptions,
-    ## use the first column
-    condition.column <- 1
-  }
-  message("\t\tSample conditions in column ", condition.column, " of sample description table. ")
-  sample.conditions <- as.vector(sample.desc[,condition.column]) ## Condition associated to each sample
-  names(sample.conditions) <- sample.ids
-
-  ## Unique conditions
-  conditions <- unique(sample.conditions) ## Set of distinct conditions
-  message("\t\tNb of conditions = ", length(conditions))
-  message("\t\tConditions = ", paste(collapse = ", ", conditions))
-
-  ## ---- Define condition-specific colors and apply them to each sample ----
-  color.per.condition <- brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
-  names(color.per.condition) <- conditions
-  sample.desc$color <- color.per.condition[sample.conditions]
-
-  # print(sample.conditions)
-
-  ## ---- Build sample labels by concatenating their ID and condition ----
-  labeL.column <- which(tolower(colnames(sample.desc)) == "label")
-#    grep(pattern = "label", x = colnames(sample.desc), ignore.case = TRUE)
-  if (length(labeL.column) == 1) {
-    message("\t\tSample labels in column ", labeL.column, " of sample description table. ")
-    sample.labels <- as.vector(unlist(sample.desc[, labeL.column]))
-  } else {
-    message("\t\tSample description file has no column with heading 'Label'. ")
-    sample.labels <- paste(sep = "_", sample.ids, sample.conditions)
-    if (is.null(sample.desc$Replicate)) {
-      message("\t\tBuilding labels from sample IDs and conditions. ")
-    } else {
-      message("\t\tBuilding labels from sample IDs, conditions and replicate nb. ")
-      sample.labels <- paste(sep = "_", sample.labels, sample.desc$Replicate)
-    }
-    sample.desc$Label <- sample.labels
-  }
-  # print(sample.labels)
-
-
-
 
 
   ## Print the sample descriptons
@@ -425,40 +262,6 @@ knitr::opts_chunk$set(
                                          col.names = c("Condition", "Nb samples")))
   if (verbose >= 2) { print(as.data.frame(samples.per.condition)) }
 
-  ## ---- Read design table ----
-  # setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
-
-  ## Read the design file, which indicates the anlayses to be done.
-  ## Each row specifies one differential expression analysis, which
-  ## consists in comparing two conditions.
-  message("\tReading design file: ", infiles["design"])
-  design <- read.delim(file.path(dirs["main"], infiles["design"]), sep = "\t",
-                       comment = c(";"), header = T, row.names = NULL)
-  message("\t\tDesign file contains ", nrow(design), " comparisons. ")
-  comparison.summary <- design ## Initialize a summary table for each DEG analysis
-  comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
-
-  ## Identify reference column in the design file
-  if ("reference" %in% (tolower(colnames(design)))) {
-    reference.column <- which(tolower(colnames(design)) == "reference")
-    if (length(reference.column) != 1) {
-      stop("The design file contains several columns entitled 'reference'. ")
-    }
-  } else {
-    message("The headers of the design table do not contain 'reference' column -> taking 1st column as reference")
-    reference.column <- 1
-  }
-
-  ## Identify test column in the design file
-  if ("test" %in% (tolower(colnames(design)))) {
-    test.column <- which(tolower(colnames(design)) == "test")
-    if (length(test.column) != 1) {
-      stop("The design file contains several columns entitled 'test'. ")
-    }
-  } else {
-    message("The headers of the design table do not contain 'test' column -> taking 1st column as test")
-    test.column <- 2
-  }
 
   ## Print out the design table (pairs of conditions to be compared)
   index.text <- append(index.text, "\n\n## Design\n")
@@ -468,10 +271,8 @@ knitr::opts_chunk$set(
     caption = "**Design**. Each row describes one comparison between two conditions."))
 
 
-
-  ## ---- Load count table ----
-  message("\tLoading count table: ", infiles["counts"])
-  ori.counts <- read.delim(infiles["counts"], row.names = 1, sep = "\t")
+  ## Keep a copy  of the original counts before applting filtering
+  ori.counts <- counts
   # names(ori.counts)
   # dim(ori.counts)
   # View(ori.counts)
@@ -496,7 +297,7 @@ knitr::opts_chunk$set(
     colnames(all.counts) <- sample.ids
     ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify
   } else if (length(ids.not.found) > 0) {
-    stop(length(ids.not.found), " missing columns in count table\t", infiles["counts"],
+    stop(length(ids.not.found), " missing columns in count table\t", countFile,
          "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
   }
 
@@ -539,7 +340,7 @@ knitr::opts_chunk$set(
     na.omit = TRUE,
     min.count = thresholds$min.count,
     mean.count = thresholds$mean.count,
-    mean.per.condition = threshold$mean.per.condition,
+    mean.per.condition = thresholds$mean.per.condition,
     black.list = black.listed.features)
   ## dim(filtered.counts)
   ## sum(filtered.counts == 0)
@@ -787,7 +588,7 @@ knitr::opts_chunk$set(
 
   norm.comparison <- NormalizeCountTable(
     counts = filtered.counts, class.labels = sample.conditions, nozero = TRUE,
-    method = norm.methods, percentile = norm.percentile, log2 = FALSE, epsilon = 0.1, detailed.sample.stats = TRUE,
+    method = norm.methods, percentile = norm.percentile, log2 = FALSE, epsilon = epsilon, detailed.sample.stats = TRUE,
     verbose = verbose)
   # names(norm.comparison)
 
@@ -947,7 +748,7 @@ knitr::opts_chunk$set(
     deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "_DESeq2.tsv")
     comparison.summary[i,"deseq2"] <- deseq2.result.file
     message("\tExporting DESeq2 result table (tab): ", deseq2.result.file)
-    outfiles[paste(sep="_", comparison.prefix, "DESeq2")]  <- deseq2.result.file
+    outfiles[paste(sep = "_", comparison.prefix, "DESeq2")]  <- deseq2.result.file
     write.table(
       x = deseq2.result$result.table, row.name    = FALSE,
       file = deseq2.result.file,
@@ -955,7 +756,7 @@ knitr::opts_chunk$set(
 
     ## ---- edgeR analysis ----
     # norm.method <- "TMM" ## For quick test and debugging
-    for (norm.method in edgeR.norm.methods) {
+    for (norm.method in parameters$edgeR$norm_method) {
 
       edgeR.prefix <- paste(sep = "_", "edgeR", norm.method)
 
@@ -1311,7 +1112,7 @@ knitr::opts_chunk$set(
   index.text <- append(index.text, "\n\n## Directories and files\n")
 
   index.text <- append(index.text, paste(sep = "", "- Config file : ", "[", configFile, "](", configFile,")"))
-  index.text <- append(index.text, paste(sep = "", "- Count table : ", "[", count.table, "](", count.table,")"))
+  index.text <- append(index.text, paste(sep = "", "- Count table : ", "[", countFile, "](", countFile,")"))
   index.text <- append(index.text, paste(sep = "", "- Sample descriptions : ", "[", infiles["sample descriptions"], "](", infiles["sample descriptions"], ")"))
   index.text <- append(index.text, paste(sep = "", "- Design : ", "[", infiles["design"], "](", infiles["design"], ")"))
 
@@ -1377,5 +1178,9 @@ knitr::opts_chunk$set(
   message("Figures directory\t", dir.figures.samples)
   message("Index of input/output files\t", index.file)
   message("Job done")
-
+  
+  
+  detach(dataset)
+  return()
+  
 }
