@@ -88,7 +88,7 @@ if (!is.null(opt$rsnakechunks_dir)) {
 
 ## ---- Run the analysis ----
 RNAseqAnalysis(
-  count.table = opt$count_table,
+  countFile = opt$count_table,
   configFile = opt$config_file,
   main.dir = opt$main_dir,
   result.dir = opt$output_dir,
