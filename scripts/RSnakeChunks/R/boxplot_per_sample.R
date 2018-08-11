@@ -6,7 +6,7 @@
 #' @param xlab="Raw counts" X axis label
 #' @param main="Box plots per sample: raw counts" Main title to display on the plot
 #' @param plot.file=NULL if specified, the graph will be stored in a pdf-formatted file.
-count.boxplot <- function(counts,
+BoxplotsPerSample <- function(counts,
                           sample.desc,
                           sample.label.col = NULL,
                           xlab="Raw counts",
