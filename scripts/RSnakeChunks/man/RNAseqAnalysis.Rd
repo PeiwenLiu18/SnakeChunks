@@ -4,22 +4,17 @@
 \alias{RNAseqAnalysis}
 \title{Normalisation and differential analysis of an RNA-seq count table}
 \usage{
-RNAseqAnalysis(count.table, configFile, main.dir = getwd(),
-  result.dir = "results", norm.methods = c("DESeq2", "TMM",
-  "percentile"), count.prefix = NULL, verbose = 1)
+RNAseqAnalysis(countFile, configFile, checkSampleIDs = TRUE,
+  main.dir = getwd(), result.dir = "results", verbose = 1)
 }
 \arguments{
-\item{count.table}{file containing a table with counts of reads per feature (row) in each sample (column).}
+\item{countFile}{file containing a table with counts of reads per feature (row) in each sample (column).}
 
 \item{configFile}{a yaml-formatted file defining the mandatory + some optional parameteres}
 
 \item{main.dir=getwd()}{directory from which the script runs. Paths are defined relative to this directory.}
 
 \item{result.dir="results"}{directory where the results will be stored. Should be defined relative to main directory.}
-
-\item{count.prefix=NULL}{basename to export the transformed count tables. If not specified, computed automatically from the name of the count table file.}
-
-\item{norm.methods="TMM"}{vector with one or more normalisation methods. Supported: DESeq2, percentile, quantile, TMM, RLE, upperquartile, none.}
 
 \item{norm.percentile=75}{default percentile to estimate sample-wise scaling factors. By default, set to the upper quartile. Will also be converted as p parameter (between 0 and 1) to tune edgeR upperquartile normalisation.}
 

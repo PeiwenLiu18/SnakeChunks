@@ -5,8 +5,9 @@
 \title{Filter features of an RNA-seq count table based on a combination of user-selected criteria.}
 \usage{
 FilterCountTable(counts, condition = NULL, na.omit = FALSE,
-  mean.count = NULL, min.count = NULL, mean.per.condition = NULL,
-  black.list = NULL, verbose = 1)
+  mean.count = NULL, min.count = NULL, zero.var.filter = TRUE,
+  min.var = NULL, mean.per.condition = NULL, black.list = NULL,
+  verbose = 1)
 }
 \arguments{
 \item{counts}{A data frame with counts (one row per feature and one column per sample).}
@@ -15,11 +16,15 @@ FilterCountTable(counts, condition = NULL, na.omit = FALSE,
 
 \item{na.rm=FALSE}{Remove rows with at least one NA value.}
 
-\item{mean.count=NULL}{Filter out the features having a cross-sample mean count lower than the specified value}
+\item{mean.count=NULL}{Filter out the features having a cross-sample mean count lower than the specified value. Setting mean.count to 0 cancels the filtering out of rows where all values equal zero.}
 
 \item{min.count=NULL}{Filter out features for which the  max count (across all samples) is lower than the specified threshold.}
 
-\item{mean.per.condition=NULL}{## Filter out features for which none of the conditions has a mean count above the threshold}
+\item{mean.per.condition=NULL}{Filter out features for which none of the conditions has a mean count above the threshold}
+
+\item{zero.var.filter=TRUE}{Filter out features with null variance (note: this includes rows where all values are zero but possibly other rows as well).}
+
+\item{min.var=NULL}{Filter out features for which the  variance (across all samples) is lower than the specified threshold.}
 
 \item{black.list=NULL}{Black-listed" features: a vector of row IDs or row indices indicating a list of features to be filtered out (e.g. 16S, 12S RNA).}
 
@@ -29,7 +34,16 @@ FilterCountTable(counts, condition = NULL, na.omit = FALSE,
 a data.frame with the same columns (samples) as the input count table, and with rows restricted to the features that pass all the thresholds.
 }
 \description{
-Filter out the features of an RNA-seq count table based on several filters.
+Filter out the features of an RNA-seq count table based on several filters. 
+This includes suppression of features based on the following criteria:
+\itemize{
+\item rows with min count  smaller than specified threshold (min.count);
+\item rows with mean count smaller than specified threshold (mean.count);
+\item rows where all values equal zeros (unless mean.count is set to 0);
+\item rows with null variance (optional);
+\item rows with variance  smaller than specified threshold (min.var);
+\item user-speficied black-listed features.
+}
 }
 \author{
 Jacques van Helden

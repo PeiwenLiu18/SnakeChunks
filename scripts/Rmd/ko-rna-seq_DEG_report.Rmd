@@ -643,19 +643,19 @@ The four plots below represent the distributions of counts per gene (X axis) for
 par(mfrow = c(2,2))
 
 ## Boxplot of raw counts
-count.boxplot(all.counts, stats.per.sample, xlab = "Raw counts", 
+BoxplotsPerSample(all.counts, stats.per.sample, xlab = "Raw counts", 
               main = "Raw counts")
 
 ## Boxplot of log10-transformed counts
-count.boxplot(all.counts.log2, stats.per.sample, xlab = "log10(counts)", 
+BoxplotsPerSample(all.counts.log2, stats.per.sample, xlab = "log10(counts)", 
               main = "log2(counts)")
 
 ## Boxplot of stdcounts
-count.boxplot(stdcounts, stats.per.sample, xlab = "std counts", 
+BoxplotsPerSample(stdcounts, stats.per.sample, xlab = "std counts", 
               main = "Standardized counts")
 
 ## Boxplot of log10-transformed stdcounts
-count.boxplot(stdcounts.log2, stats.per.sample, xlab = "log10(std counts)", 
+BoxplotsPerSample(stdcounts.log2, stats.per.sample, xlab = "log10(std counts)", 
               main = "log2(stdcounts) per sample")
 
 par(mfrow = c(1,1))
