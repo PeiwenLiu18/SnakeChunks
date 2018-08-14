@@ -25,6 +25,10 @@ LibsizeBarplot <- function(counts,
                            # height = length(sample.ids)/3 + 2,
                            ...) {
 
+  ## Make sure that sample colors and sample labels are provided as a vector rather than a factor or a list
+  sample.labels <- as.vector(unlist(sample.labels))
+  sample.colors <- as.vector(unlist(sample.colors))
+  
   ## Store original graphical parameters
   par.ori <- par(no.readonly = TRUE)
 
