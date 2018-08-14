@@ -196,7 +196,7 @@ MarginStats <- function(x,
   }
   if (length(intersect(c("below.mean", "fract.below.mean"), selected.stats)) > 0) {
     if (verbose >= 2) { message("\t\tComputing ", margin.name, "-wise below.mean") }
-    margin.stats$below.mean <- apply(t(x) < margin.stats$mean, 1, sum, na.rm = TRUE)
+    margin.stats$below.mean <- apply(x < margin.stats$mean, margin, sum, na.rm = TRUE)
   }
   if ("fract.below.mean" %in% selected.stats) {
     if (verbose >= 2) { message("\t\tComputing ", margin.name, "-wise fract.below.mean") }
@@ -229,7 +229,7 @@ MarginStats <- function(x,
 #' @description statistics are computed on each row by passing the data frame/matrux to MarginStats() with marrgin=1.
 #' @export
 RowStats <- function(x, verbose = 0) {
-  MarginStats(x, 1, verbose = 0, selected.stats = NULL)
+  MarginStats(x, margin = 1, verbose, selected.stats = NULL)
 }
 
 #' @title compute column statistics on a data.frame or matrix.
@@ -240,7 +240,7 @@ RowStats <- function(x, verbose = 0) {
 #' @description statistics are computed on each column by passing the data frame/matrux to MarginStats() with marrgin=2.
 #' @export
 ColStats <- function(x, verbose = 0, selected.stats = NULL) {
-  MarginStats(x, 2, verbose, selected.stats)
+  MarginStats(x, margin = 2, verbose, selected.stats)
 }
 
 
