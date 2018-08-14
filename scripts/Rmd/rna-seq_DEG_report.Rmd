@@ -284,20 +284,20 @@ par(mfrow=c(2,2))
 # par("mar")
 
 ## Boxplot of raw counts
-count.boxplot(all.counts, sample.desc, 
+BoxplotsPerSample(all.counts, sample.desc, 
               xlab="Raw counts", 
               main="Raw counts per sample")
 
 ## Boxplot of log10-transformed counts
-count.boxplot(all.counts.log10, sample.desc,  xlab="log10(counts)", 
+BoxplotsPerSample(all.counts.log10, sample.desc,  xlab="log10(counts)", 
               main="log10(counts) per sample")
 
 ## Boxplot of CPMs
-count.boxplot(cpms, sample.desc, xlab="CPM", 
+BoxplotsPerSample(cpms, sample.desc, xlab="CPM", 
               main="CPMs per sample")
 
 ## Boxplot of log10-transformed CPMs
-count.boxplot(cpms.log10, sample.desc, xlab="log10(CPM)", 
+BoxplotsPerSample(cpms.log10, sample.desc, xlab="log10(CPM)", 
               main="log10(CPMs) per sample")
 
 par(mfrow=c(1,1))
