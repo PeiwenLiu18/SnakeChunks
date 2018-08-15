@@ -21,6 +21,7 @@
 #' @export
 RNAseqAnalysis <- function(countFile,
                            configFile,
+                           checkSampleIDs=TRUE,
                            main.dir = getwd(),
                            result.dir = "results",
                            verbose = 1) {
@@ -28,16 +29,17 @@ RNAseqAnalysis <- function(countFile,
 
   ## ---- TO DO ----
   ##
-  ## Suppress norm.methods from arguments, since they should be specified in the config file.
+  ## Compute a table with the mean coutns per condition after normalisation
+  ## Generate scatter plots comparing mean counts per condition
   ##
   ## Check non-used variables: suppress or use them
   ## - cols.heatmap
   ## - DEG.selection.criterion
-  ## - filtered.counts.log10
-  ## - filtered.counts.log2
-  ## - stdcounts.libsum
-  ## - stdcounts.perc95
-  ## - stdcounts.median
+  ## - filteredCounts.log10
+  ## - filteredCounts.log2
+  ## - scaledCounts.libsum
+  ## - scaledCounts.perc95
+  ## - scaledCounts.median
   ## - current.labels
   ##
   ## - Add PCA
@@ -90,8 +92,8 @@ RNAseqAnalysis <- function(countFile,
   }
   setwd(main.dir)
   message("\tMain directory: ", main.dir)
-  
-  
+
+
   ## Directory to store differential expression results
   dirs["output"] <- result.dir ## Index dir for the report
   message("\tOutput directory: ", result.dir)
@@ -99,28 +101,37 @@ RNAseqAnalysis <- function(countFile,
 
   ## Input files
   infiles <- vector()   ## Input files
-  
+
   ## Configuration file
   infiles["config"] <- configFile
   message("\tConfiguration file: ", configFile)
-  
+
   ## Count table
   infiles["count_table"] <- countFile
   message("\tCount table file: ", countFile)
-  
-  
-  
+
+
+
   ## Output files
   outfiles <- vector()  ## For tab-separated value files
-  
-  
+
+
   ## ---- Load RNA-seq data, metadata and configuration ----
-  dataset <- LoadRNAseqDataset(countFile, configFile)
+  dataset <- LoadRNAseqDataset(countFile, configFile, verbose = verbose)
   parameters <- dataset$parameters
   
   ## Make the dataset fields available as variables (to avoid prepending "dataset" everywhere)
   attach(dataset)
   # detach(dataset)
+  
+  
+  # dim(rawCounts)
+  # dim(filteredCounts)
+  
+  ## ---- log2 transformation for raw and filtered counts ----
+  rawCounts.log2 <- log2(rawCounts + parameters$DEG$epsilon)
+  filteredCounts.log2 <- log2(filteredCounts + parameters$DEG$epsilon)
+  
   
   ## Instantiate some local variables for some frequently used parameters,
   ## for the readability.
@@ -128,10 +139,13 @@ RNAseqAnalysis <- function(countFile,
   norm.percentile <- parameters$DEG$norm_percentile
   thresholds <- as.vector(parameters$DEG$thresholds)
   epsilon <- parameters$DEG$epsilon
-  
+
   ## Index input files
   infiles["sample descriptions"] <- parameters$metadata$samples
   infiles["design"] <- parameters$metadata$design
+  if (!is.null(parameters$DEG$blacklist)) {
+    infiles["black_list"] <- parameters$DEG$blacklist
+  }
   
   ## ---- Define some output parameters -----------------------------------------------------
 
@@ -139,17 +153,17 @@ RNAseqAnalysis <- function(countFile,
   if (is.null(parameters$dir$count_prefix)) {
     ## use the basename of the count table as prefix for output file
     parameters$dir$count.prefix <- basename(path = countFile)
-    
+
     ## Suppress usual extensions from the basename
     ext <- ".tsv"
     for (ext in c(".tsv", ".tab", ".txt", ".csv")) {
       parameters$dir$count_prefix <- sub(
         pattern = ext, replacement = "", x = parameters$dir$count.prefix)
     }
-  } 
+  }
   count.prefix <- parameters$dir$count.prefix
   message("\tFile prefix for normalized count tables ", count.prefix)
-  
+
 
   ## Directory for Figures
   dir.figures.samples <- file.path(result.dir, "figures")
@@ -163,8 +177,8 @@ RNAseqAnalysis <- function(countFile,
   for (fig.format in figure.formats) {
     figure.files[[fig.format]] <- vector()
   }
-  
-  
+
+
   ## Directory to export result files in tba-separated value (tsv) format
   dir.tables.samples <- file.path(result.dir, "samples/tables")
   dirs["tsv"] <- dir.tables.samples ## Index directory for the report
@@ -181,12 +195,12 @@ RNAseqAnalysis <- function(countFile,
   }
 
 
-  
+
   ## ---- Initialize the Rmd report (index of input/output file) ----
   index.Rmd <- "index.Rmd"
   index.socket <- file(index.Rmd)
 
-  
+
   Rmd.header <- paste(
     sep = '',
     '---
@@ -232,10 +246,27 @@ knitr::opts_chunk$set(
     index.text <- append(index.text, "\n\n## Description\n")
     index.text <- append(index.text, parameters$description)
   }
-
+  
+  ## Print the data source
+  if (!is.null(parameters$dataset)) {
+    index.text <- append(index.text, paste(sep = "","\n\n- Dataset: ", parameters$dataset))
+  }
+  
+  ## Print the original publication
+  if (!is.null(parameters$citation)) {
+    index.text <- append(index.text, paste(sep = "","\n- Publication: ", parameters$citation))
+  }
+  
   ## Print the threshold tables
   ## NOTE: I should evaluate what I do with the kable calls
   index.text <- append(index.text, "\n\n## Parameters\n")
+  
+  index.text <- append(index.text, 
+                       paste(sep = "", "- Congiguration file: ",
+                             "[", configFile, "]",
+                             "(", configFile, ")"))
+                       
+  index.text <- append(index.text, "\n\n### Thresholds\n")
   index.text <- append(
     index.text,
     kable(t(as.data.frame(thresholds)), col.names = "Threshold",
@@ -271,91 +302,23 @@ knitr::opts_chunk$set(
     caption = "**Design**. Each row describes one comparison between two conditions."))
 
 
-  ## Keep a copy  of the original counts before applting filtering
-  ori.counts <- counts
-  # names(ori.counts)
-  # dim(ori.counts)
-  # View(ori.counts)
-
-  ## Filter out the rows corresponding to non-assigned counts,
-  ## e.g. __not_aligned, __ambiguous, __too_low_qAual, __not_aligned
-  not.feature <- grep(rownames(ori.counts), pattern = "^__", value = FALSE)
-  if (length(not.feature) > 0) {
-    all.counts <- ori.counts[-not.feature,]
-  } else {
-    all.counts <- ori.counts
-  }
-  # dim(all.counts)
-
-  message("\t\tLoaded counts: ",
-          nrow(all.counts), " features x ",
-          ncol(all.counts), " samples")
-
-  ## Check that the header of all.counts match the sample IDs
-  ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify sample IDs with no column in the count table
-  if (length(ids.not.found) == length(sample.ids)) {
-    colnames(all.counts) <- sample.ids
-    ids.not.found <- setdiff(sample.ids, names(all.counts)) ## Identify
-  } else if (length(ids.not.found) > 0) {
-    stop(length(ids.not.found), " missing columns in count table\t", countFile,
-         "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
-  }
-
-  ## Restrict the count table to the sample IDs found in the sample description file
-  all.counts <- all.counts[, sample.ids]
-  # names(all.counts)
-  # dim(all.counts)
-  # (zeros <- sum(all.counts == 0))
-  # (zero.rows <- sum(apply(all.counts, 1, sum, na.rm=TRUE) == 0))
-  # zeros/ zero.rows
-
-
-  ##---- Feature filtering ----
-
-  ## Load list of black-listed features
-  if (is.null(parameters$DEG$blacklist)) {
-    black.listed.features <- NULL
-  } else {
-    infiles["black_list"] <- parameters$DEG$blacklist
-    black.list.table <- read.table(
-      infiles["black_list"], sep = "\t",
-      comment.char = "#",
-      header = FALSE)
-    black.listed.features <- as.vector(black.list.table[,1])
-    black.listed.not.found <- setdiff(black.listed.features, row.names(all.counts))
-    if (length(black.listed.not.found) > 0) {
-      message("Warning: some IDs of the black list do not correspond to features of the count table")
-      message("\tNot found IDs\t", paste(collapse = ", ", head(black.listed.not.found)))
-    }
-    black.listed.features <- intersect(black.listed.features, row.names(all.counts))
-    if (length(black.listed.features) > 0) {
-      message("Discarding ", length(black.listed.features), " black-listed features\t", parameters$DEG$blacklist)
-    }
-  }
-
-  ## ---- Filter out features according to various user-specified criteria ----
-  ## (parameters defined in the config files
-  filtered.counts <- FilterCountTable(
-    counts = all.counts,
-    na.omit = TRUE,
-    min.count = thresholds$min.count,
-    mean.count = thresholds$mean.count,
-    mean.per.condition = thresholds$mean.per.condition,
-    black.list = black.listed.features)
-  ## dim(filtered.counts)
-  ## sum(filtered.counts == 0)
-
-  ##---- Log-transform non-normalized counts ----
-
-  ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
-  message("\t\tTreating zero-values by adding epsilon = ", epsilon)
-  filtered.counts.epsilon <- filtered.counts
-  filtered.counts.epsilon[filtered.counts == 0] <- epsilon
-
-  # ## Log-transformed data for some plots.
-  # message("\t\tComputing log-transformed values")
-  # filtered.counts.log10 <- log10(filtered.counts.epsilon)
-  # filtered.counts.log2 <- log2(filtered.counts.epsilon)
+  # ## Check that the header of rawCounts match the sample IDs
+  # ids.not.found <- setdiff(sample.ids, names(rawCounts)) ## Identify sample IDs with no column in the count table
+  # if (length(ids.not.found) == length(sample.ids)) {
+  #   colnames(rawCounts) <- sample.ids
+  #   ids.not.found <- setdiff(sample.ids, names(rawCounts)) ## Identify
+  # } else if (length(ids.not.found) > 0) {
+  #   stop(length(ids.not.found), " missing columns in count table\t", countFile,
+  #        "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
+  # }
+  # 
+  # ## Restrict the count table to the sample IDs found in the sample description file
+  # rawCounts <- rawCounts[, sample.ids]
+  # # names(rawCounts)
+  # # dim(rawCounts)
+  # # (zeros <- sum(rawCounts == 0))
+  # # (zero.rows <- sum(apply(rawCounts, 1, sum, na.rm=TRUE) == 0))
+  # # zeros/ zero.rows
 
 
   ## ---- Compute sample-wise statistics on counts -----
@@ -378,13 +341,13 @@ knitr::opts_chunk$set(
                       "fract.below.mean")
 
   message("\tComputing sample-wise statistics on all counts (non-filtered)")
-  #stats.per.sample <- calc.stats.per.sample(sample.desc, all.counts)
+  #stats.per.sample <- calc.stats.per.sample(sample.desc, rawCounts)
   # View(stats.per.sample.all)
-  # dim(all.counts)
+  # dim(rawCounts)
   # dim(sample.desc)
   stats.per.sample.all <- cbind(
     sample.desc,
-    ColStats(x = all.counts, verbose = verbose, selected.stats = selected.stats))
+    ColStats(x = rawCounts, verbose = verbose, selected.stats = selected.stats))
   #stats.per.sample.all$Mcounts <- stats.per.sample.all$sum / 1e6
   # View(stats.per.sample.all.all)
   outfiles["stats_per_sample_all_features"] <- file.path(dir.tables.samples, "stats_per_sample_all_features.tsv")
@@ -393,11 +356,11 @@ knitr::opts_chunk$set(
 
   ## Compute statistics ommitting zero values
   message("\tComputing sample-wise statistics for non-zero counts")
-  all.counts.nozero <- all.counts
-  all.counts.nozero[all.counts.nozero == 0] <- NA
+  rawCounts.nozero <- rawCounts
+  rawCounts.nozero[rawCounts.nozero == 0] <- NA
   stats.per.sample.nozero <- cbind(
     sample.desc,
-    ColStats(all.counts.nozero, verbose = verbose, selected.stats = selected.stats))
+    ColStats(rawCounts.nozero, verbose = verbose, selected.stats = selected.stats))
   #stats.per.sample.nozero$Mcounts <- stats.per.sample.nozero$sum / 1e6
   outfiles["stats_per_sample_no-zero"] <- file.path(dir.tables.samples, "stats_per_sample_no-zero.tsv")
   message("\t\t", outfiles["stats_per_sample_no-zero"])
@@ -409,7 +372,7 @@ knitr::opts_chunk$set(
   message("\tComputing sample-wise statistics for filtered counts")
   stats.per.sample.filtered <- cbind(
     sample.desc,
-    ColStats(filtered.counts, verbose = verbose, selected.stats = selected.stats))
+    ColStats(filteredCounts, verbose = verbose, selected.stats = selected.stats))
   #stats.per.sample.filtered$Mcounts <- stats.per.sample.filtered$sum / 1e6
   # names(stats.per.sample)
   # View(stats.per.sample.nozero)
@@ -424,38 +387,38 @@ knitr::opts_chunk$set(
   ## (very highly expressed genes).  A more robust normalisation criterion
   ## is to use the 75th percentile, or the median. We use the median, somewhat arbitrarily,
   ## beause it gives a nice alignment on the boxplots.
-  # stdcounts.libsum <- cpm(filtered.counts.epsilon)    ## Counts per million reads, normalised by library sum
-  # stdcounts.perc75 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$Q3)    ## Counts per million reads, normalised by 75th percentile
-  # stdcounts.perc95 <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$perc95)    ## Counts per million reads, normalised by 95th percentile
-  # stdcounts.median <- cpm(filtered.counts.epsilon, lib.size = stats.per.sample.filtered$median)    ## Counts per million reads, normalised by sample-wise median count
+  # scaledCounts.libsum <- cpm(filteredCounts.epsilon)    ## Counts per million reads, normalised by library sum
+  # scaledCounts.perc75 <- cpm(filteredCounts.epsilon, lib.size = stats.per.sample.filtered$Q3)    ## Counts per million reads, normalised by 75th percentile
+  # scaledCounts.perc95 <- cpm(filteredCounts.epsilon, lib.size = stats.per.sample.filtered$perc95)    ## Counts per million reads, normalised by 95th percentile
+  # scaledCounts.median <- cpm(filteredCounts.epsilon, lib.size = stats.per.sample.filtered$median)    ## Counts per million reads, normalised by sample-wise median count
 
 
   ## ---- Compute standardized counts (percentile method) ----
-  sample.norm.percentiles <- apply(filtered.counts.epsilon, 2, quantile, p = parameters$edgeR$norm.p)
-  stdcounts <- cpm(filtered.counts.epsilon, lib.size = sample.norm.percentiles)
-  stdcounts.log10 <- log10(stdcounts) ## Log-10 transformed stdcounts, xwith the epsilon for 0 counts
-  stdcounts.log2 <- log2(stdcounts) ## Log-10 transformed stdcounts, with the epsilon for 0 counts
+  sample.norm.percentiles <- apply(filteredCounts.epsilon, 2, quantile, p = parameters$edgeR$norm.p)
+  scaledCounts <- cpm(filteredCounts.epsilon, lib.size = sample.norm.percentiles)
+  scaledCounts.log10 <- log10(scaledCounts) ## Log-10 transformed scaledCounts, xwith the epsilon for 0 counts
+  scaledCounts.log2 <- log2(scaledCounts) ## Log-10 transformed scaledCounts, with the epsilon for 0 counts
 
   ## ???? WHY IS THIS SO DIFFERENT ????
-  # sample.norm.factors <- calcNormFactors(filtered.counts.epsilon, method = "upperquartile") #, p = parameters$edgeR$norm.p)
+  # sample.norm.factors <- calcNormFactors(filteredCounts.epsilon, method = "upperquartile") #, p = parameters$edgeR$norm.p)
   # plot(sample.norm.percentiles, sample.norm.factors)
 
   ## Export normalized counts (in log2-transformed counts per million reads)
-  outfiles["stdcounts"] <- file.path(dir.tables.samples, paste(sep = "", count.prefix, "_stdcounts.tsv"))
-  message("\tExporting standardized counts: ", outfiles["stdcounts"])
-  write.table(x = stdcounts, row.names = TRUE, col.names = NA,
-              file = outfiles["stdcounts"], sep = "\t", quote = FALSE)
+  outfiles["scaledCounts"] <- file.path(dir.tables.samples, paste(sep = "", count.prefix, "_scaledCounts.tsv"))
+  message("\tExporting standardized counts: ", outfiles["scaledCounts"])
+  write.table(x = scaledCounts, row.names = TRUE, col.names = NA,
+              file = outfiles["scaledCounts"], sep = "\t", quote = FALSE)
 
-  outfiles["log2stdcounts"] <- file.path(dir.tables.samples, paste(sep = "", count.prefix, "_stdcounts_log2.tsv"))
-  message("\tExporting log2-transformed standardized counts: ", outfiles["log2stdcounts"])
-  write.table(x = stdcounts.log2, row.names = TRUE, col.names = NA,
-              file = outfiles["log2stdcounts"], sep = "\t", quote = FALSE)
+  outfiles["log2scaledCounts"] <- file.path(dir.tables.samples, paste(sep = "", count.prefix, "_scaledCounts_log2.tsv"))
+  message("\tExporting log2-transformed standardized counts: ", outfiles["log2scaledCounts"])
+  write.table(x = scaledCounts.log2, row.names = TRUE, col.names = NA,
+              file = outfiles["log2scaledCounts"], sep = "\t", quote = FALSE)
 
 
   ## Compute Trimmed Means of M Values (TMM): TO BE DONE
-  stats.per.sample.filtered$mean.std.count <- apply(stdcounts, 2, mean, na.rm = TRUE)
-  stats.per.sample.filtered$log2.mean.std.count <- apply(stdcounts.log2, 2, mean, na.rm = TRUE)
-  stats.per.sample.filtered$log10.mean.std.count <- apply(stdcounts.log10, 2, mean, na.rm = TRUE)
+  stats.per.sample.filtered$mean.std.count <- apply(scaledCounts, 2, mean, na.rm = TRUE)
+  stats.per.sample.filtered$log2.mean.std.count <- apply(scaledCounts.log2, 2, mean, na.rm = TRUE)
+  stats.per.sample.filtered$log10.mean.std.count <- apply(scaledCounts.log10, 2, mean, na.rm = TRUE)
 
   ## ---- Export stats per sample ----
   outfiles["stats_per_sample_filtered_features"] <- file.path(dir.tables.samples, "stats_per_sample_filtered_features.tsv")
@@ -488,7 +451,7 @@ knitr::opts_chunk$set(
     message("\t\t\t", fig.format, " plot\t", figname)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = 8)
 
-    LibsizeBarplot(counts = all.counts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
+    LibsizeBarplot(counts = rawCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
@@ -502,7 +465,7 @@ knitr::opts_chunk$set(
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for all features (zeros excluded)"))
 
-  index.text <- append(index.text, "\n\n### Filtered features, non-zero counts\n")
+  index.text <- append(index.text, "\n\n### Filtered features\n")
   index.text <- append(index.text, kable(stats.per.sample.filtered[,selected.stats], digits = 2,
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for filtered features"))
@@ -518,7 +481,7 @@ knitr::opts_chunk$set(
     message("\t\t\t", fig.format, " plot\t", figname)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 7, height = 8)
 
-    LibsizeBarplot(counts = filtered.counts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
+    LibsizeBarplot(counts = filteredCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
@@ -551,7 +514,7 @@ knitr::opts_chunk$set(
     label.sizes <- nchar(row.names(x))
     left.margin <- 2 + max(label.sizes)*0.5
     # par("mar")
-    par(mar=c(5.1, left.margin, 4.1, 1))
+    par(mar = c(5.1, left.margin, 4.1, 1))
 
     x <- x[nrow(x):1,]
     indices <- sort(rep(1:nrow(x), times = 2))
@@ -560,13 +523,13 @@ knitr::opts_chunk$set(
       as.matrix(t(x)),
       horiz = TRUE,
       beside = TRUE,
-      las=1,
+      las = 1,
       cex.names = 0.9,
-      col = rev(sample.desc$color[indices]),
+      col = rev(as.vector(unlist(sample.desc$color[indices]))),
       density = barplot.densities, xlab = "Million reads",
-      main = "Library sizes\nbefore/after filtering",
+      main = "Library sizes\nBefore vs after filtering",
       xlim = c(0, max(x) * 1.3))
-    barplot.Mreads <- round(digits = 1, as.vector(unlist(t(x))))
+    barplot.Mreads <- round(digits = 2, as.vector(unlist(t(x))))
     text(x = pmax(barplot.Mreads, 3), labels =  barplot.Mreads, y = bplt, pos = 2, font = 2, cex = 0.8)
     #sample.type <- rep(c("Filtered", "All"), length.out = 2 * nrow(x))
     #text(x = 0, labels = sample.type, y = bplt, pos = 4, font = 1, cex=0.5)
@@ -587,7 +550,7 @@ knitr::opts_chunk$set(
   ## ---- Between-sample normalisation -------------------------------------------------------
 
   norm.comparison <- NormalizeCountTable(
-    counts = filtered.counts, class.labels = sample.conditions, nozero = TRUE,
+    counts = filteredCounts, class.labels = sample.conditions, nozero = TRUE,
     method = norm.methods, percentile = norm.percentile, log2 = FALSE, epsilon = epsilon, detailed.sample.stats = TRUE,
     verbose = verbose)
   # names(norm.comparison)
@@ -620,12 +583,132 @@ knitr::opts_chunk$set(
     # system(paste("open", figure.file))
   }
 
+  ## ---- Read count distributions per sample ----
+  index.text <- append(index.text, "\n\n## Distribution of read counts\n\n")
+  
+  ### Histograms: counts per gene (all samples together)
+  index.text <- append(index.text, "\n\n### Histograms: counts per gene\n\n")
+  
+  figname <- "count_histograms"
+  file.prefix <- file.path(dir.figures.samples, figname)
+  message("\t\tGenerating figure\t", figname)
+  
+  for (f in 1:length(figure.formats)) {
+    par.ori <- par(no.readonly = TRUE)
+    fig.format <- figure.formats[f]
+    figure.file <- paste(sep = "", file.prefix, ".", fig.format)
+    figure.files[[fig.format]][figname] <- figure.file
+    # message("\t\t\t", fig.format, " plot\t", figname)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 12, height = 9)
+    
+    par(mfrow = c(2,2))
+    h1 <- HistOfCounts(counts = rawCounts, maxPercentile = 95, 
+                       las = 1, cex.axis = 0.8, legend.cex = 0.7,
+                       main = "Raw counts", ylab = "Genes", 
+                       col = "#FFEEDD", border = "#AA8877")
+    h2 <- HistOfCounts(counts = filteredCounts, maxPercentile = 95, discardZeroRows = FALSE,
+                       las = 1, cex.axis = 0.8, legend.cex = 0.7,
+                       main = "Filtered counts", ylab = "Genes", 
+                       col = "#DDEEFF", border = "#7788AA")
+    ## log2(raw counts) histograme
+    h3 <- HistOfCounts(counts = rawCounts.log2, 
+                       maxPercentile = 100, discardZeroRows = FALSE, 
+                       las = 1, cex.axis = 0.8, legend.cex = 0.7,
+                       col = "#FFEEDD", border = "#AA8877",
+                       xlab = "log2(counts)",
+                       main = "Yeast Bdf1 vs WT\nRaw counts (log2)", ylab = "Genes")
+    
+    ## log2(filtered counts) histogram
+    h4 <- HistOfCounts(counts = filteredCounts.log2, maxPercentile = 100,  
+                       las = 1, cex.axis = 0.8, legend.cex = 0.7,
+                       col = "#DDEEFF", border = "#7788AA",
+                       xlab = "log2(counts)",
+                       main = "Yeast Bdf1 vs WT\nfiltered counts (log2)", ylab = "Genes")
+    
+    par(mfrow = c(1,1))
+    par(par.ori)
+    silence <- dev.off(); rm(silence)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text, 
+                                 out.width = "95%")
+    }
+    # system(paste("open", figure.file))
+  }
+  
+  
+  ### Sample-wise read count box plots
+  index.text <- append(index.text, "\n\n### Sample-wise read count box plots\n\n")
+  
+###  ```{r count_boxplots, fig.width=10, fig.height=10, fig.cap="Read count distributions. Top: raw counts. Bottom: counts per millon reads (scaledCounts). Left panels: linear scale, which emphasizes  outlier features denoted by very high counts. Rigt panels log counts permit to perceive the distribution of its whole range, including small count values. Null counts are replaced by an epsilon < 1, and appearas negative numbers after log transformation."}
 
-  ## ----differential_expression_analysis, fig.width=8, fig.height=12--------
-  # setwd(dirs["main"]) ## !!!!! I don't understand why I have to reset the working directory at each chunk
+  figname <- "boxplots_per_sample"
+  file.prefix <- file.path(dir.figures.samples, figname)
+  message("\t\tGenerating figure\t", figname)
 
+  ## Select a reasonable number of samples if there are too any of them
+  boxplot.max.samples <- 30
+  if (length(sample.ids) > boxplot.max.samples) {
+    message("Selecting a subset of ", boxplot.max.samples, " samples",
+            " among ", length(sample.ids), " for the boxplots. ")
+    selected.samples <- sample(x = sample.ids, size = boxplot.max.samples)
+  } else {
+    selected.samples <- sample.ids
+  }
+
+  for (f in 1:length(figure.formats)) {
+    par.ori <- par(no.readonly = TRUE)
+    fig.format <- figure.formats[f]
+    figure.file <- paste(sep = "", file.prefix, ".", fig.format)
+    figure.files[[fig.format]][figname] <- figure.file
+    # message("\t\t\t", fig.format, " plot\t", figname)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 10, height = 12)
+
+    par(mfrow = c(2,2))
+
+    ## Boxplot of raw counts
+    BoxplotsPerSample(
+      counts = rawCounts[, selected.samples],
+      sample.desc = sample.desc[selected.samples,], 
+      sample.label.col = "Label",
+      xlab = "Raw counts",
+      main = "Raw counts")
+
+    ## Boxplot of log10-transformed counts
+    BoxplotsPerSample(
+      counts = rawCounts.log2[, selected.samples], 
+      sample.desc = sample.desc[selected.samples,], 
+      sample.label.col = "Label",
+      xlab = "log2(counts)",
+      main = "log2 raw counts")
+
+    ## Boxplot of scaledCounts
+    BoxplotsPerSample(
+      counts = scaledCounts[, selected.samples], 
+      sample.desc = sample.desc[selected.samples,], 
+      sample.label.col = "Label",
+      xlab = "std counts",
+      main = "Normalized counts")
+    
+    ## Boxplot of log10-transformed scaledCounts
+    BoxplotsPerSample(
+      counts = scaledCounts.log2[, selected.samples], 
+      sample.desc = sample.desc[selected.samples,], 
+      sample.label.col = "Label",
+      xlab = "log2(counts)",
+      main = "log2 normalised counts")
+
+    par(par.ori)
+
+    silence <- dev.off(); rm(silence)
+    if (f == 1) {
+      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+    }
+    # system(paste("open", figure.file))
+  }
+
+
+  ## ---- Differential analysis  --------
   index.text <- append(index.text, "\n\n## Differential analysis\n\n")
-
 
   # i <- 1  # for quick test
   for (i in 1:nrow(design)) {
@@ -685,7 +768,7 @@ knitr::opts_chunk$set(
 
     ## Select counts for the samples belonging to the two conditions
     current.samples <- c(ref.samples, test.samples)
-    current.counts <- data.frame(filtered.counts[,current.samples])
+    current.counts <- data.frame(filteredCounts[,current.samples])
     # dim(current.counts)  ## For test
     # names(current.counts)
 
@@ -698,7 +781,7 @@ knitr::opts_chunk$set(
     current.labels <- paste(current.conditions, names(current.counts), sep = "_")
 
     ## A big result table with all features and all statistics
-    result.table <- init.deg.table(stdcounts, ref.samples, test.samples, stats = FALSE)
+    result.table <- init.deg.table(scaledCounts, ref.samples, test.samples, stats = FALSE)
     # View(result.table)
     # dim(result.table)
 
@@ -885,7 +968,7 @@ knitr::opts_chunk$set(
 
 
     ## Define feature colors according to their level of expression (count means)
-    # feature.scores <- log2(apply(filtered.counts.epsilon, 1, median))
+    # feature.scores <- log2(apply(filteredCounts.epsilon, 1, median))
 
     # hist(feature.scores, breaks = 100)
 
@@ -1178,9 +1261,9 @@ knitr::opts_chunk$set(
   message("Figures directory\t", dir.figures.samples)
   message("Index of input/output files\t", index.file)
   message("Job done")
-  
-  
+
+
   detach(dataset)
   return()
-  
+
 }

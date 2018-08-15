@@ -287,25 +287,25 @@ sample.description.plots <- function (sample.desc,
 
   ## Boxplot of raw counts
   plot.files["sample_boxplot_counts"] <- file.path(dir.figures, paste(sep = "", "sample_boxplots_counts.pdf"))
-  count.boxplot(count.table, stats.per.sample,
+  BoxplotsPerSample(count.table, stats.per.sample,
                 xlab="Raw counts", main="Box plots per sample: raw counts",
                 plot.file=plot.files["sample_boxplot_counts"])
 
   ## Boxplot of log10-transformed counts
   plot.files["sample_boxplot_counts_log10"] <- file.path(dir.figures, paste(sep = "", "sample_boxplots_counts_log10.pdf"))
-  count.boxplot(count.table.log10, stats.per.sample,
+  BoxplotsPerSample(count.table.log10, stats.per.sample,
                 xlab="log10(counts)", main="Box plots per sample: log10(counts)",
                 plot.file=plot.files["sample_boxplot_counts_log10"])
 
   ## Boxplot of CPMs
   plot.files["sample_boxplot_CPM"] <- file.path(dir.figures, paste(sep = "", "sample_boxplots_CPM.pdf"))
-  count.boxplot(cpms, stats.per.sample,
+  BoxplotsPerSample(cpms, stats.per.sample,
                 xlab="CPM", main="Box plots per sample: counts per million reads (CPM)",
                 plot.file=plot.files["sample_boxplot_CPM"])
 
   ## Boxplot of log10-transformed CPMs
   plot.files["sample_boxplot_CPM_log10"] <- file.path(dir.figures, paste(sep = "", "sample_boxplots_CPM_log10.pdf"))
-  count.boxplot(cpms.log10, stats.per.sample,
+  BoxplotsPerSample(cpms.log10, stats.per.sample,
                 xlab="log10(CPM)", main="Box plots per sample: counts per million reads (CPM)",
                 plot.file=plot.files["sample_boxplot_CPM"])
 

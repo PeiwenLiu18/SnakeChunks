@@ -234,9 +234,7 @@ DEGtablePostprocessing <- function(deg.table,
     silence <- dev.off()
 
     ## Volcano plot
-    message("thresholds['FC']\t", thresholds["FC"])
-    message("log2(thresholds['FC'])\t", log2(thresholds["FC"]))
-    nona.deg <- na.omit(deg.table)
+  nona.deg <- na.omit(deg.table)
     volcano.file <- file.path(dir.figures, paste(sep = "", table.name, "_volcano_plot_padj.pdf"))
     if (verbose >= 1) { message("\t\tVolcano plot\t", volcano.file) }
     pdf(file = volcano.file, width = 7, height = 7)
