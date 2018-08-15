@@ -1,0 +1,52 @@
+import sys
+import os
+
+## TO DO (JvH) adapt required parameters for the script rna-seq_deg_detection.R
+
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+if not "diffexpr" in config["dir"].keys():
+    sys.exit("The diffexpr dir must be defined in the config file")
+
+if not "metadata" in config["dir"].keys():
+    sys.exit("The metadata section must be defined in the config file")
+
+if not "configfile" in config["metadata"].keys():
+    sys.exit('The config file should contain the path to itself in the metadata section (config["metadata"]["configfile"])')
+
+
+# Rule
+rule rnaseq_deg:
+    """ This rule runs the analysis of RNA-seq count table with R,
+    including descriptive statistics on the raw counts, filtering,
+    differential expression analysis of RNA-seq data with DESeq2 and
+    edgeR. It requires replicated data to run properly.
+
+    Required parameters:
+        config["qsub"]
+        config["metadata"]["configfile"]
+
+    Author: Jacques van Helden and Claire Rioualen
+    """
+    input: 
+        count_file = "{diffexpr_dir}/{preprocess,.*}all.tsv",
+        config_file = config["metadata"]["configfile"]
+    output: 
+        rmd_report = "{diffexpr_dir}/rnaseq_deg_report.Rmd"
+        html_report = "{diffexpr_dir}/rnaseq_deg_report.html"
+    params:
+        rsnakechunks_dir = "../../RSnakeChunks",
+        rscript = "../../RSnakeChunks/misc/rnaseq_deg.R",
+        outdir = "{diffexpr_dir}/",
+        diffexpr_dir = config["dir"]["diffexpr"],
+        qsub = config["qsub"] \
+          + " -e " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.err" \
+          + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.out"
+    log: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2.log"
+    benchmark: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_benchmark.txt"
+    conda: "../envs/deseq2.yaml"
+    script:
+    "Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.config_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {output.rmd_report}"
+
