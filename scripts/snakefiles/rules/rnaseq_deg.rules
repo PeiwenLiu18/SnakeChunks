@@ -10,7 +10,7 @@ if not "qsub" in config.keys():
 if not "diffexpr" in config["dir"].keys():
     sys.exit("The diffexpr dir must be defined in the config file")
 
-if not "metadata" in config["dir"].keys():
+if not "metadata" in config.keys():
     sys.exit("The metadata section must be defined in the config file")
 
 if not "configfile" in config["metadata"].keys():
@@ -34,19 +34,20 @@ rule rnaseq_deg:
         count_file = "{diffexpr_dir}/{preprocess,.*}all.tsv",
         config_file = config["metadata"]["configfile"]
     output: 
-        rmd_report = "{diffexpr_dir}/rnaseq_deg_report.Rmd"
-        html_report = "{diffexpr_dir}/rnaseq_deg_report.html"
+        rmd_report = "{diffexpr_dir}/{preprocess,.*}rnaseq_deg_report.Rmd",
+        html_report = "{diffexpr_dir}/{preprocess,.*}rnaseq_deg_report.html"
     params:
         rsnakechunks_dir = "../../RSnakeChunks",
         rscript = "../../RSnakeChunks/misc/rnaseq_deg.R",
         outdir = "{diffexpr_dir}/",
         diffexpr_dir = config["dir"]["diffexpr"],
         qsub = config["qsub"] \
-          + " -e " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.err" \
-          + " -o " + "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_qsub.out"
-    log: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2.log"
-    benchmark: "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_benchmark.txt"
-    conda: "../envs/deseq2.yaml"
-    script:
-    "Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.config_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {output.rmd_report}"
+          + " -e " + "{diffexpr_dir}/{preprocess,.*}rnaseq_deg_qsub.err" \
+          + " -o " + "{diffexpr_dir}/{preprocess,.*}rnaseq_deg_qsub.out"
+    log: "{diffexpr_dir}/{preprocess,.*}rnaseq_deg.log"
+    benchmark: "{diffexpr_dir}/{preprocess,.*}rnaseq_deg_benchmark.txt"
+    conda: "../envs/rnaseq_deg.yaml"
+    shell: """
+Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.config_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {output.rmd_report} &> {log} 
+"""
 
