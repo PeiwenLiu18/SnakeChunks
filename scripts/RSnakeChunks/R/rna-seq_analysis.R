@@ -15,7 +15,7 @@
 #' @param configFile a yaml-formatted file defining the mandatory + some optional parameteres
 #' @param main.dir=getwd()  directory from which the script runs. Paths are defined relative to this directory.
 #' @param result.dir="results" directory where the results will be stored. Should be defined relative to main directory.
-#' @param norm.percentile=75 default percentile to estimate sample-wise scaling factors. By default, set to the upper quartile. Will also be converted as p parameter (between 0 and 1) to tune edgeR upperquartile normalisation.
+#' @param rmd.report="rnaseq_deg.Rmd" path to the R markdown report, which is also converted to html and pdf reports
 #' @param verbose=1 level of verbosity
 #'
 #' @export
@@ -24,6 +24,7 @@ RNAseqAnalysis <- function(countFile,
                            checkSampleIDs=TRUE,
                            main.dir = getwd(),
                            result.dir = "results",
+			   rmd.report = "rnaseq_deg.Rmd",
                            verbose = 1) {
 
 
@@ -197,8 +198,8 @@ RNAseqAnalysis <- function(countFile,
 
 
   ## ---- Initialize the Rmd report (index of input/output file) ----
-  index.Rmd <- "index.Rmd"
-  index.socket <- file(index.Rmd)
+  #  rmd.report <- "rmd.report"
+  index.socket <- file(rmd.report)
 
 
   Rmd.header <- paste(
@@ -1252,8 +1253,8 @@ knitr::opts_chunk$set(
 
   writeLines(text = index.text, con = index.socket)
   close(index.socket)
-  rmarkdown::render(index.Rmd, output_format = "html_document")
-  rmarkdown::render(index.Rmd, output_format = "pdf_document")
+  rmarkdown::render(rmd.report, output_format = "html_document")
+  rmarkdown::render(rmd.report, output_format = "pdf_document")
 
 
   ## ---- job_done ------------------------------------------------------------

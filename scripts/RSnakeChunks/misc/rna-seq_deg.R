@@ -23,7 +23,8 @@ if (!exists("opt")) {
     'count_table', 't', 1, "character",
     'output_dir', 'o', 1, "character",
     'snakechunks_dir', 's', 1, 'character',
-    'rsnakechunks_dir', 'r', 1, 'character'
+    'rsnakechunks_dir', 'r', 1, 'character',
+    'rmd_report', 'x', 1, 'character'
   ), byrow = TRUE, ncol = 4)
   opt = getopt(spec)
 }
@@ -59,6 +60,11 @@ if (is.null(opt$main_dir) ) {
   opt$main_dir = getwd()
 }
 
+## Rmd report
+if (is.null(opt$rmd_report) ) {
+  opt$rmd_report = "rnaseq_deg_report.Rmd"
+}
+
 ## Result directory
 if (is.null(opt$output_dir)) {
   opt$output_dir <- "results"
@@ -92,6 +98,7 @@ RNAseqAnalysis(
   configFile = opt$config_file,
   main.dir = opt$main_dir,
   result.dir = opt$output_dir,
+  rmd.report = opt$rmd_report,
   verbose = opt$verbose)
 
 # script.name <- get_Rscript_filename()
