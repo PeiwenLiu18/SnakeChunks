@@ -6,14 +6,14 @@ channels:
   - r
   - bioconda
 dependencies:
-  - bioconductor-deseq2=1.6.3
+  - bioconductor-deseq2=1.18.1
   - bioconductor-edger=3.20.7
   - bioconductor-limma=3.34.9
-  - r-yaml=2.1.13
-  - r-knitr=1.12.3
+#  - r-yaml=3.12
+  - r-knitr=1.20
   - r-pander=0.6.2
   - r-rcolorbrewer=1.1_2
   - r-gplots=3.0.1
-  - r-rmarkdown=1.8
+  - r-rmarkdown=1.9
   - r-devtools=1.13.5
 ...
