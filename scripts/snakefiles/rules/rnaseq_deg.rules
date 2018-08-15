@@ -37,8 +37,8 @@ rule rnaseq_deg:
         rmd_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.Rmd",
         html_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.html"
     params:
-        rsnakechunks_dir = "../../RSnakeChunks",
-        rscript = "../../RSnakeChunks/misc/rna-seq_deg.R",
+        rsnakechunks_dir = "SnakeChunks/scripts/RSnakeChunks",
+        rscript = "SnakeChunks/scripts/RSnakeChunks/misc/rna-seq_deg.R",
         outdir = "{diffexpr_dir}/",
         diffexpr_dir = config["dir"]["diffexpr"],
         qsub = config["qsub"] \
@@ -48,6 +48,6 @@ rule rnaseq_deg:
     benchmark: "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_benchmark.txt"
     conda: "../envs/rnaseq_deg.yaml"
     shell: """
-Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.config_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {output.rmd_report} &> {log} 
+Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.count_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {output.rmd_report} &> {log} 
 """
 
