@@ -302,8 +302,8 @@ DIFFEXPR_TOOLS = config["diffexpr"].split()
 DEG_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 DEG_FIGURES = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_figures.pdf", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 
-DEG_REPORT = expand(DEG_DIR + "/{prefix}_{read_counts}_rnaseq_deg_report.html", zip, prefix=PREFIX, read_counts=COUNTING_TOOLS)
-#DEG_REPORT = DEG_DIR + "/rnaseq_deg_report.html"
+DEG_REPORT = expand(DEG_DIR + "/{prefix}_{read_counts}_rna-seq_deg_report.html", zip, prefix=PREFIX, read_counts=COUNTING_TOOLS)
+#DEG_REPORT = DEG_DIR + "/rna-seq_deg_report.html"
 
 
 #SARTOOLS_TARGETFILE = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{prefix}}_{{read_counts}}_SARTools_targetfile.txt", test=TEST_COND, ref=REFERENCE_COND), prefix=PREFIX, read_counts=COUNTING_TOOLS)
