@@ -1319,6 +1319,9 @@ knitr::opts_chunk$set(
   message("Tables directory\t", dir.tables.samples)
   message("Figures directory\t", dir.figures.samples)
   message("Index of input/output files\t", index.file)
+  message("Report in Rmd format\t", rmd.report)
+  message("Report in HTML format\t", sub(pattern = '.Rmd', replacement  = ".html", x = rmd.report))
+  message("Report in pdf format\t", sub(pattern = '.Rmd', replacement  = ".pdf", x = rmd.report))
   message("Job done")
 
 
