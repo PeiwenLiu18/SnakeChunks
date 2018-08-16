@@ -5,7 +5,8 @@
 \title{Normalisation and differential analysis of an RNA-seq count table}
 \usage{
 RNAseqAnalysis(countFile, configFile, checkSampleIDs = TRUE,
-  main.dir = getwd(), result.dir = "results", verbose = 1)
+  main.dir = getwd(), result.dir = "results",
+  rmd.report = "rnaseq_deg.Rmd", verbose = 1)
 }
 \arguments{
 \item{countFile}{file containing a table with counts of reads per feature (row) in each sample (column).}
@@ -16,7 +17,7 @@ RNAseqAnalysis(countFile, configFile, checkSampleIDs = TRUE,
 
 \item{result.dir="results"}{directory where the results will be stored. Should be defined relative to main directory.}
 
-\item{norm.percentile=75}{default percentile to estimate sample-wise scaling factors. By default, set to the upper quartile. Will also be converted as p parameter (between 0 and 1) to tune edgeR upperquartile normalisation.}
+\item{rmd.report="rnaseq_deg.Rmd"}{path to the R markdown report, which is also converted to html and pdf reports}
 
 \item{verbose=1}{level of verbosity}
 }
