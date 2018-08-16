@@ -17,12 +17,12 @@
 #'   target = "metadata/sample_descriptions.tsv",
 #'   sourceIsDir = FALSE)
 #'
-#' ## From file to file without source in current dir
+#' ## From file to file with the source in current dir
 #' RelativePath(
-#'   source = "myreport.Rmd", 
-#'   target = "metadata/sample_descriptions.tsv",
+#'   source = "results/myreport.Rmd", 
+#'   target = "results/figures/myfigure.png",
 #'   sourceIsDir = FALSE)
-#'
+#'   
 #' ## From file to dir
 #' RelativePath(
 #'   source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
@@ -65,29 +65,43 @@ RelativePath <- function(source, target, sourceIsDir = FALSE, verbose = 0) {
     common.depth <- 0
   } else {
     common.depth <- max(pathMatch, na.rm = TRUE)
-  }  
-  backPath <- paste(collapse = "/", rep(x = "..", length.out = length(sourcePath) - common.depth))
+  }
   
+  ## Define back path as the path from the source to the shared path root
+  if (length(sourcePath) > common.depth) {
+    backPath <- paste(collapse = "/", rep(x = "..", length.out = length(sourcePath) - common.depth))
+  } else {
+    backPath <- vector() ## empty vector
+  }
   
+  ## Define forward path path from the shared path root to the target
   if (length(targetPath) > common.depth) {
     fwdPath <- paste(collapse = "/", targetPath[(common.depth + 1):length(targetPath)])
-    if (length(backPath) == 0) {
-      relPath <- fwdPath
-    } else {
-      relPath <- file.path(backPath, fwdPath)
-    }
   } else {
-    relPath <- backPath
+    fwdPath <- vector() ## empty vector
   }
   
-  if (relPath == "") {
+  ## Combine back and forward path
+  if ((length(backPath) == 0) && (length(fwdPath) == 0)) {
     relPath = "."
+  } else if (length(backPath) == 0) {
+      relPath <- fwdPath
+  } else if (length(fwdPath) == 0) {
+    relPath <- backPath
+  } else {
+    relPath <- file.path(backPath, fwdPath)
   }
+
+  # if (relPath == "") {
+  #   relPath = "."
+  # }
   
-  if (verbose >= 1) {
+  if (verbose >= 2) {
     message("\tRelativePath()")
     message("\t\tsource\t", source)
     message("\t\ttarget\t", target)
+    message("\t\tbackPath\t", backPath)
+    message("\t\tfwdPath\t", fwdPath)
     message("\t\trelPath\t", relPath)
   }
   
