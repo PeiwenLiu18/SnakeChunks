@@ -58,17 +58,19 @@ if (is.null(opt$verbose) ) {
 ## Main directory
 if (is.null(opt$main_dir) ) {
   opt$main_dir = getwd()
+  message("main_dir not defined, using getwd():\t", opt$main_dir)
 }
 
 ## Rmd report
 if (is.null(opt$rmd_report) ) {
+  message("rmd_report not defined, using default:\t", opt$rmd_report)
   opt$rmd_report = "rnaseq_deg_report.Rmd"
 }
 
 ## Result directory
 if (is.null(opt$output_dir)) {
   opt$output_dir <- "results"
-  message("Result dir defined from main directory\t", opt$output_dir)
+  message("output_dir not defined, using default:\t", opt$output_dir)
 }
 
 ## ----  Load R functions from SnakeChunks directory if specified ----
