@@ -54,7 +54,7 @@ RelativePath <- function(source, target, sourceIsDir = FALSE, verbose = 0) {
   } else {
     sourcePath <- unlist(strsplit(x = dirname(source), split = "/"))
   }
-  if ((length(sourcePath) == 1) || (sourcePath == ".")) {
+  if ((length(sourcePath) == 1) && (sourcePath == ".")) {
     sourcePath <- vector() ## replace dot by empty vector
   }
   targetPath <- unlist(strsplit(x = target, split = "/"))
@@ -63,12 +63,11 @@ RelativePath <- function(source, target, sourceIsDir = FALSE, verbose = 0) {
   pathMatch <- match(sourcePath, targetPath)
   if ((length(pathMatch) == 0) || is.na(pathMatch)) {
     common.depth <- 0
-    backPath <- vector()
   } else {
     common.depth <- max(pathMatch, na.rm = TRUE)
-    backPath <- paste(collapse = "/", rep(x = "..", length.out = length(sourcePath) - common.depth))
   }  
-
+  backPath <- paste(collapse = "/", rep(x = "..", length.out = length(sourcePath) - common.depth))
+  
   
   if (length(targetPath) > common.depth) {
     fwdPath <- paste(collapse = "/", targetPath[(common.depth + 1):length(targetPath)])
