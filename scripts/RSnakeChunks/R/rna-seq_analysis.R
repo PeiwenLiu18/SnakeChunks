@@ -24,9 +24,10 @@ RNAseqAnalysis <- function(countFile,
                            checkSampleIDs=TRUE,
                            main.dir = getwd(),
                            result.dir = "results",
-			   rmd.report = "rnaseq_deg.Rmd",
+                           rmd.report = "rnaseq_deg.Rmd",
                            verbose = 1) {
 
+  
 
   ## ---- TO DO ----
   ##
@@ -145,7 +146,7 @@ RNAseqAnalysis <- function(countFile,
   ## Index input files
   infiles["sample descriptions"] <- parameters$metadata$samples
   infiles["design"] <- parameters$metadata$design
-  if (!is.null(parameters$DEG$blacklist)) {
+  if ((!is.null(parameters$DEG$blacklist)) & (parameters$DEG$blacklist != "")) {
     infiles["black_list"] <- parameters$DEG$blacklist
   }
   
@@ -200,7 +201,11 @@ RNAseqAnalysis <- function(countFile,
 
   ## ---- Initialize the Rmd report (index of input/output file) ----
   #  rmd.report <- "rmd.report"
-  index.socket <- file(rmd.report)
+  dir.report <- dirname(rmd.report)
+  dirs["report"] <- dir.report ## Index directory for the report
+  dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
+  
+  report.socket <- file(rmd.report)
 
 
   Rmd.header <- paste(
@@ -241,36 +246,35 @@ knitr::opts_chunk$set(
 ```
 ')
 
-  index.text <- Rmd.header
+  report.text <- Rmd.header
 
   ## Print the description
   if (!is.null(parameters$description)) {
-    index.text <- append(index.text, "\n\n## Description\n")
-    index.text <- append(index.text, parameters$description)
+    report.text <- append(report.text, "\n\n## Description\n")
+    report.text <- append(report.text, parameters$description)
   }
   
   ## Print the data source
   if (!is.null(parameters$dataset)) {
-    index.text <- append(index.text, paste(sep = "","\n\n- Dataset: ", parameters$dataset))
+    report.text <- append(report.text, paste(sep = "","\n\n- Dataset: ", parameters$dataset))
   }
   
   ## Print the original publication
   if (!is.null(parameters$citation)) {
-    index.text <- append(index.text, paste(sep = "","\n- Publication: ", parameters$citation))
+    report.text <- append(report.text, paste(sep = "","\n- Publication: ", parameters$citation))
   }
   
   ## Print the threshold tables
   ## NOTE: I should evaluate what I do with the kable calls
-  index.text <- append(index.text, "\n\n## Parameters\n")
-  
-  index.text <- append(index.text, 
-                       paste(sep = "", "- Congiguration file: ",
-                             "[", configFile, "]",
-                             "(", configFile, ")"))
+  report.text <- append(report.text, "\n\n## Parameters\n")
+
+  report.text <- append(report.text, 
+                       paste(sep = "", "- Congiguration file: ", 
+                             ReportLink(source = rmd.report, target = configFile)))
                        
-  index.text <- append(index.text, "\n\n### Thresholds\n")
-  index.text <- append(
-    index.text,
+  report.text <- append(report.text, "\n\n### Thresholds\n")
+  report.text <- append(
+    report.text,
     kable(t(as.data.frame(thresholds)), col.names = "Threshold",
           caption = "Thresholds for the selection of differentially expressed genes. "))
 
@@ -285,20 +289,20 @@ knitr::opts_chunk$set(
 
 
   ## Print the sample descriptons
-  index.text <- append(index.text, "\n\n## Sample descriptions\n")
-  index.text <- append(index.text, kable(sample.desc, caption = "Sample description table"))
+  report.text <- append(report.text, "\n\n## Sample descriptions\n")
+  report.text <- append(report.text, kable(sample.desc, caption = "Sample description table"))
 
 
   samples.per.condition <- as.data.frame.table(table(sample.conditions))
-  index.text <- append(index.text, "\n\n### Samples per condition\n")
-  index.text <- append(index.text, kable(samples.per.condition, caption = "Samples per condition",
+  report.text <- append(report.text, "\n\n### Samples per condition\n")
+  report.text <- append(report.text, kable(samples.per.condition, caption = "Samples per condition",
                                          col.names = c("Condition", "Nb samples")))
   if (verbose >= 2) { print(as.data.frame(samples.per.condition)) }
 
 
   ## Print out the design table (pairs of conditions to be compared)
-  index.text <- append(index.text, "\n\n## Design\n")
-  index.text <- append(index.text, kable(
+  report.text <- append(report.text, "\n\n## Design\n")
+  report.text <- append(report.text, kable(
     comparison.summary,
     row.names = TRUE,
     caption = "**Design**. Each row describes one comparison between two conditions."))
@@ -434,10 +438,10 @@ knitr::opts_chunk$set(
   # setdiff(selected.stats, names(stats.per.sample))
 
   # names(stats.per.sample.all)
-  index.text <- append(index.text, "\n\n## Sample-wise statistics\n")
+  report.text <- append(report.text, "\n\n## Sample-wise statistics\n")
 
-  index.text <- append(index.text, "\n\n### All feature counts (zeros included)\n")
-  index.text <- append(index.text, kable(stats.per.sample.all[,selected.stats], digits = 2,
+  report.text <- append(report.text, "\n\n### All feature counts (zeros included)\n")
+  report.text <- append(report.text, kable(stats.per.sample.all[,selected.stats], digits = 2,
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for all features (zeros included)"))
 
@@ -457,18 +461,22 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
 
-  index.text <- append(index.text, "\n\n### All features, non-zero counts\n")
-  index.text <- append(index.text, kable(stats.per.sample.nozero[,selected.stats], digits = 2,
+  report.text <- append(report.text, "\n\n### All features, non-zero counts\n")
+  report.text <- append(report.text, kable(stats.per.sample.nozero[,selected.stats], digits = 2,
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for all features (zeros excluded)"))
 
-  index.text <- append(index.text, "\n\n### Filtered features\n")
-  index.text <- append(index.text, kable(stats.per.sample.filtered[,selected.stats], digits = 2,
+  report.text <- append(report.text, "\n\n### Filtered features\n")
+  report.text <- append(report.text, kable(stats.per.sample.filtered[,selected.stats], digits = 2,
                                          format.args = list(big.mark = ",", decimal.mark = "."),
                                          caption = "Sample-wise statistics for filtered features"))
 
@@ -487,7 +495,12 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
+      #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
@@ -541,8 +554,13 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(
-        figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
+      # report.text <- ReportFigure(
+      #   figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       #, chunk.opt = paste(sep = "", ", out.height = ", plot.height))
     }
     # system(paste("open", figure.file))
@@ -580,16 +598,21 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
+      #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
 
   ## ---- Read count distributions per sample ----
-  index.text <- append(index.text, "\n\n## Distribution of read counts\n\n")
+  report.text <- append(report.text, "\n\n## Distribution of read counts\n\n")
   
   ### Histograms: counts per gene (all samples together)
-  index.text <- append(index.text, "\n\n### Histograms: counts per gene\n\n")
+  report.text <- append(report.text, "\n\n### Histograms: counts per gene\n\n")
   
   figname <- "count_histograms"
   file.prefix <- file.path(dir.figures.samples, figname)
@@ -631,15 +654,19 @@ knitr::opts_chunk$set(
     par(par.ori)
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, 
-                                 out.width = "95%")
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
+#      report.text <- ReportFigure(figname, figure.file, report.text, out.width = "95%")
     }
     # system(paste("open", figure.file))
   }
   
   
   ### Sample-wise read count box plots
-  index.text <- append(index.text, "\n\n### Sample-wise read count box plots\n\n")
+  report.text <- append(report.text, "\n\n### Sample-wise read count box plots\n\n")
   
 ###  ```{r count_boxplots, fig.width=10, fig.height=10, fig.cap="Read count distributions. Top: raw counts. Bottom: counts per millon reads (scaledCounts). Left panels: linear scale, which emphasizes  outlier features denoted by very high counts. Rigt panels log counts permit to perceive the distribution of its whole range, including small count values. Null counts are replaced by an epsilon < 1, and appearas negative numbers after log transformation."}
 
@@ -703,14 +730,19 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+      report.text <- ReportFigure(name = figname, 
+                                  figureFile = figure.file, 
+                                  reportFile = rmd.report, 
+                                  report.text = report.text, 
+                                  out.width = parameters$DEG$out_width)
+      #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
   }
 
 
   ## ---- Differential analysis  --------
-  index.text <- append(index.text, "\n\n## Differential analysis\n\n")
+  report.text <- append(report.text, "\n\n## Differential analysis\n\n")
 
   # i <- 1  # for quick test
   for (i in 1:nrow(design)) {
@@ -735,15 +767,15 @@ knitr::opts_chunk$set(
     }
 
 
-    index.text <- append(index.text, paste(sep= "", "\n\n### ", test.condition, " versus ", ref.condition, "\n\n"))
-#    index.text <- append(index.text, paste(sep= "", "Test condition : ",  test.condition, "\n"))
-#    index.text <- append(index.text, paste(sep= "", "Reference condition :",  ref.condition, "\n"))
+    report.text <- append(report.text, paste(sep= "", "\n\n### ", test.condition, " versus ", ref.condition, "\n\n"))
+#    report.text <- append(report.text, paste(sep= "", "Test condition : ",  test.condition, "\n"))
+#    report.text <- append(report.text, paste(sep= "", "Reference condition :",  ref.condition, "\n"))
     compa.table <- data.frame(
       type = c("Reference", "Test"),
       condition = c(ref.condition, test.condition),
       samples = c(length(ref.samples), length(test.samples))
     )
-    index.text <- append(index.text,
+    report.text <- append(report.text,
                          kable(compa.table))
 
 
@@ -980,7 +1012,7 @@ knitr::opts_chunk$set(
     ## ---- Plot comparing DEGs obtained with DESeq2 and edgeR ----
 
     ## Comparison between adjusted p-values
-    index.text <- append(index.text, "\n\n#### Adjusted p-values\n\n")
+    report.text <- append(report.text, "\n\n#### Adjusted p-values\n\n")
 
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_padj")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
@@ -1000,12 +1032,17 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+        report.text <- ReportFigure(name = figname, 
+                                    figureFile = figure.file, 
+                                    reportFile = rmd.report, 
+                                    report.text = report.text, 
+                                    out.width = parameters$DEG$out_width)
+        #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
 
-    index.text <- append(index.text, "\n\n#### Log2(fold changes)\n\n")
+    report.text <- append(report.text, "\n\n#### Log2(fold changes)\n\n")
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_log2FC")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
@@ -1024,14 +1061,19 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+        report.text <- ReportFigure(name = figname, 
+                                    figureFile = figure.file, 
+                                    reportFile = rmd.report, 
+                                    report.text = report.text, 
+                                    out.width = parameters$DEG$out_width)
+        #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
 
 
     ## ---- Draw Volcano plots -----
-    index.text <- append(index.text, "\n\n#### Volcano plots\n\n")
+    report.text <- append(report.text, "\n\n#### Volcano plots\n\n")
     deg.names <- names(deg.results)
     nb.panels <- n2mfrow(length(deg.names))
     if (length(deg.names) <= 5) {
@@ -1069,7 +1111,12 @@ knitr::opts_chunk$set(
       par(par.ori)
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+        report.text <- ReportFigure(name = figname, 
+                                    figureFile = figure.file, 
+                                    reportFile = rmd.report, 
+                                    report.text = report.text, 
+                                    out.width = parameters$DEG$out_width)
+        #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -1083,7 +1130,7 @@ knitr::opts_chunk$set(
     ## Draw Volcano plots
     # deg.name <- "DESeq2"
     # deg.name <- "edgeR_TMM"
-    index.text <- append(index.text, "\n\n#### P-value histograms\n\n")
+    report.text <- append(report.text, "\n\n#### P-value histograms\n\n")
     figname <- paste(sep = "", comparison.prefix, "_norm_compa_pvalue_histograms")
     file.prefix <- file.path(dir.figures.diffexpr, figname)
     message("\t\tGenerating figure\t", figname)
@@ -1115,7 +1162,12 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+        report.text <- ReportFigure(name = figname, 
+                                    figureFile = figure.file, 
+                                    reportFile = rmd.report, 
+                                    report.text = report.text, 
+                                    out.width = parameters$DEG$out_width)
+#        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -1123,7 +1175,7 @@ knitr::opts_chunk$set(
 
     ## ---- Draw Venn diagram with number of genes declared significant ----
     ## according to the selection criteria (threshold fields).
-    index.text <- append(index.text, "\n\n#### Venn diagrams: padj versus FC\n\n")
+    report.text <- append(report.text, "\n\n#### Venn diagrams: padj versus FC\n\n")
     selection.fields <- c("padj", "FC")
     selection.thresholds <- thresholds[selection.fields]
     selection.columns <- paste(sep = "", selection.fields, "_", selection.thresholds)
@@ -1155,7 +1207,12 @@ knitr::opts_chunk$set(
       }
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        index.text <- index.figure(figname, figure.file, index.text, out.width = parameters$DEG$out_width)
+        report.text <- ReportFigure(name = figname, 
+                                    figureFile = figure.file, 
+                                    reportFile = rmd.report, 
+                                    report.text = report.text, 
+                                    out.width = parameters$DEG$out_width)
+        #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
       # system(paste("open", figure.file))
     }
@@ -1194,66 +1251,66 @@ knitr::opts_chunk$set(
 
   ## ---- Build the file index ----
 
-  index.text <- append(index.text, "\n\n## Directories and files\n")
+  report.text <- append(report.text, "\n\n## Directories and files\n")
 
-  index.text <- append(index.text, paste(sep = "", "- Config file : ", "[", configFile, "](", configFile,")"))
-  index.text <- append(index.text, paste(sep = "", "- Count table : ", "[", countFile, "](", countFile,")"))
-  index.text <- append(index.text, paste(sep = "", "- Sample descriptions : ", "[", infiles["sample descriptions"], "](", infiles["sample descriptions"], ")"))
-  index.text <- append(index.text, paste(sep = "", "- Design : ", "[", infiles["design"], "](", infiles["design"], ")"))
+  report.text <- append(report.text, paste(sep = "", "- Config file : ", ReportLink(source = rmd.report, target = configFile)))
+  report.text <- append(report.text, paste(sep = "", "- Count table : ", ReportLink(source = rmd.report, target = countFile)))
+  report.text <- append(report.text, paste(sep = "", "- Sample descriptions : ", ReportLink(source = rmd.report, target = infiles["sample descriptions"])))
+  report.text <- append(report.text, paste(sep = "", "- Design : ", ReportLink(source = rmd.report, target = infiles["design"])))
 
-  index.text <- append(index.text, paste(sep = "", "\n\n### Directories\n"))
-  index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
+  report.text <- append(report.text, paste(sep = "", "\n\n### Directories\n"))
+  report.text <- append(report.text, paste(sep = "", "| Content | Path |"))
+  report.text <- append(report.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (dirname in names(dirs)) {
     dir <- dirs[dirname]
-    index.text <- append(index.text, paste(sep = "", "| ", dirname, " | ", "[", dir, "](", dir, ") |"))
+    report.text <- append(report.text, paste(sep = "", "| ", dirname, " | ", ReportLink(source = rmd.report, target = dir), " | "))
   }
 
-  index.text <- append(index.text, paste(sep = "", "\n\n### Input files\n"))
-  index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
+  report.text <- append(report.text, paste(sep = "", "\n\n### Input files\n"))
+  report.text <- append(report.text, paste(sep = "", "| Content | Path |"))
+  report.text <- append(report.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (filename in names(infiles)) {
     file <- infiles[filename]
-    index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
+    report.text <- append(report.text, paste(sep = "", "| ", filename, " | ", ReportLink(source = rmd.report, target = file), " | "))
   }
 
-  index.text <- append(index.text, paste(sep = "", "\n\n### Output files"))
-  index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-  index.text <- append(index.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
+  report.text <- append(report.text, paste(sep = "", "\n\n### Output files"))
+  report.text <- append(report.text, paste(sep = "", "| Content | Path |"))
+  report.text <- append(report.text, paste(sep = "", "|:----------------------|--------------------------------------------------|"))
   for (filename in names(outfiles)) {
     file <- outfiles[filename]
-    index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
+    report.text <- append(report.text, paste(sep = "", "| ", filename, " | ", ReportLink(source = rmd.report, target = file), " | "))
   }
 
   f <- 1
   for (f in 1:length(figure.formats)) {
     fig.format <- figure.formats[f]
     figfiles <- unlist(figure.files[fig.format])
-    index.text <- append(index.text, paste(sep = "", "\n\n### Figures (", fig.format,")"))
-    index.text <- append(index.text, paste(sep = "", "| Content | Path |"))
-    index.text <- append(index.text, paste(sep = "", "|----------------------|--------------------------------------------------|"))
+    report.text <- append(report.text, paste(sep = "", "\n\n### Figures (", fig.format,")"))
+    report.text <- append(report.text, paste(sep = "", "| Content | Path |"))
+    report.text <- append(report.text, paste(sep = "", "|----------------------|--------------------------------------------------|"))
     for (filename in names(figfiles)) {
       file <- figfiles[filename]
-      index.text <- append(index.text, paste(sep = "", "| ", filename, " | ", "[", file, "](", file, ") |"))
+      report.text <- append(report.text, paste(sep = "", "| ", filename, " | ", ReportLink(source = rmd.report, target = file), " | "))
     }
   }
 
   ## ---- Session info ---------------------------------------------------------
   ## Print the complete list of libraries + versions used in this session
-  index.text <- append(index.text, "\n\n## Session info\n")
+  report.text <- append(report.text, "\n\n## Session info\n")
   session.info <- sessionInfo()
   # print(session.info)
-  index.text <- append(index.text, "\n```\n")
-  index.text <- append(index.text, capture.output(session.info))
-  index.text <- append(index.text, "\n```\n")
+  report.text <- append(report.text, "\n```\n")
+  report.text <- append(report.text, capture.output(session.info))
+  report.text <- append(report.text, "\n```\n")
 
 
 
   ## ---- Generate the HTML index -----
-  index.text <- append(index.text, paste(sep = "", "\n\nJob done: ", Sys.time()))
+  report.text <- append(report.text, paste(sep = "", "\n\nJob done: ", Sys.time()))
 
-  writeLines(text = index.text, con = index.socket)
-  close(index.socket)
+  writeLines(text = report.text, con = report.socket)
+  close(report.socket)
   rmarkdown::render(rmd.report, output_format = "html_document")
   rmarkdown::render(rmd.report, output_format = "pdf_document")
 
