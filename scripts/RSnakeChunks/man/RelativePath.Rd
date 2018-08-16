@@ -30,12 +30,12 @@ RelativePath(
   target = "metadata/sample_descriptions.tsv",
   sourceIsDir = FALSE)
 
-## From file to file without source in current dir
+## From file to file with the source in current dir
 RelativePath(
-  source = "myreport.Rmd", 
-  target = "metadata/sample_descriptions.tsv",
+  source = "results/myreport.Rmd", 
+  target = "results/figures/myfigure.png",
   sourceIsDir = FALSE)
-
+  
 ## From file to dir
 RelativePath(
   source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
