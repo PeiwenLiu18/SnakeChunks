@@ -92,10 +92,7 @@ RelativePath <- function(source, target, sourceIsDir = FALSE, verbose = 0) {
     relPath <- file.path(backPath, fwdPath)
   }
 
-  # if (relPath == "") {
-  #   relPath = "."
-  # }
-  
+  ## Report parameters (very verbosy)
   if (verbose >= 2) {
     message("\tRelativePath()")
     message("\t\tsource\t", source)
