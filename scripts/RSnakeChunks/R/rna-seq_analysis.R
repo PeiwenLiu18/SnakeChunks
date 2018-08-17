@@ -455,7 +455,7 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
+    plot.height <- min(max(2 + 0.35 * nrow(sample.desc), 4), 12)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
 
     LibsizeBarplot(counts = rawCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
@@ -490,7 +490,7 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
+    plot.height <- min(max(2 + 0.35 * nrow(sample.desc), 4), 12)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
 
     LibsizeBarplot(counts = filteredCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
@@ -516,8 +516,7 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
-
+    plot.height <- min(max(2 + 0.35 * nrow(sample.desc), 4), 12)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
 
     par.ori <- par(no.readonly = TRUE)
@@ -667,7 +666,7 @@ knitr::opts_chunk$set(
   }
 
 
-  ### Sample-wise read count box plots
+  ## ---- Sample-wise read count box plots ----
   report.text <- append(report.text, "\n\n### Sample-wise read count box plots\n\n")
 
 ###  ```{r count_boxplots, fig.width=10, fig.height=10, fig.cap="Read count distributions. Top: raw counts. Bottom: counts per millon reads (scaledCounts). Left panels: linear scale, which emphasizes  outlier features denoted by very high counts. Rigt panels log counts permit to perceive the distribution of its whole range, including small count values. Null counts are replaced by an epsilon < 1, and appearas negative numbers after log transformation."}
@@ -692,7 +691,9 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     # message("\t\t\t", fig.format, " plot\t", figname)
-    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 10, height = 12)
+    plot.height <- min(max((2 + 0.35 * nrow(sample.desc) )* 2, 8), 20)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 10, height = plot.height)
+#    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 10, height = 12)
 
     par(mfrow = c(2,2))
 
@@ -1315,6 +1316,7 @@ knitr::opts_chunk$set(
   close(report.socket)
   rmarkdown::render(rmd.report, output_format = "html_document")
   rmarkdown::render(rmd.report, output_format = "pdf_document")
+  rmarkdown::render(rmd.report, output_format = "word_document")
 
 
   ## ---- job_done ------------------------------------------------------------
@@ -1324,6 +1326,7 @@ knitr::opts_chunk$set(
   message("Report in Rmd format\t", rmd.report)
   message("Report in HTML format\t", sub(pattern = '.Rmd', replacement  = ".html", x = rmd.report))
   message("Report in pdf format\t", sub(pattern = '.Rmd', replacement  = ".pdf", x = rmd.report))
+  message("Report in Word format\t", sub(pattern = '.Rmd', replacement  = ".docx", x = rmd.report))
   message("Job done")
 
 
