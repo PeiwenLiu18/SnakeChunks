@@ -27,7 +27,7 @@ RNAseqAnalysis <- function(countFile,
                            rmd.report = "rnaseq_deg.Rmd",
                            verbose = 1) {
 
-  
+
 
   ## ---- TO DO ----
   ##
@@ -122,20 +122,20 @@ RNAseqAnalysis <- function(countFile,
   ## ---- Load RNA-seq data, metadata and configuration ----
   dataset <- LoadRNAseqDataset(countFile, configFile, verbose = verbose)
   parameters <- dataset$parameters
-  
+
   ## Make the dataset fields available as variables (to avoid prepending "dataset" everywhere)
   attach(dataset)
   # detach(dataset)
-  
-  
+
+
   # dim(rawCounts)
   # dim(filteredCounts)
-  
+
   ## ---- log2 transformation for raw and filtered counts ----
   rawCounts.log2 <- log2(rawCounts + parameters$DEG$epsilon)
   filteredCounts.log2 <- log2(filteredCounts + parameters$DEG$epsilon)
-  
-  
+
+
   ## Instantiate some local variables for some frequently used parameters,
   ## for the readability.
   norm.methods <- parameters$DEG$norm_method
@@ -149,7 +149,7 @@ RNAseqAnalysis <- function(countFile,
   if ((!is.null(parameters$DEG$blacklist)) & (parameters$DEG$blacklist != "")) {
     infiles["black_list"] <- parameters$DEG$blacklist
   }
-  
+
   ## ---- Define some output parameters -----------------------------------------------------
 
   ## Compute count prefix, i.e. the basename to export various transformations of the count tables
@@ -204,7 +204,7 @@ RNAseqAnalysis <- function(countFile,
   dir.report <- dirname(rmd.report)
   dirs["report"] <- dir.report ## Index directory for the report
   dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
-  
+
   report.socket <- file(rmd.report)
 
 
@@ -253,25 +253,25 @@ knitr::opts_chunk$set(
     report.text <- append(report.text, "\n\n## Description\n")
     report.text <- append(report.text, parameters$description)
   }
-  
+
   ## Print the data source
   if (!is.null(parameters$dataset)) {
     report.text <- append(report.text, paste(sep = "","\n\n- Dataset: ", parameters$dataset))
   }
-  
+
   ## Print the original publication
   if (!is.null(parameters$citation)) {
     report.text <- append(report.text, paste(sep = "","\n- Publication: ", parameters$citation))
   }
-  
+
   ## Print the threshold tables
   ## NOTE: I should evaluate what I do with the kable calls
   report.text <- append(report.text, "\n\n## Parameters\n")
 
-  report.text <- append(report.text, 
-                       paste(sep = "", "- Congiguration file: ", 
+  report.text <- append(report.text,
+                       paste(sep = "", "- Congiguration file: ",
                              ReportLink(source = rmd.report, target = configFile)))
-                       
+
   report.text <- append(report.text, "\n\n### Thresholds\n")
   report.text <- append(
     report.text,
@@ -317,7 +317,7 @@ knitr::opts_chunk$set(
   #   stop(length(ids.not.found), " missing columns in count table\t", countFile,
   #        "\n\tMissing columns: ", paste(collapse = "; ", ids.not.found))
   # }
-  # 
+  #
   # ## Restrict the count table to the sample IDs found in the sample description file
   # rawCounts <- rawCounts[, sample.ids]
   # # names(rawCounts)
@@ -455,16 +455,17 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = 8)
+    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
 
     LibsizeBarplot(counts = rawCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "All features", cex.axis = 0.8)
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
     }
     # system(paste("open", figure.file))
@@ -489,16 +490,17 @@ knitr::opts_chunk$set(
     figure.file <- paste(sep = "", file.prefix, ".", fig.format)
     figure.files[[fig.format]][figname] <- figure.file
     message("\t\t\t", fig.format, " plot\t", figname)
-    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 7, height = 8)
+    plot.height <- max(2 + 0.35 * nrow(sample.desc), 6)
+    OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 8, height = plot.height)
 
     LibsizeBarplot(counts = filteredCounts, sample.labels = sample.labels, sample.colors = sample.desc$color, main = "After filtering", cex.names = 0.8)
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
       #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
@@ -554,10 +556,10 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
       # report.text <- ReportFigure(
       #   figname, figure.file, report.text, out.width = parameters$DEG$out_width)
@@ -598,10 +600,10 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
       #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
@@ -610,14 +612,14 @@ knitr::opts_chunk$set(
 
   ## ---- Read count distributions per sample ----
   report.text <- append(report.text, "\n\n## Distribution of read counts\n\n")
-  
+
   ### Histograms: counts per gene (all samples together)
   report.text <- append(report.text, "\n\n### Histograms: counts per gene\n\n")
-  
+
   figname <- "count_histograms"
   file.prefix <- file.path(dir.figures.samples, figname)
   message("\t\tGenerating figure\t", figname)
-  
+
   for (f in 1:length(figure.formats)) {
     par.ori <- par(no.readonly = TRUE)
     fig.format <- figure.formats[f]
@@ -625,49 +627,49 @@ knitr::opts_chunk$set(
     figure.files[[fig.format]][figname] <- figure.file
     # message("\t\t\t", fig.format, " plot\t", figname)
     OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, width = 12, height = 9)
-    
+
     par(mfrow = c(2,2))
-    h1 <- HistOfCounts(counts = rawCounts, maxPercentile = 95, 
+    h1 <- HistOfCounts(counts = rawCounts, maxPercentile = 95,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
-                       main = "Raw counts", ylab = "Genes", 
+                       main = "Raw counts", ylab = "Genes",
                        col = "#FFEEDD", border = "#AA8877")
     h2 <- HistOfCounts(counts = filteredCounts, maxPercentile = 95, discardZeroRows = FALSE,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
-                       main = "Filtered counts", ylab = "Genes", 
+                       main = "Filtered counts", ylab = "Genes",
                        col = "#DDEEFF", border = "#7788AA")
     ## log2(raw counts) histograme
-    h3 <- HistOfCounts(counts = rawCounts.log2, 
-                       maxPercentile = 100, discardZeroRows = FALSE, 
+    h3 <- HistOfCounts(counts = rawCounts.log2,
+                       maxPercentile = 100, discardZeroRows = FALSE,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        col = "#FFEEDD", border = "#AA8877",
                        xlab = "log2(counts)",
                        main = "Yeast Bdf1 vs WT\nRaw counts (log2)", ylab = "Genes")
-    
+
     ## log2(filtered counts) histogram
-    h4 <- HistOfCounts(counts = filteredCounts.log2, maxPercentile = 100,  
+    h4 <- HistOfCounts(counts = filteredCounts.log2, maxPercentile = 100,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        col = "#DDEEFF", border = "#7788AA",
                        xlab = "log2(counts)",
                        main = "Yeast Bdf1 vs WT\nfiltered counts (log2)", ylab = "Genes")
-    
+
     par(mfrow = c(1,1))
     par(par.ori)
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
 #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = "95%")
     }
     # system(paste("open", figure.file))
   }
-  
-  
+
+
   ### Sample-wise read count box plots
   report.text <- append(report.text, "\n\n### Sample-wise read count box plots\n\n")
-  
+
 ###  ```{r count_boxplots, fig.width=10, fig.height=10, fig.cap="Read count distributions. Top: raw counts. Bottom: counts per millon reads (scaledCounts). Left panels: linear scale, which emphasizes  outlier features denoted by very high counts. Rigt panels log counts permit to perceive the distribution of its whole range, including small count values. Null counts are replaced by an epsilon < 1, and appearas negative numbers after log transformation."}
 
   figname <- "boxplots_per_sample"
@@ -697,31 +699,31 @@ knitr::opts_chunk$set(
     ## Boxplot of raw counts
     BoxplotsPerSample(
       counts = rawCounts[, selected.samples],
-      sample.desc = sample.desc[selected.samples,], 
+      sample.desc = sample.desc[selected.samples,],
       sample.label.col = "Label",
       xlab = "Raw counts",
       main = "Raw counts")
 
     ## Boxplot of log10-transformed counts
     BoxplotsPerSample(
-      counts = rawCounts.log2[, selected.samples], 
-      sample.desc = sample.desc[selected.samples,], 
+      counts = rawCounts.log2[, selected.samples],
+      sample.desc = sample.desc[selected.samples,],
       sample.label.col = "Label",
       xlab = "log2(counts)",
       main = "log2 raw counts")
 
     ## Boxplot of scaledCounts
     BoxplotsPerSample(
-      counts = scaledCounts[, selected.samples], 
-      sample.desc = sample.desc[selected.samples,], 
+      counts = scaledCounts[, selected.samples],
+      sample.desc = sample.desc[selected.samples,],
       sample.label.col = "Label",
       xlab = "std counts",
       main = "Normalized counts")
-    
+
     ## Boxplot of log10-transformed scaledCounts
     BoxplotsPerSample(
-      counts = scaledCounts.log2[, selected.samples], 
-      sample.desc = sample.desc[selected.samples,], 
+      counts = scaledCounts.log2[, selected.samples],
+      sample.desc = sample.desc[selected.samples,],
       sample.label.col = "Label",
       xlab = "log2(counts)",
       main = "log2 normalised counts")
@@ -730,10 +732,10 @@ knitr::opts_chunk$set(
 
     silence <- dev.off(); rm(silence)
     if (f == 1) {
-      report.text <- ReportFigure(name = figname, 
-                                  figureFile = figure.file, 
-                                  reportFile = rmd.report, 
-                                  report.text = report.text, 
+      report.text <- ReportFigure(name = figname,
+                                  figureFile = figure.file,
+                                  reportFile = rmd.report,
+                                  report.text = report.text,
                                   out.width = parameters$DEG$out_width)
       #      report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
     }
@@ -1032,10 +1034,10 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        report.text <- ReportFigure(name = figname, 
-                                    figureFile = figure.file, 
-                                    reportFile = rmd.report, 
-                                    report.text = report.text, 
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
                                     out.width = parameters$DEG$out_width)
         #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
@@ -1061,10 +1063,10 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        report.text <- ReportFigure(name = figname, 
-                                    figureFile = figure.file, 
-                                    reportFile = rmd.report, 
-                                    report.text = report.text, 
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
                                     out.width = parameters$DEG$out_width)
         #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
@@ -1111,10 +1113,10 @@ knitr::opts_chunk$set(
       par(par.ori)
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        report.text <- ReportFigure(name = figname, 
-                                    figureFile = figure.file, 
-                                    reportFile = rmd.report, 
-                                    report.text = report.text, 
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
                                     out.width = parameters$DEG$out_width)
         #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
@@ -1162,10 +1164,10 @@ knitr::opts_chunk$set(
 
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        report.text <- ReportFigure(name = figname, 
-                                    figureFile = figure.file, 
-                                    reportFile = rmd.report, 
-                                    report.text = report.text, 
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
                                     out.width = parameters$DEG$out_width)
 #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
@@ -1207,10 +1209,10 @@ knitr::opts_chunk$set(
       }
       silence <- dev.off(); rm(silence)
       if (f == 1) {
-        report.text <- ReportFigure(name = figname, 
-                                    figureFile = figure.file, 
-                                    reportFile = rmd.report, 
-                                    report.text = report.text, 
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
                                     out.width = parameters$DEG$out_width)
         #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
       }
