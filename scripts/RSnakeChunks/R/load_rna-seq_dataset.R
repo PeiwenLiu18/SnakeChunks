@@ -309,7 +309,6 @@ LoadRNAseqDataset <- function(countFile,
                        comment = c(";"), header = T, row.names = NULL)
   message("\t\tDesign file contains ", nrow(design), " comparisons. ")
   comparison.summary <- design ## Initialize a summary table for each DEG analysis
-  comparison.summary$prefixes <- paste(sep = "_", design[,1], "vs", design[,2])
   
   ## Identify reference column in the design file
   if ("reference" %in% (tolower(colnames(design)))) {
@@ -332,6 +331,8 @@ LoadRNAseqDataset <- function(countFile,
     message("The headers of the design table do not contain 'test' column -> taking 1st column as test")
     test.column <- 2
   }
+
+  comparison.summary$prefixes <- paste(sep = "_", design[,test.column], "vs", design[,reference.column])
   
   ##---- Feature filtering ----
   
