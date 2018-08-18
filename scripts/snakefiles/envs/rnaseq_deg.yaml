@@ -20,4 +20,6 @@ dependencies:
   - r-devtools=1.13.5
   - r-ascii=2.1
   - r-codetools=0.2_15
+#  - pandoc=2.2.2
+#  - r-tinytex=0.6
 ...

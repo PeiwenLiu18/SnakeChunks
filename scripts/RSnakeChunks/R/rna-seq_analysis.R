@@ -1315,7 +1315,7 @@ knitr::opts_chunk$set(
   writeLines(text = report.text, con = report.socket)
   close(report.socket)
   rmarkdown::render(rmd.report, output_format = "html_document")
-  rmarkdown::render(rmd.report, output_format = "pdf_document")
+#  rmarkdown::render(rmd.report, output_format = "pdf_document")
   rmarkdown::render(rmd.report, output_format = "word_document")
 
 
@@ -1325,7 +1325,7 @@ knitr::opts_chunk$set(
   message("Index of input/output files\t", index.file)
   message("Report in Rmd format\t", rmd.report)
   message("Report in HTML format\t", sub(pattern = '.Rmd', replacement  = ".html", x = rmd.report))
-  message("Report in pdf format\t", sub(pattern = '.Rmd', replacement  = ".pdf", x = rmd.report))
+#  message("Report in pdf format\t", sub(pattern = '.Rmd', replacement  = ".pdf", x = rmd.report))
   message("Report in Word format\t", sub(pattern = '.Rmd', replacement  = ".docx", x = rmd.report))
   message("Job done")
 
