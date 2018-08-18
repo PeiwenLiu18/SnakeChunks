@@ -826,7 +826,7 @@ knitr::opts_chunk$set(
     result.table.synthetic <- data.frame(row.names = row.names(result.table),"feature_id" = row.names(result.table))
 
     ## ---- DESeq2 analysis ----
-    message("\tDESeq2 analysis\t", comparison.prefix)
+    message("\tDESeq2 analysis\t", comparison.prefix, "\ttest condition\t", test.condition)
     deseq2.result <- deseq2.analysis(
       counts = current.counts,
       # head(counts)
