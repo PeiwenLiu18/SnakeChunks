@@ -205,6 +205,8 @@ RNAseqAnalysis <- function(countFile,
   dirs["report"] <- dir.report ## Index directory for the report
   dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
 
+  report.prefix <- sub(pattern = ".Rmd", replacement = "", x = rmd.report, ignore.case = TRUE)
+  
   report.socket <- file(rmd.report)
 
 
@@ -831,7 +833,8 @@ knitr::opts_chunk$set(
       counts = current.counts,
       # head(counts)
       condition = current.conditions,
-      ref.condition = test.condition,
+      ref.condition = ref.condition,
+#      test.condition = test.condition,
       comparison.prefix = comparison.prefix,
       thresholds = as.vector(thresholds),
       title = comparison.prefix,
@@ -1246,7 +1249,7 @@ knitr::opts_chunk$set(
                  ))
 
   index$html.link <- paste("<a href='", index$path, "'>", index$name, "</a>")
-  index.file <- "file.index.tsv"
+  index.file <- paste(sep = "", report.prefix, "_file_index.tsv")
   write.table(x = index, file = index.file, quote = FALSE,
               sep = "\t", row.names = FALSE, col.names = TRUE)
 
@@ -1324,9 +1327,9 @@ knitr::opts_chunk$set(
   message("Figures directory\t", dir.figures.samples)
   message("Index of input/output files\t", index.file)
   message("Report in Rmd format\t", rmd.report)
-  message("Report in HTML format\t", sub(pattern = '.Rmd', replacement  = ".html", x = rmd.report))
-#  message("Report in pdf format\t", sub(pattern = '.Rmd', replacement  = ".pdf", x = rmd.report))
-  message("Report in Word format\t", sub(pattern = '.Rmd', replacement  = ".docx", x = rmd.report))
+  message("Report in HTML format\t", paste(sep = "", report.prefix, ".html"))
+#  message("Report in pdf format\t", paste(sep = "", report.prefix, ".pdf"))
+  message("Report in Word format\t", paste(sep = "", report.prefix, ".docx"))
   message("Job done")
 
 
