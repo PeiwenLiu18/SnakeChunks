@@ -47,7 +47,8 @@ deseq2.analysis <- function(counts,
   ## which may be misleading to interpret the log2 fold changes.
   if (!is.null(ref.condition)) {
     if (!(ref.condition %in% condition)) {
-      stop("deseq2.analysis\treference condition (", ref.condition, ") does not exist in sample conditions (",
+      stop("deseq2.analysis\treference condition (", ref.condition, ")",
+           "does not exist in sample conditions (",
            paste(collapse = ", ", unique(condition)), ")")
     }
     deseq2.dds$condition <- relevel(deseq2.dds$condition, ref = ref.condition)
