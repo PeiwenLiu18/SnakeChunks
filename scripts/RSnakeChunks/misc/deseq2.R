@@ -170,6 +170,34 @@ if (length(parameters$sample.ids) == ncol(counts)) {
     stop("Invalid specification of sample IDs. ")
 }
 
+## Identify Reference and Test columns in the header line of the design file
+## Identify reference column in the design file
+
+if ("reference" %in% (tolower(colnames(design)))) {
+  reference.column <- which(tolower(colnames(design)) == "reference")
+  if (length(reference.column) != 1) {
+    stop("The design file contains several columns entitled 'reference'. ")
+  }
+} else {
+  message("The headers of the design table do not contain 'reference' column -> taking 1st column as reference")
+  reference.column <- 1
+}
+
+## Identify test column in the design file
+if ("test" %in% (tolower(colnames(design)))) {
+  test.column <- which(tolower(colnames(design)) == "test")
+  if (length(test.column) != 1) {
+    stop("The design file contains several columns entitled 'test'. ")
+  }
+} else {
+  message("The headers of the design table do not contain 'test' column -> taking 1st column as test")
+  test.column <- 2
+}
+
+# comparison.summary$prefixes <- paste(sep = "_", design[,test.column], "vs", design[,reference.column])
+  
+
+
 ## Iterate over each line of the design file.
 
 ## Note: a design fle can contain several differential expression analyses. 
@@ -177,8 +205,8 @@ if (length(parameters$sample.ids) == ncol(counts)) {
 i <- 1
 for (i in 1:nrow(design.table)) {
     ## Define reference and test conditions from the design file
-    ref.condition <- as.vector(unlist(design.table[i, 1]))
-    test.condition <- as.vector(unlist(design.table[i, 2]))
+    ref.condition <- as.vector(unlist(design.table[i, ref.column]))
+    test.condition <- as.vector(unlist(design.table[i, test.column]))
     
     ## Select reference and test samples
     ref.samples <- row.names(coldata)[sample.conditions == ref.condition]
