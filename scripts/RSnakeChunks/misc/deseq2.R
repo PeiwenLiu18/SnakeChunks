@@ -205,7 +205,7 @@ if ("test" %in% (tolower(colnames(design)))) {
 i <- 1
 for (i in 1:nrow(design.table)) {
     ## Define reference and test conditions from the design file
-    ref.condition <- as.vector(unlist(design.table[i, ref.column]))
+    ref.condition <- as.vector(unlist(design.table[i, reference.column]))
     test.condition <- as.vector(unlist(design.table[i, test.column]))
     
     ## Select reference and test samples
