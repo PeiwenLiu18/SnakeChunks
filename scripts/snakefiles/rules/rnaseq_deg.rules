@@ -35,12 +35,9 @@ rule rnaseq_deg:
         config_file = config["metadata"]["configfile"]
     output: 
 #        html_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.html",
-#        gene_table = "{diffexpr_dir}/{preprocess,.*}{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_all_genes.tsv",
-#        deg_table = "{diffexpr_dir}/{preprocess,.*}{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_DEG_table.tsv",
+#        gene_table = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_all_genes.tsv",
+#        deg_table = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_DEG_table.tsv",
         gene_list = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_DEG_list.txt"
-#        deg_table = "{diffexpr_dir}/{test}_vs_{ref}/{test}_vs_{ref}_{preprocess,.*}DEG.tsv"
-#        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.txt",
-#        gene_pval = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_pval.tsv",
 #        pdf_file = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_figures.pdf"
     params:
         rmd_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.Rmd",
