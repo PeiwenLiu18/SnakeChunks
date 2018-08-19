@@ -12,14 +12,14 @@ LoadRNAseqDataset(countFile, configFile, checkSampleIDs = TRUE,
 
 \item{configFile}{a yaml-formatted file containing the parameters, including the path to metadata files (sample description table, design table).}
 
-\item{checkSampleIDs=TRUE}{check that the sample IDS are equal in the row names of the 
-sample description table and the column names (header) of the count table. If "FALSE", row names of 
+\item{checkSampleIDs=TRUE}{check that the sample IDS are equal in the row names of the
+sample description table and the column names (header) of the count table. If "FALSE", row names of
 the sample description fable are taken a sample IDs and imposed as column headers for the count table.}
 
-\item{reorderSamples=NULL}{criterion to ensure consistency of sample order between count table and sample description. 
-Supported values:  
+\item{reorderSamples=NULL}{criterion to ensure consistency of sample order between count table and sample description.
+Supported values:
 \itemize{
-\item NULL (no reordering is applied), 
+\item NULL (no reordering is applied),
 \item counts (reorder columns of the  count table to match the rows sample description table),
 \item sample_desc (reorder rows of sample description fable to match columns of the count table).
 }}
@@ -37,7 +37,7 @@ a list with all the required data for further analysis
 }
 }
 \description{
-Load an RNA-seq dataset (i.e. a table with raw counts per feature), 
+Load an RNA-seq dataset (i.e. a table with raw counts per feature),
 together with sample descriptions, design for differential expression, and parameters
 from  yaml formatted file.
 }
