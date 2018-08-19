@@ -299,7 +299,7 @@ ALL_FEATURE_COUNTS          = expand(DEG_DIR + "/{prefix}_{read_counts}_all.tsv"
 #----------------------------------------------------------------#
 
 DIFFEXPR_TOOLS = config["diffexpr"].split()
-DEG_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
+DESEQ2_DEG_LIST = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 DEG_FIGURES = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{prefix}}_{{read_counts}}_{{deg}}_figures.pdf", zip, test=TEST_COND, ref=REFERENCE_COND), deg=DIFFEXPR_TOOLS, prefix=PREFIX, read_counts=COUNTING_TOOLS)
 
 DEG_REPORT = expand(DEG_DIR + "/{prefix}_{read_counts}_rna-seq_deg_report.html", zip, prefix=PREFIX, read_counts=COUNTING_TOOLS)
@@ -343,9 +343,9 @@ rule all:
             ALL_COVERAGE, # Coverage files
             FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
             ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
-            DEG_REPORT, ## Differential analysis report
 #            SARTOOLS_TARGETFILE,
-            DEG_LIST #, # Lists of differentially expressed genes
+#            DESEQ2_DEG_LIST #, # Lists of differentially expressed genes
+            DEG_REPORT ## Differential analysis report
 #            DEG_FIGURES,
 #            DEG,
 #            INFER_TRANSCRIPTS,
