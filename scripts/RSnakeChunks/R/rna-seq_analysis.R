@@ -859,10 +859,12 @@ knitr::opts_chunk$set(
     result.table <- cbind(
       result.table,
       "DESeq2" = deseq2.result$result.table[row.names(result.table),])
+    # names(result.table)
+
 
     result.table.synthetic <- cbind(
       result.table.synthetic,
-      "DESeq2" = deseq2.result$result.table[row.names(result.table),c("padj", "FC")])
+      "DESeq2" = deseq2.result$result.table[row.names(result.table),c("padj", "FC", "log2FC")])
     # names(result.table)
     # names(result.table.synthetic)
     # dim(deseq2.result$result.table)
@@ -903,7 +905,7 @@ knitr::opts_chunk$set(
 
       ## A tricky way to add edgeR with normalisation in column names
       edger.to.bind <- edger.result$result.table[row.names(result.table),]
-      colnames(edger.to.bind) <- paste(sep = "_", edgeR.prefix, colnames(edger.to.bind))
+      colnames(edger.to.bind) <- paste(sep = ".", edgeR.prefix, colnames(edger.to.bind))
       # names(edger.to.bind)
       # View(edger.to.bind)
       result.table <- cbind(
@@ -911,7 +913,7 @@ knitr::opts_chunk$set(
         edger.to.bind)
       # names(result.table)
 
-      colnames.synthetic <- paste(sep = "_", edgeR.prefix, c("padj", "FC"))
+      colnames.synthetic <- paste(sep = ".", edgeR.prefix, c("padj", "FC", "log2FC"))
       result.table.synthetic <- cbind(
         result.table.synthetic,
         edger.to.bind[, colnames.synthetic])
@@ -929,8 +931,9 @@ knitr::opts_chunk$set(
     }
 
     ## ----  Select significant genes by combining DESeq2 and edgeR results ----
-    padj.columns <- grep(colnames(result.table.synthetic), pattern = "padj", value = TRUE)
-    FC.columns <- grep(colnames(result.table.synthetic), pattern = "FC", value = TRUE)
+    padj.columns <- grep(colnames(result.table.synthetic), pattern = "\\.padj", value = TRUE)
+    FC.columns <- grep(colnames(result.table.synthetic), pattern = "\\.FC", value = TRUE)
+#    log2FC.columns <- grep(colnames(result.table.synthetic), pattern = "log2", value = TRUE)
     if (is.null(parameters$DEG$selection_criterion)) {
       parameters$DEG$selection_criterion <- "union"
     }
