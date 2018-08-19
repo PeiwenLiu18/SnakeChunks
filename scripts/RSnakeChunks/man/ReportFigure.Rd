@@ -5,7 +5,7 @@
 \title{generate a figure chunk of R code to insert in an Rmd report}
 \usage{
 ReportFigure(name, figureFile, reportFile, report.text = NULL,
-  out.width = "75\%", chunk.opt = ", eval=TRUE")
+  out.width = "75\%", pdf.link = TRUE, chunk.opt = ", eval=TRUE")
 }
 \arguments{
 \item{name}{name of the chunk}
@@ -14,9 +14,11 @@ ReportFigure(name, figureFile, reportFile, report.text = NULL,
 
 \item{reportFile}{path of the report file. The link will be computed relative to this file}
 
+\item{report.text=NULL}{if specified, the chunk will be appended to it}
+
 \item{out.width="75\%"}{figure width, relative to page width}
 
-\item{report.text=NULL}{if specified, the chunk will be appended to it}
+\item{pdf.link=TRUE}{if TRUE, the chunk is inserted between square brackates followed with a link to the corresponding pdf figure (obtained by substituting the extension)}
 
 \item{chunk_opt=", eval=TRUE"}{a string specifying one or more options to append to the chunk declaration line. Must start with a comma.}
 }

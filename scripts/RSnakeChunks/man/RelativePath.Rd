@@ -20,46 +20,46 @@ compute the path of one file relative to another one
 
 ## From file to file with shared path
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
+  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd",
   target = "RNA-seq/results/diffexpr/a_vs_b/DEG/deg_table.tsv",
   sourceIsDir = FALSE)
 
 ## From file to file without shared path
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
+  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd",
   target = "metadata/sample_descriptions.tsv",
   sourceIsDir = FALSE)
 
 ## From file to file with the source in current dir
 RelativePath(
-  source = "results/myreport.Rmd", 
+  source = "results/myreport.Rmd",
   target = "results/figures/myfigure.png",
   sourceIsDir = FALSE)
-  
+
 ## From file to dir
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
+  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd",
   target = "RNA-seq/results/samples/",
   sourceIsDir = FALSE)
-  
+
 ## From dir to dir: requires to specify sourceIsDIR=TRUE
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports", 
+  source = "RNA-seq/results/diffexpr/reports",
   target = "RNA-seq/results/samples",
   sourceIsDir = TRUE)
-  
+
 ## From file to upper dir
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
+  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd",
   target = "RNA-seq/results/",
   sourceIsDir = FALSE)
-  
+
 ## From file to its own dir
 RelativePath(
-  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd", 
+  source = "RNA-seq/results/diffexpr/reports/myreport.Rmd",
   target = "RNA-seq/results/diffexpr/reports/",
   sourceIsDir = FALSE)
-  
+
 }
 \author{
 Jacques van Helden
