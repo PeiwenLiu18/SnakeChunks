@@ -344,7 +344,7 @@ rule all:
             FEATURE_COUNTS_PER_SAMPLE, ## Counts per feature (gene, transcript), one file per sample
             ALL_FEATURE_COUNTS, ## Counts per feature (gene, transcript, depending on options), one table with all samples
 #            SARTOOLS_TARGETFILE,
-#            DESEQ2_DEG_LIST #, # Lists of differentially expressed genes
+            DESEQ2_DEG_LIST #, # Lists of differentially expressed genes
             DEG_REPORT ## Differential analysis report
 #            DEG_FIGURES,
 #            DEG,
