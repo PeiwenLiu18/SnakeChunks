@@ -21,6 +21,7 @@ opt <- list(
   rsnakechunks_dir = "SnakeChunks/scripts/RSnakeChunks",
   output_dir  = "RNA-seq/results/diffexpr/",
   rmd_report  = "RNA-seq/results/diffexpr/cutadapt_bwa_featureCounts_rna-seq_deg_report.Rmd",
+  prefix = "cutadapt_bwa_featureCounts_",
   verbose = 1
 )
 
@@ -54,4 +55,6 @@ RNAseqAnalysis(
   main.dir = opt$main_dir,
   result.dir = opt$output_dir,
   rmd.report = opt$rmd_report,
+  prefix = opt$prefix,
   verbose = opt$verbose)
+

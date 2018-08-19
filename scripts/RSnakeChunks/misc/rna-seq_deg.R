@@ -24,7 +24,8 @@ if (!exists("opt")) {
     'output_dir', 'o', 1, "character",
     'snakechunks_dir', 's', 1, 'character',
     'rsnakechunks_dir', 'r', 1, 'character',
-    'rmd_report', 'x', 1, 'character'
+    'prefix', 'x', 1, 'character',
+    'rmd_report', 'y', 1, 'character'
   ), byrow = TRUE, ncol = 4)
   opt = getopt(spec)
 }
@@ -67,6 +68,12 @@ if (is.null(opt$rmd_report) ) {
   opt$rmd_report = "rnaseq_deg_report.Rmd"
 }
 
+## Optional prefix for the output files
+if (is.null(opt$prefix) ) {
+  message("prefix not defined, using none")
+  opt$prefix = ""
+}
+
 ## Result directory
 if (is.null(opt$output_dir)) {
   opt$output_dir <- "results"
@@ -100,6 +107,7 @@ RNAseqAnalysis(
   configFile = opt$config_file,
   main.dir = opt$main_dir,
   result.dir = opt$output_dir,
+  prefix = opt$prefix,
   rmd.report = opt$rmd_report,
   verbose = opt$verbose)
 

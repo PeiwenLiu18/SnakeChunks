@@ -15,6 +15,7 @@
 #' @param configFile a yaml-formatted file defining the mandatory + some optional parameteres
 #' @param main.dir=getwd()  directory from which the script runs. Paths are defined relative to this directory.
 #' @param result.dir="results" directory where the results will be stored. Should be defined relative to main directory.
+#' @param prefix="" optional prefix to appent to output files
 #' @param rmd.report="rnaseq_deg.Rmd" path to the R markdown report, which is also converted to html and pdf reports
 #' @param verbose=1 level of verbosity
 #'
@@ -24,6 +25,7 @@ RNAseqAnalysis <- function(countFile,
                            checkSampleIDs=TRUE,
                            main.dir = getwd(),
                            result.dir = "results",
+                           prefix = "",
                            rmd.report = "rnaseq_deg.Rmd",
                            verbose = 1) {
 
@@ -120,7 +122,7 @@ RNAseqAnalysis <- function(countFile,
 
 
   ## ---- Load RNA-seq data, metadata and configuration ----
-  dataset <- LoadRNAseqDataset(countFile, configFile, verbose = verbose)
+  dataset <- LoadRNAseqDataset(countFile = countFile, configFile = configFile, verbose = verbose)
   parameters <- dataset$parameters
 
   ## Make the dataset fields available as variables (to avoid prepending "dataset" everywhere)
@@ -206,7 +208,7 @@ RNAseqAnalysis <- function(countFile,
   dir.create(dir.report, showWarnings = FALSE, recursive = TRUE)
 
   report.prefix <- sub(pattern = ".Rmd", replacement = "", x = rmd.report, ignore.case = TRUE)
-  
+
   report.socket <- file(rmd.report)
 
 
@@ -634,10 +636,13 @@ knitr::opts_chunk$set(
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        main = "Raw counts", ylab = "Genes",
                        col = "#FFEEDD", border = "#AA8877")
+    rm(h1)
     h2 <- HistOfCounts(counts = filteredCounts, maxPercentile = 95, discardZeroRows = FALSE,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        main = "Filtered counts", ylab = "Genes",
                        col = "#DDEEFF", border = "#7788AA")
+    rm(h2)
+
     ## log2(raw counts) histograme
     h3 <- HistOfCounts(counts = rawCounts.log2,
                        maxPercentile = 100, discardZeroRows = FALSE,
@@ -645,6 +650,7 @@ knitr::opts_chunk$set(
                        col = "#FFEEDD", border = "#AA8877",
                        xlab = "log2(counts)",
                        main = "Yeast Bdf1 vs WT\nRaw counts (log2)", ylab = "Genes")
+    rm(h3)
 
     ## log2(filtered counts) histogram
     h4 <- HistOfCounts(counts = filteredCounts.log2, maxPercentile = 100,
@@ -652,6 +658,7 @@ knitr::opts_chunk$set(
                        col = "#DDEEFF", border = "#7788AA",
                        xlab = "log2(counts)",
                        main = "Yeast Bdf1 vs WT\nfiltered counts (log2)", ylab = "Genes")
+    rm(h4)
 
     par(mfrow = c(1,1))
     par(par.ori)
@@ -753,7 +760,7 @@ knitr::opts_chunk$set(
   for (i in 1:nrow(design)) {
 
 
-    prefix <- list() ## list for output file prefixes
+    #prefix <- list() ## list for output file prefixes
 
     deg.results <- list()
 
@@ -772,9 +779,9 @@ knitr::opts_chunk$set(
     }
 
 
-    report.text <- append(report.text, paste(sep= "", "\n\n### ", test.condition, " versus ", ref.condition, "\n\n"))
-#    report.text <- append(report.text, paste(sep= "", "Test condition : ",  test.condition, "\n"))
-#    report.text <- append(report.text, paste(sep= "", "Reference condition :",  ref.condition, "\n"))
+    report.text <- append(report.text, paste(sep = "", "\n\n### ", test.condition, " versus ", ref.condition, "\n\n"))
+#    report.text <- append(report.text, paste(sep = "", "Test condition : ",  test.condition, "\n"))
+#    report.text <- append(report.text, paste(sep = "", "Reference condition :",  ref.condition, "\n"))
     compa.table <- data.frame(
       type = c("Reference", "Test"),
       condition = c(ref.condition, test.condition),
@@ -792,7 +799,7 @@ knitr::opts_chunk$set(
     dirs[comparison.prefix] <- dir.results.diffexpr ## Index current result dir for the list of directories
     comparison.summary[i, "result.dir"] <- dir.results.diffexpr ## Include current result dir to the comparison summary table
     dir.create(path = file.path(dirs["main"], dir.results.diffexpr), showWarnings = FALSE, recursive = TRUE)
-    prefix["comparison_file"] <- file.path(dir.results.diffexpr, comparison.prefix)
+    comparison.file.prefix <- file.path(dir.results.diffexpr, paste(sep = "", prefix, comparison.prefix))
     message("\t\tDifferential expression results:\t", dir.results.diffexpr)
 
     ## Create a specific directory for the figures of this comparison
@@ -800,10 +807,8 @@ knitr::opts_chunk$set(
     dirs[paste(sep = "_", comparison.prefix, "figures")] <- dir.figures.diffexpr ## Index current figures dir for the list of directories
     comparison.summary[i, "figures"] <- dir.figures.diffexpr ## Include current figures dir to the comparison summary table
     dir.create(path = file.path(dirs["main"], dir.figures.diffexpr), showWarnings = FALSE, recursive = TRUE)
-    prefix["comparison_figure"] <- file.path(dir.figures.diffexpr, comparison.prefix)
+#    comparison.figure.prefix <- file.path(dir.figures.diffexpr, paste(sep = "", prefix, comparison.prefix))
     message("\t\tfigures:\t", dir.figures.diffexpr)
-    #    paste(sep = "", comparison.prefix, "_",  suffix.deg))
-
 
     ## Select counts for the samples belonging to the two conditions
     current.samples <- c(ref.samples, test.samples)
@@ -817,7 +822,7 @@ knitr::opts_chunk$set(
 
     ## Define conditions and labels for the samples of the current analysis
     current.conditions <- sample.conditions[current.samples]
-    current.labels <- paste(current.conditions, names(current.counts), sep = "_")
+#    current.labels <- paste(current.conditions, names(current.counts), sep = "_")
 
     ## A big result table with all features and all statistics
     result.table <- init.deg.table(scaledCounts, ref.samples, test.samples, stats = FALSE)
@@ -868,7 +873,7 @@ knitr::opts_chunk$set(
 
 
     ## Save the completed DESeq2 result table
-    deseq2.result.file <- paste(sep = "", prefix["comparison_file"], "_DESeq2.tsv")
+    deseq2.result.file <- paste(sep = "", comparison.file.prefix, "_DESeq2.tsv")
     comparison.summary[i,"deseq2"] <- deseq2.result.file
     message("\tExporting DESeq2 result table (tab): ", deseq2.result.file)
     outfiles[paste(sep = "_", comparison.prefix, "DESeq2")]  <- deseq2.result.file
@@ -913,10 +918,10 @@ knitr::opts_chunk$set(
       # names(edger.to.bind)
 
       ## Export edgeR result table
-      edger.result.file <- paste(sep = "", prefix["comparison_file"], "_", edgeR.prefix, ".tsv")
+      edger.result.file <- paste(sep = "", comparison.file.prefix, "_", edgeR.prefix, ".tsv")
       comparison.summary[i,"edger"] <- edger.result.file
       message("\tExporting edgeR result table (tab): ", edger.result.file)
-      outfiles[paste(sep="_", comparison.prefix, edgeR.prefix)] <- edger.result.file
+      outfiles[paste(sep = "_", comparison.prefix, edgeR.prefix)] <- edger.result.file
       write.table(x = edger.result$result.table,
                   file = edger.result.file,
                   row.names = FALSE,
@@ -964,9 +969,7 @@ knitr::opts_chunk$set(
 
     ## Export full result table (DESeq2 + edgeR with different normalisation methods)
     ## in a tab-separated values (tsv) file
-    result.file <- paste(sep = "",
-                         prefix["comparison_file"],
-                         "_diffexpr_DESeq2_and_edgeR.tsv")
+    result.file <- paste(sep = "", comparison.file.prefix, "_all_genes.tsv")
     # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
     message("\tExporting result table (tsv): ", result.file)
     outfiles[paste(sep = "", comparison.prefix, "_complete_result_table")] <- result.file
@@ -974,14 +977,20 @@ knitr::opts_chunk$set(
                 file = result.file, sep = "\t", quote = FALSE)
 
     ## Export synthetic table with positive features, and only the most relevant stats
-    deg.file <- paste(sep = "",
-                         prefix["comparison_file"],
-                         "_diffexpr_DESeq2_and_edgeR_DEG.tsv")
+    deg.table <- paste(sep = "", comparison.file.prefix, "_DEG_table.tsv")
     # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
-    message("\tExporting table of differentially expressed genes (tsv): ", deg.file)
-    outfiles[paste(sep = "", comparison.prefix, "_synthetic_result_table")] <- deg.file
+    message("\tExporting table of differentially expressed genes (tsv): ", deg.table)
+    outfiles[paste(sep = "", comparison.prefix, "_DEG_table")] <- deg.table
     write.table(x = result.table.synthetic, row.names = FALSE,
-                file = deg.file, sep = "\t", quote = FALSE)
+                file = deg.table, sep = "\t", quote = FALSE)
+
+    ## Export names of differentially expressed genes in a text file (one row per gene)
+    deg.list.file <- paste(sep = "", comparison.file.prefix, "_DEG_list.txt")
+    # comparison.summary[i,"result.table"] <- paste(sep=".", result.file, "tsv")
+    message("\tExporting table of differentially expressed genes (tsv): ", deg.list.file)
+    outfiles[paste(sep = "", comparison.prefix, "_DEG_list")] <- deg.list.file
+    write.table(x = row.names(result.table.synthetic), row.names = FALSE, col.names = FALSE,
+                file = deg.list.file, sep = "\t", quote = FALSE)
 
 
 
