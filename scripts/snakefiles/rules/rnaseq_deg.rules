@@ -34,9 +34,17 @@ rule rnaseq_deg:
         count_file = "{diffexpr_dir}/{preprocess,.*}all.tsv",
         config_file = config["metadata"]["configfile"]
     output: 
-        html_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.html"
+#        html_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.html",
+#        gene_table = "{diffexpr_dir}/{preprocess,.*}{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_all_genes.tsv",
+#        deg_table = "{diffexpr_dir}/{preprocess,.*}{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_DEG_table.tsv",
+        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/{preprocess,.*}{test}_vs_{ref}_DEG_list.txt"
+#        deg_table = "{diffexpr_dir}/{test}_vs_{ref}/{test}_vs_{ref}_{preprocess,.*}DEG.tsv"
+#        gene_list = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_list.txt",
+#        gene_pval = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_gene_pval.tsv",
+#        pdf_file = "{diffexpr_dir}/{test}_vs_{ref}/DESeq2/{test}_vs_{ref}_{preprocess,.*}DESeq2_figures.pdf"
     params:
         rmd_report = "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_report.Rmd",
+        prefix = "{preprocess,.*}",
         rsnakechunks_dir = "SnakeChunks/scripts/RSnakeChunks",
         rscript = "SnakeChunks/scripts/RSnakeChunks/misc/rna-seq_deg.R",
         outdir = "{diffexpr_dir}/",
@@ -48,6 +56,6 @@ rule rnaseq_deg:
     benchmark: "{diffexpr_dir}/{preprocess,.*}rna-seq_deg_benchmark.txt"
     conda: "../envs/rnaseq_deg.yaml"
     shell: """
-Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.count_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {params.rmd_report} &> {log} 
+Rscript --vanilla  {params.rscript} -v 1 --config_file={input.config_file} --count_table={input.count_file} --output_dir={params.outdir} --rsnakechunks_dir={params.rsnakechunks_dir} --report {params.rmd_report} --prefix {params.prefix} &> {log} 
 """
 
