@@ -22,4 +22,5 @@ dependencies:
   - r-codetools=0.2_15
 #  - pandoc=2.2.2
 #  - r-tinytex=0.6
+  - psutil=5.4.6
 ...

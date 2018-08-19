@@ -135,7 +135,6 @@ rule gene_comparison:
         TF = TF,
         verbose = 1
     output:
-        #"boum"
         venn = VENN,
         gene_table = TABLE,
         chip_genes_gff = GFF_CHIP,
@@ -162,7 +161,6 @@ Rscript {params.rscript} \
 	--rna_genes_gff={output.rna_genes_gff} \
  	--regulon_genes_gff={output.regulon_genes_gff}
  &> {log} 
-#echo "HELLO"; ls -ltr > boum \
 """
 
 #    script:
