@@ -4,9 +4,13 @@ channels:
   - conda-forge
 dependencies:
   - pcre
-  - cairo=1.14.10
-  - r-venndiagram=1.6.18
-#  - r-venndiagram=1.6.16
+  - cairo=1.14.12
+#  - cairo=1.14.10
   - r-getopt=1.20.2
-  - r-argparse=1.1.1
+#  - r-argparse=1.1.1
+  - r-argparse
+## Note : I had to suppress versions to avoid conflicts between dependencies
+#  - r-venndiagram=1.6.16
+#  - r-venndiagram=1.6.18
+  - r-venndiagram
 ...
