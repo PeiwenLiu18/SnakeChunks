@@ -5,7 +5,7 @@
 \title{Normalisation and differential analysis of an RNA-seq count table}
 \usage{
 RNAseqAnalysis(countFile, configFile, checkSampleIDs = TRUE,
-  main.dir = getwd(), result.dir = "results",
+  main.dir = getwd(), result.dir = "results", prefix = "",
   rmd.report = "rnaseq_deg.Rmd", verbose = 1)
 }
 \arguments{
@@ -16,6 +16,8 @@ RNAseqAnalysis(countFile, configFile, checkSampleIDs = TRUE,
 \item{main.dir=getwd()}{directory from which the script runs. Paths are defined relative to this directory.}
 
 \item{result.dir="results"}{directory where the results will be stored. Should be defined relative to main directory.}
+
+\item{prefix=""}{optional prefix to appent to output files}
 
 \item{rmd.report="rnaseq_deg.Rmd"}{path to the R markdown report, which is also converted to html and pdf reports}
 
