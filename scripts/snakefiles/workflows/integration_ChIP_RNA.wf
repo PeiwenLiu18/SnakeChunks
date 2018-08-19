@@ -164,8 +164,7 @@ Rscript {params.rscript} \
 	--gene_table={output.gene_table} \
 	--chip_genes_gff={output.chip_genes_gff} \
 	--rna_genes_gff={output.rna_genes_gff} \
- 	--regulon_genes_gff={output.regulon_genes_gff}
- &> {log} 
+ 	--regulon_genes_gff={output.regulon_genes_gff} &> {log} 
 """
 
 #    script:
