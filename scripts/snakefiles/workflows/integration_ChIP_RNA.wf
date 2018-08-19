@@ -129,6 +129,7 @@ rule gene_comparison:
         regulondb_sites = REGULON_DIR + "/BindingSiteSet.txt",
         regulondb_gene_product = REGULON_DIR + "/GeneProductSet.txt"       
     params:
+        rscript = "SnakeChunks/scripts/RSnakeChunks/misc/gene_lists_comparison.R",
         outdir = INTEGRATION_DIR,
         image_format = venn_format,
         TF = TF,
@@ -144,7 +145,7 @@ rule gene_comparison:
     benchmark: INTEGRATION_DIR + "/" + outdir_prefix + "_benchmark.txt"
     conda: "../envs/venn.yaml"
     shell: """
-Rscript ../..//RSnakeChunks/misc/gene_lists_comparison.R \
+Rscript {params.rscript} \
 	--chip_genes={input.chip_genes} \
 	--rna_genes={input.rna_genes} \
 	--gene_descriptions={input.regulondb_gene_product} \
