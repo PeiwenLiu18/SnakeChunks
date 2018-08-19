@@ -122,14 +122,18 @@ rule all:
         GFF_REGULON
 
 
+## Genes reported as differentially expressed by  DESeq2.rules
+DESEQ2_DEG_LIST=expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{trimming}}_{{mapping_rna}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts)
 
-
+## Genes reported as differentially expressed by  rnaseq_deg.rules, which combies DESeq2 and edgeR
+DEG_LIST=expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{trimming}}_{{mapping_rna}}_{{read_counts}}_{test}_vs_{ref}_DEG_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts)
 
 
 rule genelists_vs_regulondb:
     input:
         chip_genes = expand(expand(PEAKS_DIR + "/{treat}_vs_{control}/{{peakcaller}}/{treat}_vs_{control}_{{trimming}}_{{mapping_chip}}_{{peakcaller}}_gene_list.txt", zip, treat=chip_treatment, control=chip_control), peakcaller=peakcalling, trimming=trimming, mapping_chip=mapping_chip),
-        rna_genes = expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{trimming}}_{{mapping_rna}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts),
+        rna_genes = DEG_LIST,
+#        rna_genes = DESEQ2_DEG_LIST,
         regulondb_tus = REGULON_DIR + "/TUSet.txt",
         regulondb_sites = REGULON_DIR + "/BindingSiteSet.txt",
         regulondb_gene_product = REGULON_DIR + "/GeneProductSet.txt"       
