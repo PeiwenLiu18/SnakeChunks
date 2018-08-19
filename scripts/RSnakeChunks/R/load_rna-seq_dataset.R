@@ -1,22 +1,22 @@
 #' @title Load RNA-seq data, metadata and parameters
 #' @author Jacques van Helden
-#' @description Load an RNA-seq dataset (i.e. a table with raw counts per feature), 
+#' @description Load an RNA-seq dataset (i.e. a table with raw counts per feature),
 #' together with sample descriptions, design for differential expression, and parameters
-#' from  yaml formatted file. 
-#' @param countFile a tab-separated-value file containing the counts of reads for each feature (row) in each sample (column). 
-#' @param configFile a yaml-formatted file containing the parameters, including the path to metadata files (sample description table, design table). 
-#' @param checkSampleIDs=TRUE check that the sample IDS are equal in the row names of the 
-#' sample description table and the column names (header) of the count table. If "FALSE", row names of 
-#' the sample description fable are taken a sample IDs and imposed as column headers for the count table.  
-#' @param reorderSamples=NULL criterion to ensure consistency of sample order between count table and sample description. 
-#' Supported values:  
+#' from  yaml formatted file.
+#' @param countFile a tab-separated-value file containing the counts of reads for each feature (row) in each sample (column).
+#' @param configFile a yaml-formatted file containing the parameters, including the path to metadata files (sample description table, design table).
+#' @param checkSampleIDs=TRUE check that the sample IDS are equal in the row names of the
+#' sample description table and the column names (header) of the count table. If "FALSE", row names of
+#' the sample description fable are taken a sample IDs and imposed as column headers for the count table.
+#' @param reorderSamples=NULL criterion to ensure consistency of sample order between count table and sample description.
+#' Supported values:
 #' \itemize{
-#' \item NULL (no reordering is applied), 
+#' \item NULL (no reordering is applied),
 #' \item counts (reorder columns of the  count table to match the rows sample description table),
 #' \item sample_desc (reorder rows of sample description fable to match columns of the count table).
 #' }
 #' @param verbose=1 level or verbosity
-#' 
+#'
 #' @return a list with all the required data for further analysis
 #' \itemize{
 #' \item rawCounts the count table (data.frame) with one row per feature and one column per sample
@@ -26,29 +26,29 @@
 #' \item parameters a list with the parameters read from the yaml-formatted configuration file
 #' }
 #' @export
-LoadRNAseqDataset <- function(countFile, 
+LoadRNAseqDataset <- function(countFile,
                               configFile,
                               checkSampleIDs = TRUE,
                               reorderSamples = NULL,
                               verbose = 1) {
-  
-  
-  
+
+
+
   ## ---- Load count table ----
   if (!file.exists(countFile)) {
     stop("Count table does not exist: ", countFile)
   }
   if (verbose >= 1) { message("\tLoading count table: ", countFile) }
   ori.counts <- read.delim(countFile, header = TRUE, row.names = 1, sep = "\t", comment.char = '#')
-  if (verbose >= 1) { message("\t\tRaw count table dimensions: ", 
-                              nrow(ori.counts), " rows (features) x ", 
+  if (verbose >= 1) { message("\t\tRaw count table dimensions: ",
+                              nrow(ori.counts), " rows (features) x ",
                               ncol(ori.counts), " columns (samples). ") }
   if (verbose >= 2) { message("Sample IDs in count table\t", paste(collapse = ", ", colnames(ori.counts))) }
-  
+
   # dim(ori.counts)
   count.table.colnames.ori <- colnames(ori.counts) ## keep a trace
-  
-  
+
+
   ## Filter out the rows corresponding to non-assigned counts,
   ## e.g. __not_aligned, __ambiguous, __too_low_qAual, __not_aligned
   not.feature <- grep(rownames(ori.counts), pattern = "^__", value = FALSE)
@@ -59,11 +59,11 @@ LoadRNAseqDataset <- function(countFile,
     rawCounts <- ori.counts
   }
   # dim(rawCounts)
-  
+
   message("\t\tLoaded raw counts: ",
           nrow(rawCounts), " features x ",
           ncol(rawCounts), " samples")
-  
+
   ## ---- Load configuration file (YAML-formatted) ----
   if (!exists("configFile")) {
     ## The prompt does not seem to work with the Rmd documents
@@ -73,11 +73,11 @@ LoadRNAseqDataset <- function(countFile,
   }
   if (verbose >= 1) { message("\tLoading configuration file: ", configFile) }
   parameters <- yaml.load_file(configFile)
-  
-  
+
+
   ## --- Check parameters ----
-  
-  
+
+
   ## Check sample IDs (if specified, overwrites the argumment passed in the function call)
   if (!is.null(parameters$DEG$check_sample_ids)) {
     checkSampleIDs <- parameters$DEG$check_sample_ids
@@ -91,54 +91,54 @@ LoadRNAseqDataset <- function(countFile,
   } else {
     parameters$DEG$reorder_samples <- reorderSamples
   }
-  
-  
+
+
   ## Sample description file
   if (is.null(parameters$metadata$samples)) {
     stop("The sample file must be defined in the metadata seection of the yaml config file: ", configFile)
-  } 
-  
+  }
+
   ## Design file
   if (is.null(parameters$metadata$design)) {
     stop("The design file must be defined in the metadata seection of the yaml config file: ", configFile)
-  } 
-  
-  
+  }
+
+
   ## A trick: to enable log-scaled plots for 0 values, I add an epsilon increment
   if (is.null(parameters$DEG$epsilon)) {
     parameters$DEG$epsilon <- 0.1 # passed to file parameters.R, 2017-03-15
   }
-  
+
   ## Figures in different format
   if (is.null(parameters$figure_formats)) {
     parameters$figure_formats <- c("png", "pdf")
-  }  
-  
+  }
+
   ## Output width parameter for figures in the Rmd report
   if (is.null(parameters$DEG$out_width)) {
     parameters$DEG$out_width <- "75%" # passed to file parameters.R, 2017-03-15
   }
-  
+
   ## Default method for the selection of the final list of DEG
   ## Since DESeq2 seems more conservative, we use it by default
   if (is.null(parameters$DEG$selection_criterion)) {
     parameters$DEG$selection_criterion <- "DESeq2"
   }
   # DEG.selection.criterion <- parameters$DEG$selection_criterion
-  
-  
-  
+
+
+
   ## ---- Normalisation methods ----
   if (is.null(parameters$DEG$norm_method)) {
     parameters$DEG$norm_method <- c("DESeq2", "TMM")
   }
-  
+
   ## Normalisation method(s) for edgeR differential analysis.
   edgeR.supported.norm.methods <- c("TMM", "RLE", "upperquartile", "none")
   if (is.null(parameters$edgeR$norm_method)) {
     # If not defined in config file, use the norm methods specified in the arguments that are supporte by edgeR
     parameters$edgeR$norm_method <- intersect(norm.methods, edgeR.supported.norm.methods)
-  } 
+  }
   ## Take edgeR normalisation methods from config file
   edgeR.norm.methods <- parameters$edgeR$norm_method
   ## Check that edgeR norm methods provided in config files are all supported by edgeR
@@ -153,11 +153,11 @@ LoadRNAseqDataset <- function(countFile,
   if (is.null(parameters$DEG$norm_percentile)) {
     parameters$DEG$norm_percentile <- 0.75
   }
-  
+
   ## Convert our percentile parameter into edgeR p parameter
   ## (comprized between 0 and 1, which is actually a quantile rather than a percentile).
   parameters$edgeR$norm.p <- parameters$DEG$norm_percentile/100
-  
+
   ## ---- DEG selection thresholds ----
   if (is.null(parameters$DEG$thresholds)) {
     message("\tDEG thresholds were not defined in config file -> using default values")
@@ -185,10 +185,10 @@ LoadRNAseqDataset <- function(countFile,
   if (is.null(parameters$author_email)) {
     parameters$author_email <- "[AUTHOR_EMAIL] "
   }
-  
-  
+
+
   ## ---- Load sample description table ----
-  
+
   ## Read the sample description file, which indicates the
   ## condition associated to each sample ID.
   if (!file.exists(parameters$metadata$samples)) {
@@ -199,21 +199,23 @@ LoadRNAseqDataset <- function(countFile,
     file = parameters$metadata$samples,
     sep = "\t",
     comment = ";", header = TRUE, row.names = 1)
-  
+
   ## Compare sample IDs betweeb count table and sample ID file
   sample.desc.rownames.ori <- rownames(sample.desc)
-  
+
   if (sum(sample.desc.rownames.ori != count.table.colnames.ori) > 0) {
     message("BEWARE! Column names of the count table differ from the IDs from sample description tables. ")
-    
+    message(paste(collapse = "\n\t\t", c("\tCount table", count.table.colnames.ori)))
+    message(paste(collapse = "\n\t\t", c("\tSample description table", sample.desc.rownames.ori)))
+
     if (checkSampleIDs) {
-      
+
       ## Detect samples with no corresponding column in count header line
       no.counts <- setdiff(x = sample.desc.rownames.ori, y = count.table.colnames.ori)
       if (length(no.counts) > 0) {
         stop("Samples absent from count table\t", paste(collapse = ", ", no.counts))
       }
-      
+
       ## Detect columns of the count table with no entry in the sample description file
       no.descriptions <- setdiff(x = count.table.colnames.ori, y = sample.desc.rownames.ori)
       if (length(no.descriptions) > 0) {
@@ -224,7 +226,7 @@ LoadRNAseqDataset <- function(countFile,
       colnames(rawCounts) <- sample.desc.rownames.ori
     }
   }
-  
+
   ## Check that the order of samples is the same in the count table (columns) and sample descriptions (rows)
   if (sum(colnames(rawCounts) != rownames(sample.desc)) > 0) {
     if (is.null(reorderSamples)) {
@@ -239,13 +241,13 @@ LoadRNAseqDataset <- function(countFile,
       stop(reorderSamples, " is not a valid parameter for reorderSamples. Supported:NULL, counts, samples. ")
     }
   }
-    
+
   sample.ids <- row.names(sample.desc)
   message("\t\tNb of samples = ", length(sample.ids))
-  
-  
+
+
   ## ---- Extract conditions from the sample table
-  
+
   ## Identify if the sample description file contains a column with heading "condition"(case-insensitive)
   condition.column <- grep(pattern = "condition",
                            x = colnames(sample.desc),
@@ -258,24 +260,24 @@ LoadRNAseqDataset <- function(countFile,
   message("\t\tSample conditions in column ", condition.column, " of sample description table. ")
   sample.conditions <- as.vector(sample.desc[,condition.column]) ## Condition associated to each sample
   names(sample.conditions) <- sample.ids
-  
+
   ## Unique conditions
   conditions <- unique(sample.conditions) ## Set of distinct conditions
   message("\t\tNb of conditions = ", length(conditions))
   message("\t\tConditions = ", paste(collapse = ", ", conditions))
-  
+
   ## Create a table with attributes per condition
   condition.table <- data.frame(
     row.names = conditions,
     color = brewer.pal(max(3, length(conditions)),"Dark2")[1:length(conditions)]
   )
-  
+
   ## Define sample colors according to their condition
   color.per.condition <- condition.table$color
   names(color.per.condition) <- row.names(condition.table)
   sample.desc$color <- color.per.condition[sample.conditions]
   # print(sample.conditions)
-  
+
   ## ---- Build sample labels by concatenating their ID and condition ----
   labeL.column <- which(tolower(colnames(sample.desc)) == "label")
   #    grep(pattern = "label", x = colnames(sample.desc), ignore.case = TRUE)
@@ -294,13 +296,13 @@ LoadRNAseqDataset <- function(countFile,
     sample.desc$Label <- sample.labels
   }
   # print(sample.labels)
-  
+
   # ## Use sample labels as headers for count table
   # message("\t\tUsing sample labels as column headers for count table")
   # colnames(rawCounts) <- as.vector(sample.desc[colnames(rawCounts), "Label"])
 
   ## ---- Read design table ----
-  
+
   ## Read the design table, which indicates the anlayses to be done.
   ## Each row specifies one differential expression analysis, which
   ## consists in comparing two conditions.
@@ -309,7 +311,7 @@ LoadRNAseqDataset <- function(countFile,
                        comment = c(";"), header = T, row.names = NULL)
   message("\t\tDesign file contains ", nrow(design), " comparisons. ")
   comparison.summary <- design ## Initialize a summary table for each DEG analysis
-  
+
   ## Identify reference column in the design file
   if ("reference" %in% (tolower(colnames(design)))) {
     reference.column <- which(tolower(colnames(design)) == "reference")
@@ -320,7 +322,7 @@ LoadRNAseqDataset <- function(countFile,
     message("The headers of the design table do not contain 'reference' column -> taking 1st column as reference")
     reference.column <- 1
   }
-  
+
   ## Identify test column in the design file
   if ("test" %in% (tolower(colnames(design)))) {
     test.column <- which(tolower(colnames(design)) == "test")
@@ -332,10 +334,10 @@ LoadRNAseqDataset <- function(countFile,
     test.column <- 2
   }
 
-  comparison.summary$prefixes <- paste(sep = "_", design[,test.column], "vs", design[,reference.column])
-  
+  comparison.summary$prefixes <- paste(sep = "", design[,test.column], "_vs_", design[,reference.column])
+
   ##---- Feature filtering ----
-  
+
   ## Load list of black-listed features
   if ((is.null(parameters$DEG$blacklist)) || (parameters$DEG$blacklist == "")) {
     black.listed.features <- NULL
@@ -356,7 +358,7 @@ LoadRNAseqDataset <- function(countFile,
       message("Discarding ", length(black.listed.features), " black-listed features\t", parameters$DEG$blacklist)
     }
   }
-  
+
   ## ---- Filter out features according to various user-specified criteria ----
   ## (parameters defined in the config files
   filteredCounts <- FilterCountTable(
@@ -370,52 +372,52 @@ LoadRNAseqDataset <- function(countFile,
     verbose = verbose)
   ## dim(filteredCounts)
   ## sum(filteredCounts == 0)
-  
+
   ##---- Log-transform filtered (non-normalized) counts ----
-  
+
   ## Add an epsilon to 0 values only, in order to enable log-transform and display on logarithmic axes.
   message("\t\tTreating zero-values by adding epsilon = ", parameters$DEG$epsilon)
   filteredCounts.epsilon <- filteredCounts
   filteredCounts.epsilon[filteredCounts == 0] <- parameters$DEG$epsilon
-  
+
   # ## Log-transformed data for some plots.
   # message("\t\tComputing log-transformed values")
   filteredCounts.log2 <- log2(filteredCounts.epsilon)
-  
-  
-  
+
+
+
   ## Build the result object
   result <- list()
-  
+
   ## Raw counts
   result$rawCounts <- rawCounts
   result$count.table.colnames.ori <- count.table.colnames.ori
-  
+
   ## Parameters
   result$parameters <- parameters
-  
+
   ## Sample descriptions
   result$sample.desc <- sample.desc
   result$sample.desc.rownames.ori <- sample.desc.rownames.ori
   result$sample.ids <- sample.ids
   result$sample.labels <- sample.labels
-  
+
   ## Conditions
   result$conditions <- conditions
   result$condition.table <- condition.table
   result$sample.conditions <- sample.conditions
-  
+
   ## Design for differential analysis
   result$design <- design
   result$comparison.summary <- comparison.summary
   result$reference.column <- reference.column
   result$test.column <- test.column
-  
+
   ## Filtered counts
   result$black.listed.features <- black.listed.features
   result$filteredCounts <- filteredCounts
   result$filteredCounts.epsilon <- filteredCounts.epsilon
   result$filteredCounts.log2 <- filteredCounts.log2
-  
+
   return(result)
 }
