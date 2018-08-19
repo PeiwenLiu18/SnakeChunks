@@ -133,7 +133,8 @@ rule gene_comparison:
         image_format = venn_format,
         TF = TF,
         verbose = 1
-    output: 
+    output:
+        #"boum"
         venn = VENN,
         gene_table = TABLE,
         chip_genes_gff = GFF_CHIP,
@@ -142,25 +143,25 @@ rule gene_comparison:
     log: INTEGRATION_DIR + "/" + outdir_prefix + ".log"
     benchmark: INTEGRATION_DIR + "/" + outdir_prefix + "_benchmark.txt"
     conda: "../envs/venn.yaml"
-    conda: "../envs/rnaseq_deg.yaml"
     shell: """
 Rscript ../..//RSnakeChunks/misc/gene_lists_comparison.R \
 	--chip_genes={input.chip_genes} \
 	--rna_genes={input.rna_genes} \
 	--gene_descriptions={input.regulondb_gene_product} \
 	--TUs={input.regulondb_tus} \
-	--BS={input/regulondb.sites} \
+	--BS={input.regulondb_sites} \
 	--TFs={input.regulondb_gene_product} \
 	--myTF={params.TF} \
 	--venn.format={params.image_format} \
 	--verbose={params.verbose} \
 	--outdir={params.outdir} \
-	--venn={output.VENN} \
+	--venn={output.venn} \
 	--gene_table={output.gene_table} \
 	--chip_genes_gff={output.chip_genes_gff} \
 	--rna_genes_gff={output.rna_genes_gff} \
-	--regulon_genes_gff={output.regulon_genes_gff}
+ 	--regulon_genes_gff={output.regulon_genes_gff}
  &> {log} 
+#echo "HELLO"; ls -ltr > boum \
 """
 
 #    script:
