@@ -125,7 +125,8 @@ rule all:
 ## Genes reported as differentially expressed by  DESeq2.rules
 DESEQ2_DEG_LIST=expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{trimming}}_{{mapping_rna}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts)
 
-## Genes reported as differentially expressed by  rnaseq_deg.rules, which combies DESeq2 and edgeR
+## Genes reported as differentially expressed by  rnaseq_deg.rules, which combines DESeq2 and edgeR
+## 
 DEG_LIST=expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{trimming}}_{{mapping_rna}}_{{read_counts}}_{test}_vs_{ref}_DEG_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts)
 
 
