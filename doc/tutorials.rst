@@ -118,7 +118,7 @@ You should then be able to run the following command:
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/import_from_sra.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml --use-conda
 
 .. figure:: ../img/import_from_sra_rulegraph.png
    :alt: 
@@ -141,7 +141,7 @@ Workflow execution
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/quality_control.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml --use-conda
 
 .. figure:: ../img/quality_control_rulegraph.png
    :alt: 
@@ -164,7 +164,7 @@ Workflow execution
 ::
 
     cd ${ANALYSIS_DIR}
-    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq_peak-calling.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml
+    snakemake -s SnakeChunks/scripts/snakefiles/workflows/ChIP-seq_peak-calling.wf -p --configfile SnakeChunks/examples/ChIP-seq_SE_GSE20870/config.yml --use-conda
 
 .. figure:: ../img/ChIP-seq_rulegraph.png
    :alt: 
