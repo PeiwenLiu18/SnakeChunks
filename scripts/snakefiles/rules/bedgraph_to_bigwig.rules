@@ -15,4 +15,4 @@ rule bedgraph_to_bigwig:
     log:  "{coverage}_bedGraphToBigWig.log"
     benchmark:  "{coverage}_bedGraphToBigWig.txt"
     params: qsub = config["qsub"] + " -e {coverage}_bedGraphToBigWig_qsub.err -o {coverage}_bedGraphToBigWig_qsub.out"
-    shell: "bedGraphToBigWig {input.bedgrap} {input.chromsizes} {output} 2> {log}"
+    shell: "bedGraphToBigWig {input.bedgraph} {input.chromsizes} {output} 2> {log}"
