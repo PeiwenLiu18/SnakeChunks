@@ -31,9 +31,7 @@ genome = snakemake.input["genome_fasta"]
 genome_version = snakemake.params["genome_version"]
 gff3 = snakemake.input["genome_gff3"]
 gtf = snakemake.input["genome_gtf"]
-peaks = snakemake.input["peaks"]
-
-print("peaks=", peaks)
+tracks = snakemake.input["tracks"]
 
 
 def igv_session(filename, genome, genome_version, gtf="", gff3="", peaks="", coverage="", transcripts_gtf=""):
