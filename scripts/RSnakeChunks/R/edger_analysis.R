@@ -55,7 +55,7 @@ edger.analysis <- function(counts,
   ################################################################
   ## Detect differentially expressed genes by applying the exact
   ## negative binomial test from edgeR package.
-  edger.de <- exactTest(d, pair = c(test.condition, ref.condition), ...)      ## Run the exact negative binomial test
+  edger.de <- exactTest(d, pair = c(ref.condition, test.condition), ...)      ## Run the exact negative binomial test
 
   ## Sort genes by increasing p-values, i.e. by decreasing significance
   edger.tt <- topTags(edger.de, n = nrow(d), sort.by = "PValue")
