@@ -635,11 +635,13 @@ knitr::opts_chunk$set(
     h1 <- HistOfCounts(counts = rawCounts, maxPercentile = 95,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        main = "Raw counts", ylab = "Genes",
+                       xlab = "Counts",
                        col = "#FFEEDD", border = "#AA8877")
     rm(h1)
     h2 <- HistOfCounts(counts = filteredCounts, maxPercentile = 95, discardZeroRows = FALSE,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
                        main = "Filtered counts", ylab = "Genes",
+                       xlab = "Counts",
                        col = "#DDEEFF", border = "#7788AA")
     rm(h2)
 
@@ -647,17 +649,17 @@ knitr::opts_chunk$set(
     h3 <- HistOfCounts(counts = rawCounts.log2,
                        maxPercentile = 100, discardZeroRows = FALSE,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
-                       col = "#FFEEDD", border = "#AA8877",
                        xlab = "log2(counts)",
-                       main = "Yeast Bdf1 vs WT\nRaw counts (log2)", ylab = "Genes")
+                       main = "Raw counts (log2)", ylab = "Genes",
+                       col = "#FFEEDD", border = "#AA8877")
     rm(h3)
 
     ## log2(filtered counts) histogram
     h4 <- HistOfCounts(counts = filteredCounts.log2, maxPercentile = 100,
                        las = 1, cex.axis = 0.8, legend.cex = 0.7,
-                       col = "#DDEEFF", border = "#7788AA",
                        xlab = "log2(counts)",
-                       main = "Yeast Bdf1 vs WT\nfiltered counts (log2)", ylab = "Genes")
+                       main = "Filtered counts (log2)", ylab = "Genes",
+                       col = "#DDEEFF", border = "#7788AA")
     rm(h4)
 
     par(mfrow = c(1,1))
@@ -791,7 +793,7 @@ knitr::opts_chunk$set(
                          kable(compa.table))
 
 
-    message("\tDifferential analysis\t", i , "/", nrow(design), "\t", ref.condition, " vs ", test.condition)
+    message("\tDifferential analysis\t", i , "/", nrow(design), "\t", test.condition, " vs ", ref.condition)
 
     ## Create a specific directory for the results of this comparison
     comparison.prefix <- comparison.summary$prefixes[i]
