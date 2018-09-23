@@ -12,9 +12,9 @@
 #' @param title=comparison.prefix main title for the plots
 #' @param dir.figures=NULL optional directory to save figures
 #' @param norm.method="TMM" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
-#' @param thresholds=c(padj=0.05,FC=2) thresholds on adjusted p-value (padj) and fold change (FC). 
+#' @param thresholds=c(padj=0.05,FC=2) thresholds on adjusted p-value (padj) and fold change (FC).
 #' The result table will include columns indicating which feature pass these thresholds.
-#' See DEGtablePostprocessing() for supported thresholds. 
+#' See DEGtablePostprocessing() for supported thresholds.
 #' @param verbose=0 level of verbosity
 #' @param ... additional parameters are passed to edgeR::exactTest() function
 #' @export
@@ -62,7 +62,8 @@ edger.analysis <- function(counts,
 
   ## Complete the analysis of edgeR result table
   edger.result.table <- data.frame("gene.id" = row.names(edger.tt$table),
-                                   "mean" = edger.tt$table$logCPM,
+                                   "mean" = 10^(edger.tt$table$logCPM),
+                                   "log2Mean" = edger.tt$table$logCPM,
                                    "log2FC" = edger.tt$table$logFC,
                                    "pvalue" = edger.tt$table$PValue,
                                    "padj" = edger.tt$table$FDR)
