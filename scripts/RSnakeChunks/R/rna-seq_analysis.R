@@ -211,12 +211,19 @@ RNAseqAnalysis <- function(countFile,
 
   report.socket <- file(rmd.report)
 
+  if (is.null(parameters$email)
+      || (parameters$email == "")
+      || (parameters$email == "[AUTHOR_EMAIL]")) {
+    author.email <- ""
+  } else {
+    author.email <- paste("<", parameters$email, ">")
+  }
 
   Rmd.header <- paste(
     sep = '',
     '---
 title:  "', parameters$title,'"
-author: "', parameters$author, ' <', parameters$author_email, '>"
+author: "', parameters$author, author.email, '"
 date: Last update:`r format(Sys.time())`
 output:
   html_document:
