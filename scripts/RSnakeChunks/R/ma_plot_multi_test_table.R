@@ -137,9 +137,10 @@ MAplot.MultiTestTable <- function(
     multitest.table.sorted$color <- col.points
     if (length(col.points) != nrow(multitest.table.sorted)) {
       if (!is.na(col.positive) & !is.null(col.positive)) {
-        multitest.table.sorted[multitest.table.sorted$is.positive, "color"] <- rep(col.positive, length.out = sum(positive, na.rm = TRUE))
+        multitest.table.sorted[multitest.table.sorted$is.positive, "color"] <- rep(col.positive, length.out = sum(multitest.table.sorted$is.positive, na.rm = TRUE))
       }
     }
+    # table(multitest.table.sorted$is.positive)
     # table(multitest.table.sorted$color)
   }
 
