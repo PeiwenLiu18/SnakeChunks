@@ -3,6 +3,7 @@
 ##
   description: ""
   author: "Claire Rioualen and Jacques van Helden"
+  author_email: ""
   title: "FNR analysis protocol for RNA-seq data"
   dataset: "GSE41195"
   qsub: "-V -m a -d ." 
