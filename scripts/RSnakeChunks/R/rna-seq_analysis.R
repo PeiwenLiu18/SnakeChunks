@@ -1131,7 +1131,7 @@ knitr::opts_chunk$set(
           alpha = parameters$DEG$thresholds$padj,
           log2FC.threshold = log2(parameters$DEG$thresholds$FC),
           legend.cex = 0.7,
-          ylim = c(-3,3),
+          ylim = c(-4,4),
           legend.corner = "topright")
       }
       par(mfrow = c(1,1))
