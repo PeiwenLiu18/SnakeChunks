@@ -227,7 +227,7 @@ MAplot.MultiTestTable <- function(
     }
 
     ## Legend for the points, depending on their status + display options
-    nb.positives <- sum(positive, na.rm = TRUE)
+    nb.positives <- sum(multitest.table.sorted$is.positive, na.rm = TRUE)
     nb.negatives <- nb.tests - nb.positives
     legend.table <- rbind(
       legend.table,
@@ -251,9 +251,9 @@ MAplot.MultiTestTable <- function(
     if (full.legend) {
       legend.pch <- c(as.vector(legend.table$pch), -1,-1,-1,-1)
       legend(legend.corner,
-             c(paste(sep="","N=",nrow(multitest.table)),
-               paste(sep="", sum(positive), " positives (",control.type," <= ", alpha, ")"),
-               paste(sum(!positive), "negatives"),
+             c(paste(sep = "","N=", nrow(multitest.table)),
+               paste(sep = "", sum(multitest.table.sorted$is.positive), " positives (", control.type, " <= ", alpha, ")"),
+               paste(sum(!multitest.table.sorted$is.positive), "negatives"),
                paste(sep="", "P-value <= ", alpha, ": ", sum(multitest.table[,"p.value"] <= alpha)),
                paste(sep="", "FDR <= ", alpha, ": ", sum(multitest.table[,"fdr"] <= alpha)),
                paste(sep="", "E-value <=", alpha, ": ", sum(multitest.table[,"e.value"] <= alpha)),
@@ -268,8 +268,8 @@ MAplot.MultiTestTable <- function(
     } else {
       legend(legend.corner,
              #              c(paste(sep="", control.type," = ", alpha),
-             #                paste(sep="", sum(positive), " positives"),
-             #                paste(sum(!positive), "negatives")
+             #                paste(sep="", sum(multitest.table.sorted$is.positive), " positives"),
+             #                paste(sum(!multitest.table.sorted$is.positive), "negatives")
              #              ),
              legend=as.vector(legend.table$legend),
              pch=as.vector(legend.table$pch),
