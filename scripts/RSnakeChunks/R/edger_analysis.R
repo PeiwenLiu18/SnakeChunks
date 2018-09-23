@@ -63,7 +63,7 @@ edger.analysis <- function(counts,
   ## Complete the analysis of edgeR result table
   edger.result.table <- data.frame("gene.id" = row.names(edger.tt$table),
                                    "mean" = 10^(edger.tt$table$logCPM),
-                                   "log2Mean" = edger.tt$table$logCPM,
+                                   "log2mean" = edger.tt$table$logCPM,
                                    "log2FC" = edger.tt$table$logFC,
                                    "pvalue" = edger.tt$table$PValue,
                                    "padj" = edger.tt$table$FDR)
