@@ -176,12 +176,15 @@ LoadRNAseqDataset <- function(countFile,
   if (is.null(parameters$title)) {
     parameters$title <- "RNA-seq analysis report"
   }
+
   if (is.null(parameters$description)) {
     parameters$description <- "Analysis workflow for RNA-seq data: sample normalisation, descriptive statistics, differential analysis. "
   }
+
   if (is.null(parameters$author)) {
     parameters$author <- "[AUTHOR] "
   }
+
   if (is.null(parameters$author_email)) {
     parameters$author_email <- "[AUTHOR_EMAIL] "
   }
