@@ -1098,6 +1098,56 @@ knitr::opts_chunk$set(
       # system(paste("open", figure.file))
     }
 
+    ## ---- Draw MA plots -----
+    report.text <- append(report.text, "\n\n#### MA plots\n\n")
+    deg.names <- names(deg.results)
+    nb.panels <- n2mfrow(length(deg.names))
+    if (length(deg.names) <= 5) {
+      nb.panels <- rev(nb.panels)
+    }
+    figname <- paste(sep = "", comparison.prefix, "_norm_compa_MA_plots")
+
+    file.prefix <- file.path(dir.figures.diffexpr, figname)
+    message("\t\tGenerating figure\t", figname)
+    for (f in 1:length(figure.formats)) {
+      fig.format <- figure.formats[f]
+      figure.file <- paste(sep = "", file.prefix, ".", fig.format)
+      figure.files[[fig.format]][figname] <- figure.file
+      # message("\t\t\t", fig.format, " plot\t", figname)
+      height <- 2 + nb.panels[1]*3
+      width <- 2 + nb.panels[2]*3.5
+      OpenPlotDevice(file.prefix = file.prefix, fig.format = fig.format, height = height, width = width)
+
+      par.ori <- par(no.readonly = TRUE)
+      par(mfrow = nb.panels)
+      for (deg.name in deg.names) {
+        message("\tDrawing MA plot\t", deg.name)
+        deg.table <- deg.results[[deg.name]]$result.table
+        MAplot.MultiTestTable(
+          multitest.table = deg.results[[deg.name]]$result.table,
+          main = deg.name,
+          log2mean.col = "log2mean",
+          log2FC.col = "log2FC",
+          alpha = parameters$DEG$thresholds$padj,
+          log2FC.threshold = log2(parameters$DEG$thresholds$FC),
+          legend.cex = 0.7,
+          ylim = c(-3,3),
+          legend.corner = "topright")
+      }
+      par(mfrow = c(1,1))
+      par(par.ori)
+      silence <- dev.off(); rm(silence)
+      if (f == 1) {
+        report.text <- ReportFigure(name = figname,
+                                    figureFile = figure.file,
+                                    reportFile = rmd.report,
+                                    report.text = report.text,
+                                    out.width = parameters$DEG$out_width)
+        #        report.text <- ReportFigure(figname, figure.file, report.text, out.width = parameters$DEG$out_width)
+      }
+      # system(paste("open", figure.file))
+    }
+
 
     ## ---- Draw Volcano plots -----
     report.text <- append(report.text, "\n\n#### Volcano plots\n\n")
