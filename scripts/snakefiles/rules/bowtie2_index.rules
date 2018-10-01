@@ -48,7 +48,7 @@ rule bowtie2_index:
     conda:  "../envs/bowtie2.yaml"
     shell: """
 mkdir -p {params.dir}
-cp {input} {params.dir}
+cp -f {input} {params.dir}/
 bowtie2-build {output}  {output} --threads {params.threads} &> {log}
 """
 
