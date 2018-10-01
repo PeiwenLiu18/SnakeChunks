@@ -51,7 +51,7 @@
     length_threshold: "20"                                              # Optional (def. 20)
 
   bowtie2:
-    threads: "2"                                                        # Number of threads
+    threads: "1"                                                        # Number of threads
 #    mode: "--local"                                                     # Alignent mode. Supported: "--local" or "--end-to-end"
 #    other_options: "--very-fast"                                        # supplementary options. We should evaluate if we do not convert them to fully documented options
     
