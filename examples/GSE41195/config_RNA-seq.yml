@@ -58,22 +58,22 @@
     length_threshold: 20                                              # Minimal output read length. Default 20
 
   bwa:
-    threads: 10             # Number of threads (parallel computing) for bwa
+    threads: 1             # Number of threads (parallel computing) for bwa
 
   subread-align:
-    threads: "10"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads
 
   hisat2:
-    threads: "4"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads
 
   tophat:
-    threads: "4"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads
 
   STAR:
-    threads: "4"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads
 
   bowtie2:
-    threads: "4"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads
     mode: "--local"                                                         # Alignent mode. Supported: "--local" or "--end-to-end"
     other_options: "--very-fast --maxins 1500"                                 # supplementary options. We should evaluate if we do not convert them to fully documented options
 
