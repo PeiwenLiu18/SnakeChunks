@@ -12,7 +12,7 @@
 #' @param title=comparison.prefix main title for the plots
 #' @param dir.figures=NULL optional directory to save figures
 #' @param norm.method="TMM" normalisation method. This parameter strongly affects the results! See edgeR documentation for a list of supported methods
-#' @param thresholds=c(padj=0.05,FC=2) thresholds on adjusted p-value (padj) and fold change (FC).
+#' @param thresholds=c(padj=0.05,FC=1.5) thresholds on adjusted p-value (padj) and fold change (FC).
 #' The result table will include columns indicating which feature pass these thresholds.
 #' See DEGtablePostprocessing() for supported thresholds.
 #' @param verbose=0 level of verbosity
@@ -23,7 +23,7 @@ edger.analysis <- function(counts,
                            test.condition = 1,# first condition for edegR::exactTest()
                            ref.condition = 2, # second condition for edgeR::exactTest()
                            norm.method = "TMM",
-                           thresholds = c(padj = 0.05, FC = 2),
+                           thresholds = c(padj = 0.05, FC = 1.5),
                            comparison.prefix,
                            title = paste(sep = "_", norm.method, comparison.prefix),
                            dir.figures = NULL,

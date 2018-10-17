@@ -8,7 +8,7 @@
 #' @param condition a vector with the condition associated to each sample. The length of this vector must equal the number of columns of the count table.
 #' @param ref.condition=NULL reference condition for the differential analysis
 #' @param comparison.prefix a string with the prefix for output files
-#' @param thresholds=c(padj=0.05,FC=2) thresholds on adjusted p-value (padj) and fold change (FC).
+#' @param thresholds=c(padj=0.05,FC=1.5) thresholds on adjusted p-value (padj) and fold change (FC).
 #' The result table will include columns indicating which feature pass these thresholds.
 #' See DEGtablePostprocessing() for supported thresholds.
 #' @param title=comparison.prefix main title for the plots
@@ -19,7 +19,7 @@
 deseq2.analysis <- function(counts,
                             condition,
                             ref.condition = NULL,
-                            thresholds = c(padj = 0.05, FC = 2),
+                            thresholds = c(padj = 0.05, FC = 1.5),
                             comparison.prefix,
                             title = comparison.prefix,
                             dir.figures = NULL,
