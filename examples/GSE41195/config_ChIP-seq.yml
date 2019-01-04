@@ -51,7 +51,7 @@
     length_threshold: "20"                                              # Optional (def. 20)
 
   bowtie2:
-    threads: "1"                                                        # Number of threads
+    threads: "1"                                                         ## Number of threads. Beware: if the nb of threads exceeds the number of CPUs, bowtie2-index runs indefinitely. 
 #    mode: "--local"                                                     # Alignent mode. Supported: "--local" or "--end-to-end"
 #    other_options: "--very-fast"                                        # supplementary options. We should evaluate if we do not convert them to fully documented options
     
