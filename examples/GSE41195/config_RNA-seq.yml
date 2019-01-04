@@ -102,7 +102,7 @@
       min.var: 25             # Filter out features with very low variance
       mean.per.condition: 10  # Filter out features for which not a single condition has a mean count above the threshold
       padj: 0.05              # Upper threshold on False Discovery Rate (FDR)
-      FC: 2                   # Lower threshold on the fold-change (will be applied in both orientations)
+      FC: 1.5                   # Lower threshold on the fold-change (will be applied in both orientations)
 
   DESeq2:
     pAdjustMethod: "BH"       # Default "BH", else "BY"
@@ -114,37 +114,4 @@
     alpha: 0.05               # Default 0.05
     rowsum_filter: 10         # Default 10
     norm_method: ["TMM"]
-    
-#  DEG:                                                             ## Generic parameters for differential analysis
-#    epsilon: 0.1
-#    pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
-#    alpha: 0.05                                                         # Default 0.05
-#    rowsum_filter: 10                                                   # Default 10
-#    selection_criterion: "intersection"                                       # Criterion to select DEG. Supported: DESeq2 | edgeR | intersection | union
-#    thresholds:                                  ## Thresholds tor fhte detection of differentially expressed genes (apply to DESeq2 and edgeR)
-#      min.count: 1  ## Filter out undetected features
-#      mean.count: 5  ## Filter out features with very low mean expression level
-#      mean.per.condition: 10  ## Filter out features for which not a single condition has a mean count above the threshold
-#      padj: 0.05                                 ## Upper threshold on False Discovery Rate (FDR)
-#      FC: 1.14                                    ## Lower threshold on the fold-change
-#      max.log10.cpm: 8.5                         ## Upper threshold for outliers on log10-transformed counts
- 
-                                                
-#  DESeq2:
-#    pAdjustMethod: "BH"                                                 # Default "BH", else "BY"
-#    alpha: 0.05                                                         # Default 0.05
-#    rowsum_filter: 10                                                   # Default 10
-#    featuresToRemove: NULL                                              # "alignment_not_unique", "ambiguous", "no_feature", "not_aligned", "too_low_aQual"
-#    varInt: "group"
-#    condRef: "WT"
-#    batch: NULL
-#    fitType: "parametric"                                               # "parametric" (default) or "local"
-#    cooksCutoff: TRUE
-#    independentFiltering: TRUE
-#    alpha: 0.05
-#    pAdjustMethod: "BH"                                                 # "BH" (default) or "BY"
-#    typeTrans: "VST"                                                    # "VST" or "rlog"
-#    locfunc: "median"                                                   # "median" (default) or "shorth" to estimate the size factors
-
-
 

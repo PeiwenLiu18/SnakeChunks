@@ -176,3 +176,18 @@ Rscript {params.rscript} \
 #        "../../RSnakeChunks/misc/gene_lists_comparison.R"
 
 
+## Subworkflows
+
+##subworkflow chip:
+##    workdir: "ChIP-seq_RegulonDB.wf"
+##    snakefile: "ChIP-seq_RegulonDB.wf"
+##    configfile: "metadata/config_ChIP-seq.yml"
+
+##subworkflow rna:
+##    workdir: "RNA-seq_complete.wf"
+##    snakefile: "RNA-seq_complete.wf"
+##    configfile: "metadata/config_RNA-seq.yml"
+
+
+
+

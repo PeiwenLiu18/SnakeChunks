@@ -61,7 +61,7 @@ rule peak_motifs:
    -test {input} \
    -graph_title "{params.title}" \
    -disco dyads \
-   -motif_db regulonDB \
+   -motif_db regulonDB \ 
    -output both -prefix {params.prefix} \
    -server fungi
 
@@ -70,7 +70,7 @@ unzip -qq -d `dirname {params.prefix}` {params.prefix}.zip
 rm -rf {params.prefix} && mv -f {wildcards.caller_dir}/peak-motifs/peak-motifs_ws_*/ {params.prefix} && rm {params.prefix}.zip
 """
 
-
+## !! motif_db & server hard codded, to be changed
 
     #shell: "peak-motifs  -v 1 -i  {input} -disco {params.disco} -minol 5 -maxol 7 -motif_db {params.motif_db} -task {params.tasks} -prefix {params.prefix} -outdir {params.outdir} &> {log}"
 

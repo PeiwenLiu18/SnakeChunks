@@ -26,7 +26,7 @@
 #' @param sort.column="none" Column to sort the result.
 #' Supported: c("none", "mean", "log2FC", "pvalue", "padj").
 #'
-#' @param thresholds=c(padj = 0.05, FC = 2)
+#' @param thresholds=c(padj = 0.05, FC = 1.5)
 #'
 #' Thresholds on some specific scores, used for display purpose, and to
 #' add some columns to the result table, indicating if the gene passes the
@@ -62,7 +62,7 @@
 DEGtablePostprocessing <- function(deg.table,
                                table.name="DEG_table",
                                sort.column = "none",
-                               thresholds = c(padj = 0.05, FC = 2),
+                               thresholds = c(padj = 0.05, FC = 1.5),
                                round.digits = 3,
                                dir.figures = NULL,
                                verbose = 0) {
