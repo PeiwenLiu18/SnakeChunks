@@ -61,19 +61,19 @@
     threads: 1             # Number of threads (parallel computing) for bwa
 
   subread-align:
-    threads: "1"                                                         ## Number of threads
+    threads: "4"                                                         ## Number of threads
 
   hisat2:
-    threads: "1"                                                         ## Number of threads
+    threads: "4"                                                         ## Number of threads
 
   tophat:
-    threads: "1"                                                         ## Number of threads
+    threads: "4"                                                         ## Number of threads
 
   STAR:
-    threads: "1"                                                         ## Number of threads
+    threads: "4"                                                         ## Number of threads
 
   bowtie2:
-    threads: "1"                                                         ## Number of threads
+    threads: "1"                                                         ## Number of threads. Beware: if the nb of threads exceeds the number of CPUs, bowtie2-index runs indefinitely. 
     mode: "--local"                                                         # Alignent mode. Supported: "--local" or "--end-to-end"
     other_options: "--very-fast --maxins 1500"                                 # supplementary options. We should evaluate if we do not convert them to fully documented options
 
