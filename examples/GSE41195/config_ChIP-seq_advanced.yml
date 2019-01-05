@@ -67,3 +67,6 @@
   spp: 
     fdr: "0.01"                                                         # False Discovery Rate. Optional (def. 0.05)
 
+  peak-motifs:
+    disco: "dyads"                                                      # motif discovery algorithms (supported: oligos, dyads, positions, local-words)
+    server: "teaching"                                                  # RSAT server (supported: teaching, metazoa, plants, fungi, bacteria, protists)

@@ -69,4 +69,6 @@
     P: "0.01"                                                           # Optional (def. 0.0001)
     fdr: "0.01"                                                         # Optional (def. 0.001)
 
-
+  peak-motifs:
+    disco: "dyads"                                                      # motif discovery algorithms (supported: oligos, dyads, positions, local-words)
+    server: "teaching"                                                  # RSAT server (supported: teaching, metazoa, plants, fungi, bacteria, protists)
