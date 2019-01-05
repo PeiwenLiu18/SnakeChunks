@@ -11,14 +11,17 @@ if not "peak-motifs" in config.keys():
 if not "python" in config["peak-motifs"].keys():
     config["peak-motifs"]["python"] = "python2"
 
+if not "server" in config["peak-motifs"].keys():
+    config["peak-motifs"]["server"] = "teaching"
+
 if not "motif_db" in config["peak-motifs"].keys():
-    config["peak-motifs"]["motif_db"] = ""
+    config["peak-motifs"]["motif_db"] = "regulonDB"
 
 if not "tasks" in config["peak-motifs"].keys():
     config["peak-motifs"]["tasks"] = "all"
 
 if not "disco" in config["peak-motifs"].keys():
-    config["peak-motifs"]["disco"] =  ""
+    config["peak-motifs"]["disco"] =  "oligos,dyads"
 
 # Rule
 rule peak_motifs:
@@ -31,6 +34,7 @@ rule peak_motifs:
         config["peak-motifs"]["motif_db"]
 
     Optional parameters:
+        config["peak-motifs"]["server"]
         config["peak-motifs"]["tasks"]
         config["peak-motifs"]["disco"]
 
@@ -46,6 +50,7 @@ rule peak_motifs:
         title = config["title"],
         bed_ctrl = "{caller_dir}/{peaks}.bed", \
         tasks = config["peak-motifs"]["tasks"], \
+        server = config["peak-motifs"]["server"], \
         disco = config["peak-motifs"]["disco"], \
         motif_db = config["peak-motifs"]["motif_db"], \
         outdir = "{caller_dir}/peak-motifs", \
@@ -57,13 +62,7 @@ rule peak_motifs:
     benchmark: "{caller_dir}/peak-motifs/{peaks}_peak-motifs_benchmark.txt"
     conda: "../envs/peakmotifs.yaml"
     shell:"""
-{params.python} {params.python_script} \
-   -test {input} \
-   -graph_title "{params.title}" \
-   -disco dyads \
-   -motif_db regulonDB \ 
-   -output both -prefix {params.prefix} \
-   -server fungi
+{params.python} {params.python_script} -server {params.server} -test {input} -graph_title "{params.title}" -disco {params.disco} -motif_db {params.motif_db} -output both -prefix {params.prefix}
 
 unzip -qq -d `dirname {params.prefix}` {params.prefix}.zip
 
