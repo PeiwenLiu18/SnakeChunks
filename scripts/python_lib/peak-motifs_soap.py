@@ -180,25 +180,25 @@ peakMotifsVersion = '0.1 - 30/01/2015'
 # server dictionary
 serverDict = {
 
-	"fr_ens":"http://rsat01.biologie.ens.fr/rsat/web_services/RSATWS.wsdl",
+	"protists":"http://rsat01.biologie.ens.fr/rsat/web_services/RSATWS.wsdl",
 	"fungi":"http://rsat-tagc.univ-mrs.fr/rsat/web_services/RSATWS.wsdl",
-	"fr_ro":"http://rsat.sb-roscoff.fr/web_services/RSATWS.wsdl",
-	"fr_mrs_2":"http://pedagogix-tagc.univ-mrs.fr/rsat/web_services/RSATWS.wsdl",
-	"es":"http://floresta.eead.csic.es/rsat/web_services/RSATWS.wsdl",
-	"mx":"http://embnet.ccg.unam.mx/rsa-tools/web_services/RSATWS.wsdl"
+	"metazoa":"http://rsat.sb-roscoff.fr/web_services/RSATWS.wsdl",
+	"teaching":"http://pedagogix-tagc.univ-mrs.fr/rsat/web_services/RSATWS.wsdl",
+	"plants":"http://floresta.eead.csic.es/rsat/web_services/RSATWS.wsdl",
+	"bacteria":"http://embnet.ccg.unam.mx/rsa-tools/web_services/RSATWS.wsdl"
 
 	}
 
 """
 serverDict = {
 
-	"fr_ens":"http://protists.rsat.eu/rsat/web_services/RSATWS.wsdl",
+	"protists":"http://protists.rsat.eu/rsat/web_services/RSATWS.wsdl",
 	"fungi":"http://fungi.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"fr_mrs":"http://fungi.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"fr_ro":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
-	"fr_mrs_2":"http://teaching.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"es":"http://plants.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"mx":"http://prokaryotes.rsat.eu/rsa-tools/web_services/RSATWS.wsdl"
+	"fungi":"http://fungi.rsat.eu/rsat/web_services/RSATWS.wsdl",
+	"metazoa":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
+	"teaching":"http://teaching.rsat.eu/rsat/web_services/RSATWS.wsdl",
+	"plants":"http://plants.rsat.eu/rsat/web_services/RSATWS.wsdl",
+	"bacteria":"http://prokaryotes.rsat.eu/rsa-tools/web_services/RSATWS.wsdl"
 	
 	}
 """
@@ -208,7 +208,7 @@ if __name__ == '__main__':
 	########### peak motifs arguments ####################
 	parser = argparse.ArgumentParser(description='Client to download peak-motifs results from RSAT server.', epilog='Version '+peakMotifsVersion)
 	
-	parser.add_argument('-server', '--server', metavar='<SERVEUR>', type=str, nargs=1, help='RSAT server', required=True)
+	parser.add_argument('-server', '--server', metavar='<SERVER>', type=str, nargs=1, help='RSAT server', required=True)
 
 	parser.add_argument('-test', '--test_file', metavar='<TEST_FILE>', type=argparse.FileType('r'), nargs=1, help='Input test peak sequence in fasta format.', required=True)
 	parser.add_argument('-control', '--control_file', metavar='<CONTROL_FILE>', type=argparse.FileType('r'), nargs=1, help='Input control peak sequence in fasta format.', required=False)
@@ -354,12 +354,12 @@ if __name__ == '__main__':
 	"""
 	zipFileDict = {
 	
-		"fr_ens":"http://protists.rsat.eu/rsat/",
-		"fr_mrs":"http://fungi.rsat.eu/rsat/",
-		"fr_ro":"http://metazoa.rsat.eu/",
-		"fr_mrs_2":"http://teaching.rsat.eu/rsat/",
-		"es":"http://plants.rsat.eu/rsat/",
-		"mx":"http://prokaryotes.rsat.eu/rsa-tools/"
+		"protists":"http://protists.rsat.eu/rsat/",
+		"fungi":"http://fungi.rsat.eu/rsat/",
+		"metazoa":"http://metazoa.rsat.eu/",
+		"teaching":"http://teaching.rsat.eu/rsat/",
+		"plants":"http://plants.rsat.eu/rsat/",
+		"bacteria":"http://prokaryotes.rsat.eu/rsa-tools/"
 	
 		}
 	"""
