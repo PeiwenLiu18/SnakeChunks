@@ -210,7 +210,7 @@ rule all:
 	input: \
             MAPPING,
             MAPPING_QC,
-            MAPPING_MD5,
+#            MAPPING_MD5,
             BAM_STATS,
             BAM_BAI,
 #            GENOME_INDEX,

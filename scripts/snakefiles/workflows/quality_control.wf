@@ -207,7 +207,7 @@ rule all:
 	"""
 	input: \
 #            TRIMMING,
-            MD5,
+#            MD5,
             QC,
             GRAPHICS
 	params: qsub=config["qsub"]
