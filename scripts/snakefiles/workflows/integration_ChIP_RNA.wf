@@ -103,11 +103,12 @@ INTEGRATION_DIR = "integration"
 ## Final targets ##
 
 outdir_prefix = "ChIP-RNA-regulons"
+peak_prefixes = expand(outdir_prefix + "_{peakcaller}_peaks", peakcaller = peakcalling)
 venn_format = "png" # svg"
 
-VENN = expand(INTEGRATION_DIR + "/" + outdir_prefix + "_venn.{ext}", ext=venn_format)
-TABLE = INTEGRATION_DIR + "/" + outdir_prefix + "_gene_table.tsv"
-GFF_CHIP = INTEGRATION_DIR + "/" + outdir_prefix + "_ChIP-seq.gff"
+VENN = expand(INTEGRATION_DIR + "/{peak_prefix}_venn.{ext}", ext=venn_format, peak_prefix = peak_prefixes)
+TABLE = expand(INTEGRATION_DIR + "/{peak_prefix}_gene_table.tsv", peak_prefix = peak_prefixes)
+GFF_CHIP = expand(INTEGRATION_DIR + "/{peak_prefix}_ChIP-seq.gff", peak_prefix = peak_prefixes)
 GFF_RNA = INTEGRATION_DIR + "/" + outdir_prefix + "_RNA-seq.gff"
 GFF_REGULON = INTEGRATION_DIR + "/" + outdir_prefix + "_RegulonDB.gff"
 
