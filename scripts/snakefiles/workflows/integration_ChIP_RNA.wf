@@ -111,8 +111,6 @@ GFF_CHIP = INTEGRATION_DIR + "/" + outdir_prefix + "_ChIP-seq.gff"
 GFF_RNA = INTEGRATION_DIR + "/" + outdir_prefix + "_RNA-seq.gff"
 GFF_REGULON = INTEGRATION_DIR + "/" + outdir_prefix + "_RegulonDB.gff"
 
-
-
 rule all: 
     input:
         VENN,
@@ -120,7 +118,6 @@ rule all:
         GFF_CHIP,
         GFF_RNA, 
         GFF_REGULON
-
 
 ## Genes reported as differentially expressed by  DESeq2.rules
 DESEQ2_DEG_LIST=expand(expand(DEG_DIR + "/{test}_vs_{ref}/{{deg}}/{test}_vs_{ref}_{{trimming}}_{{mapping_rna}}_{{read_counts}}_{{deg}}_gene_list.txt", zip, test=rna_test, ref=rna_reference), deg=diffexpr, trimming=trimming, mapping_rna=mapping_rna, read_counts=read_counts)
