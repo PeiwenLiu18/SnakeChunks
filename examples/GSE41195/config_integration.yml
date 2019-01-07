@@ -39,7 +39,7 @@
   trimming: "cutadapt"
   mapping_chip: "bowtie2"
   mapping_rna: "bwa"
-  peakcalling: "macs2"
+  peakcalling: "homer"
   read_counts: "featureCounts"
   diffexpr: "DESeq2"
 

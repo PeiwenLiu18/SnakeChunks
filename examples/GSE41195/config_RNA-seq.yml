@@ -102,7 +102,7 @@
       min.var: 25             # Filter out features with very low variance
       mean.per.condition: 10  # Filter out features for which not a single condition has a mean count above the threshold
       padj: 0.05              # Upper threshold on False Discovery Rate (FDR)
-      FC: 1.5                   # Lower threshold on the fold-change (will be applied in both orientations)
+      FC: 2                   # Lower threshold on the fold-change (will be applied in both orientations)
 
   DESeq2:
     pAdjustMethod: "BH"       # Default "BH", else "BY"
