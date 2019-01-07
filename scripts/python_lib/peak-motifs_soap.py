@@ -180,25 +180,28 @@ peakMotifsVersion = '0.1 - 30/01/2015'
 # server dictionary
 serverDict = {
 
-	"protists":"http://rsat01.biologie.ens.fr/rsat/web_services/RSATWS.wsdl",
-	"fungi":"http://rsat-tagc.univ-mrs.fr/rsat/web_services/RSATWS.wsdl",
-	"metazoa":"http://rsat.sb-roscoff.fr/web_services/RSATWS.wsdl",
-	"teaching":"http://pedagogix-tagc.univ-mrs.fr/rsat/web_services/RSATWS.wsdl",
-	"plants":"http://floresta.eead.csic.es/rsat/web_services/RSATWS.wsdl",
-	"bacteria":"http://embnet.ccg.unam.mx/rsa-tools/web_services/RSATWS.wsdl"
+	"protists":"http://protists.rsat.eu/web_services/RSATWS.wsdl",
+	"fungi":"http://fungi.rsat.eu/web_services/RSATWS.wsdl",
+	"metazoa":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
+	"teaching":"http://teaching.rsat.eu/web_services/RSATWS.wsdl",
+	"plants":"http://rsat.eead.csic.es/plants//web_services/RSATWS.wsdl",
+	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS.wsdl",
+	"archaea":"http://archaea.rsat.eu/web_services/RSATWS.wsdl",
+	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS.wsdl"
 
 	}
 
 """
 serverDict = {
 
-	"protists":"http://protists.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"fungi":"http://fungi.rsat.eu/rsat/web_services/RSATWS.wsdl",
+	"protists":"http://protists.rsat.eu/web_services/RSATWS.wsdl",
 	"fungi":"http://fungi.rsat.eu/rsat/web_services/RSATWS.wsdl",
 	"metazoa":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
-	"teaching":"http://teaching.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"plants":"http://plants.rsat.eu/rsat/web_services/RSATWS.wsdl",
-	"bacteria":"http://prokaryotes.rsat.eu/rsa-tools/web_services/RSATWS.wsdl"
+	"teaching":"http://teaching.rsat.eu/web_services/RSATWS.wsdl",
+	"plants":"http://rsat.eead.csic.es/plants//web_services/RSATWS.wsdl",
+	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS.wsdl",
+	"archaea":"http://archaea.rsat.eu/web_services/RSATWS.wsdl",
+	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS.wsdl"
 	
 	}
 """
@@ -354,12 +357,14 @@ if __name__ == '__main__':
 	"""
 	zipFileDict = {
 	
-		"protists":"http://protists.rsat.eu/rsat/",
-		"fungi":"http://fungi.rsat.eu/rsat/",
+		"protists":"http://protists.rsat.eu/",
+		"fungi":"http://fungi.rsat.eu/",
 		"metazoa":"http://metazoa.rsat.eu/",
-		"teaching":"http://teaching.rsat.eu/rsat/",
-		"plants":"http://plants.rsat.eu/rsat/",
-		"bacteria":"http://prokaryotes.rsat.eu/rsa-tools/"
+		"teaching":"http://teaching.rsat.eu/",
+		"plants":"http://rsat.eead.csic.es/plants//",
+		"prokaryotes":"http://prokaryotes.rsat.eu/",
+		"archaea":"http://archaea.rsat.eu/",
+		"bacteria":"http://bacteria.rsat.eu/"
 	
 		}
 	"""
