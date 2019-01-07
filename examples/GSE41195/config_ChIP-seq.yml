@@ -56,9 +56,9 @@
 #    other_options: "--very-fast"                                        # supplementary options. We should evaluate if we do not convert them to fully documented options
     
   macs2: 
-    qval: "0.05"                                                        # Optional (def. 0.05)
-    keep_dup: "1"                                                       # Optional (def. 1)
-    mfold_min: "5"                                                      # Optional (def. 5)
+    qval: "0.001"                                                       # Optional (def. 0.05)
+    keep_dup: "all"                                                     # Optional (def. 1)
+    mfold_min: "2"                                                      # Optional (def. 5)
     mfold_max: "50"                                                     # Optional (def. 50)
     other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
