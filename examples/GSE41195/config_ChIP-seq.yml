@@ -57,8 +57,8 @@
     
   macs2: 
     qval: "0.05"                                                        # Optional (def. 0.05)
-    keep_dup: "all"                                                     # Optional (def. 1)
-    mfold_min: "2"                                                      # Optional (def. 5)
+    keep_dup: "1"                                                       # Optional (def. 1)
+    mfold_min: "5"                                                      # Optional (def. 5)
     mfold_max: "50"                                                     # Optional (def. 50)
     other_options: "--nomodel"                                          # Optional can include --call-summits, --broad...
 
@@ -71,4 +71,4 @@
 
   peak-motifs:
     disco: "dyads"                                                      # motif discovery algorithms (supported: oligos, dyads, positions, local-words)
-    server: "teaching"                                                  # RSAT server (supported: teaching, metazoa, plants, fungi, bacteria, protists)
+    server: "bacteria"                                                  # RSAT server (supported: teaching, metazoa, plants, fungi, bacteria, protists)
