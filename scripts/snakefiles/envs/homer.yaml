@@ -8,4 +8,5 @@ channels:
   - bioconda
 dependencies:
   - homer=4.9.1
+  - bedtools=2.27.1
 ...
