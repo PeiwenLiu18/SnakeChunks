@@ -38,9 +38,9 @@ def cutadapt_inputs(wildcards):
 #    else:
 #        ext = config["metadata"]["input_format"]
     if (seq_type == "pe"):
-        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}.fastq.gz", strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand(expand(config["dir"]["fastq"] + "/{dataset}/{samples}_{{strand}}.fastq.gz", zip, dataset=wildcards.dataset, samples=wildcards.samples), strand=strands)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{samples}.fastq.gz", samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand(config["dir"]["fastq"] + "/{dataset}/{samples}.fastq.gz", dataset=wildcards.dataset, samples=wildcards.samples)
     else:
         sys.exit("Error: invalid seq_type parameter. Must be 'se' or 'pe'")
     return reads
@@ -61,24 +61,24 @@ rule cutadapt:
     """
     input: reads = cutadapt_inputs
     output:
-        forward = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[0] + ".fastq.gz",
-        reverse = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_" + strands[1] + ".fastq.gz",
-        single = config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.fastq.gz"
+        forward = config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt_" + strands[0] + ".fastq.gz",
+        reverse = config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt_" + strands[1] + ".fastq.gz",
+        single = config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt.fastq.gz"
     params:
         qual_threshold = config["cutadapt"]["qual_threshold"],
         length_threshold = config["cutadapt"]["length_threshold"],
-        temp_output_se = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed.fq.gz",
-        temp_output_pe_1 = config["dir"]["fastq"] + "/{samples}/{samples}_" + strands[0] + "_val_" + strands[0] + ".fq.gz",
-        temp_output_pe_2 = config["dir"]["fastq"] + "/{samples}/{samples}_" + strands[1] + "_val_" + strands[1] + ".fq.gz",
+        temp_output_se = config["dir"]["fastq"] + "/{dataset}/{samples}_trimmed.fq.gz",
+        temp_output_pe_1 = config["dir"]["fastq"] + "/{dataset}/{samples}_" + strands[0] + "_val_" + strands[0] + ".fq.gz",
+        temp_output_pe_2 = config["dir"]["fastq"] + "/{dataset}/{samples}_" + strands[1] + "_val_" + strands[1] + ".fq.gz",
         seq_type = config["metadata"]["seq_type"],
-#        temp_output_pe_1 = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed_" + strands[0] + ".fq.gz",
-#        temp_output_pe_2 = config["dir"]["fastq"] + "/{samples}/{samples}_trimmed_" + strands[1] + ".fq.gz",
-        outdir = config["dir"]["fastq"] + "/{samples}",
+#        temp_output_pe_1 = config["dir"]["fastq"] + "/{dataset}/{samples}_trimmed_" + strands[0] + ".fq.gz",
+#        temp_output_pe_2 = config["dir"]["fastq"] + "/{dataset}/{samples}_trimmed_" + strands[1] + ".fq.gz",
+        outdir = config["dir"]["fastq"] + "/{dataset}",
         qsub = config['qsub'] \
-            + " -e "+ config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_qsub.err" \
-            + " -o "+ config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_qsub.out"
-    log: config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt.log"
-    benchmark: config["dir"]["fastq"] + "/{samples}/{samples}_cutadapt_benchmark.txt"
+            + " -e "+ config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt_qsub.err" \
+            + " -o "+ config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt_qsub.out"
+    log: config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt.log"
+    benchmark: config["dir"]["fastq"] + "/{dataset}/{samples}_cutadapt_benchmark.txt"
     conda:  "../envs/cutadapt.yaml"
 #    run:
 #        if (seq_type == "pe"):
