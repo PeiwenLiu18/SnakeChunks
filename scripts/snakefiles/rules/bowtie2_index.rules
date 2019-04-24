@@ -14,9 +14,6 @@ if not "genome" in config["dir"].keys():
 if not "bowtie2" in config.keys():
     config["bowtie2"] = {}
 
-if not "threads" in config["bowtie2"].keys():
-    config["bowtie2"]["threads"] = "1"
-
 bowtie2_dir = os.path.join(config["dir"]["genome"], "bowtie2")
 
 # Rule
@@ -38,7 +35,6 @@ rule bowtie2_index:
     input: os.path.join(config["dir"]["genome"], config["genome"]["fasta_file"])
     output: os.path.join(bowtie2_dir, config["genome"]["fasta_file"])
     params:
-        threads = config["bowtie2"]["threads"], \
         dir = bowtie2_dir, \
         qsub = config["qsub"] \
           + " -e " + bowtie2_dir + "index_qsub.err" \
@@ -49,6 +45,6 @@ rule bowtie2_index:
     shell: """
 mkdir -p {params.dir}
 cp -f {input} {params.dir}/
-bowtie2-build {output}  {output} --threads {params.threads} &> {log}
+bowtie2-build {output}  {output} &> {log}
 """
 
