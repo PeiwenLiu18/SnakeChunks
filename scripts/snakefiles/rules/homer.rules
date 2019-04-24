@@ -93,7 +93,10 @@ makeTagDirectory {params.control_tag} -genome {params.genome} -checkGC {input.co
 findPeaks {params.treatment_tag} -style {params.style} -L {params.L} -P {params.P} -F {params.F} -fdr {params.fdr} -gsize {params.genome_size} -fragLength {params.frag_length} -o {params.treatment_tag}/peaks.txt -i {params.control_tag} &&
 pos2bed.pl {params.treatment_tag}/peaks.txt > {output} &&
 makeUCSCfile {params.treatment_tag} -o auto &&
-makeUCSCfile {params.control_tag} -o auto) &> {log} \
+makeUCSCfile {params.control_tag} -o auto &&
+bedtools sort -i {output} > temp &&
+mv temp {output} &&
+rm temp) &> {log} \
 || (touch {output})
 """
 
