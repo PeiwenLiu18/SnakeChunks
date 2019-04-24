@@ -1,0 +1,43 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+#if not "peakcalling" in config.keys():
+#    sys.exit("peakcalling tools must be defined in the config file")
+
+#peakcallers = config["peakcalling"].split()
+
+# Rule
+rule bedops_peaks_vs_sites:
+    """
+    Required parameters: 
+        config["qsub"]
+
+    Contributors: Claire Rioualen
+    """
+	input: 
+		sites = config["dir"]["regulondb"] + "/{TF}/{TF}_BS.bed",
+		peaks = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_peaks.bed"
+	output: 
+		found = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_found.bed",
+		not_found = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_not_found.bed",
+		new = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_new.bed"
+	log: "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites.log"
+	benchmark: "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_benchmark.txt"
+	params: qsub = config["qsub"] + " -e {dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_qsub.err -o {dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_qsub.out"
+	conda:  "../envs/bedops.yaml"
+	shell:"""
+bedops --element-of {input.sites} {input.peaks} > {output.found}
+bedops --not-element-of {input.sites} {input.peaks} > {output.not_found}
+bedops --not-element-of 0% {input.peaks} {input.sites} > {output.new}
+"""
+
+
+#	input: 
+#        sites_bed = "{sites}.bed",
+#        peaks_bed = "{peaks}.bed"
+
+
+
+#bedops --intersect sites.bed peaks.bed > found.bed
+

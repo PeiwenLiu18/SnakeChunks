@@ -1,0 +1,41 @@
+# Set parameters
+if not "qsub" in config.keys():
+    sys.exit("The parameter qsub must be defined in the config file")
+
+if not "peakcalling" in config.keys():
+    sys.exit("peakcalling tools must be defined in the config file")
+
+peakcallers = config["peakcalling"].split()
+
+# Rule
+rule bedops_intersect:
+    """
+    Required parameters: 
+        config["qsub"]
+
+
+    Contributors: Claire Rioualen
+    """
+	input: expand("{{stuff}}/{peakcaller}/{{stuffbis}}_{peakcaller}.bed", peakcaller=peakcallers)
+	output: "{stuff}/{stuffbis}_peaks.bed"
+	log: "{stuff}/{stuffbis}_mergedpeaks.log"
+	benchmark: "{stuff}/{stuffbis}_mergedpeaks_benchmark.txt"
+	params: qsub = config["qsub"] + " -e {stuff}/{stuffbis}_mergedpeaks_qsub.err -o {stuff}/{stuffbis}_mergedpeaks_qsub.out"
+	conda:  "../envs/bedops.yaml"
+	shell:"""
+bedops --header --intersect {input} > {output} 2> {log}
+"""
+
+
+#	input: 
+#        sites_bed = "{sites}.bed",
+#        peaks_bed = "{peaks}.bed"
+
+#bedops --element-of sites.bed peaks.bed > found.bed
+
+#bedops --not-element-of sites.bed peaks.bed > not_found.bed
+#bedops --not-element-of peaks.bed sites.bed > new.bed
+
+
+#bedops --intersect sites.bed peaks.bed > found.bed
+

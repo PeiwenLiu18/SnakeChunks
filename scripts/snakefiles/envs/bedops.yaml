@@ -1,0 +1,10 @@
+---
+name: bedops
+channels:
+  - conda-forge
+  - defaults
+  - r
+  - bioconda
+dependencies:
+  - bedops=2.4.35
+...
