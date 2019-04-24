@@ -17,19 +17,19 @@ if not "sickle" in config.keys():
 if not "qual_threshold" in config["sickle"].keys():
     config["sickle"]["qual_threshold"] = "20"
 
-## Check whether input fastq files are compressed or not
-if  "input_format" in config["metadata"].keys():
-    input_ext = "." + config["metadata"]["input_format"]
-else:
-    input_ext = ".fastq.gz"
-
-## Compress or not the output fastq file (trimmed reads)
-gzip_option = "--gzip-output"
-gzip_ext = ".gz"
-if  "gzip_output" in config["sickle"].keys():
-    if (config["sickle"]["gzip_output"] == False):
-        gzip_option = ""
-        gzip_ext = ""
+# ## Check whether input fastq files are compressed or not
+# if  "input_format" in config["metadata"].keys():
+#     input_ext = "." + config["metadata"]["input_format"]
+# else:
+#     input_ext = ".fastq.gz"
+# 
+# ## Compress or not the output fastq file (trimmed reads)
+# gzip_option = "--gzip-output"
+# gzip_ext = ".gz"
+# if  "gzip_output" in config["sickle"].keys():
+#     if (config["sickle"]["gzip_output"] == False):
+#         gzip_option = ""
+#         gzip_ext = ""
 
 if not "length_threshold" in config["sickle"].keys():
     config["sickle"]["length_threshold"] = "30"
@@ -52,9 +52,9 @@ elif (seq_type == "se"):
 # Define input files
 def sickle_inputs(wildcards):
     if (seq_type == "pe"):
-        reads = expand("{fastq_dir}/{samples}/{samples}_{strand}" + input_ext, strand=strands, samples=wildcards.samples, fastq_dir=fastq_dir)
+        reads = expand(expand(config["dir"]["fastq"] + "/{dataset}/{samples}_{{strand}}.fastq.gz", zip, dataset=wildcards.dataset, samples=wildcards.samples), strand=strands)
     elif (seq_type == "se"):
-        reads = expand("{fastq_dir}/{samples}/{samples}" + input_ext, samples=wildcards.samples, fastq_dir=fastq_dir)[0]
+        reads = expand(config["dir"]["fastq"] + "/{dataset}/{samples}.fastq.gz", dataset=wildcards.dataset, samples=wildcards.samples)[0]
     else:
         sys.exit("Error: invalid seq_type parameter. Must be 'se' or 'pe'")
     return reads
@@ -80,21 +80,21 @@ rule sickle:
     """
     input: reads = sickle_inputs
     output:
-        forward = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[0] + ".fastq" + gzip_ext,
-        reverse = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_" + strands[1] + ".fastq" + gzip_ext,
-        single = config["dir"]["fastq"] + "/{samples}/{samples}_sickle.fastq" + gzip_ext,
-        stats = config["dir"]["fastq"] + "/{samples}/{samples}_sickle_stats.txt"
+        forward = config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_" + strands[0] + ".fastq.gz",
+        reverse = config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_" + strands[1] + ".fastq.gz",
+        single = config["dir"]["fastq"] + "/{dataset}/{samples}_sickle.fastq.gz",
+        stats = config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_stats.txt"
     params:
         qual_threshold = config["sickle"]["qual_threshold"],
         length_threshold = config["sickle"]["length_threshold"],
         qual_type = config["sickle"]["qual"],
-        gzip_option = gzip_option,
+        gzip_option = "--gzip-output",
         seq_type = config["metadata"]["seq_type"],
         qsub = config['qsub'] \
-            + " -e "+ config["dir"]["fastq"] + "/{samples}/{samples}_sickle_qsub.err" \
-            + " -o "+ config["dir"]["fastq"] + "/{samples}/{samples}_sickle_qsub.out"
-    log: config["dir"]["fastq"] + "/{samples}/{samples}_sickle.log"
-    benchmark: config["dir"]["fastq"] + "/{samples}/{samples}_sickle_benchmark.txt"
+            + " -e "+ config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_qsub.err" \
+            + " -o "+ config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_qsub.out"
+    log: config["dir"]["fastq"] + "/{dataset}/{samples}_sickle.log"
+    benchmark: config["dir"]["fastq"] + "/{dataset}/{samples}_sickle_benchmark.txt"
     conda: "../envs/sickle.yaml"
     shell:"""
 if [[ "{params.seq_type}" == "pe" ]]
