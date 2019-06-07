@@ -2,8 +2,8 @@
 if not "qsub" in config.keys():
     sys.exit("The parameter qsub must be defined in the config file")
 
-if not "TF" in config["metadata"].keys():
-    sys.exit("Parameters config['metadata']['TF'] must be defined in the config file to perform the RegulonDB download.")
+if not "regulonDB" in config["dir"].keys():
+   config["dir"]["regulonDB"] = "RegulonDB"
 
 # Rule
 rule RegulonDB_download_one_TF:
@@ -16,7 +16,7 @@ rule RegulonDB_download_one_TF:
     Author: Claire Rioualen
     """
     input: 
-        all_tfbs="{dir}/BindingSiteSet.bed"
+        all_tfbs = config["dir"]["regulonDB"] + "/BindingSiteSet.bed"
     output: 
         selected_tfbs="{dir}/{TF}/{TF}_BS.bed"
     params: qsub = config["qsub"] + " -e {dir}/{TF}/{TF}_BS_qsub.err -o {dir}/{TF}/{TF}_BS_qsub.out"
