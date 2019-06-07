@@ -25,6 +25,7 @@ rule regulondb_get_matrix:
 wget http://regulondb.ccg.unam.mx/webresources/tools/getPSSM?tfObject={wildcards.TF} 
 sed '1d' getPSSM?tfObject={wildcards.TF} > {output.tab}
 convert-matrix  -from tab -to tf -i {output.tab} -pseudo 1 -multiply 1 -decimals 1 -perm 0 \
--bgfile $RSAT/public_html/data/genomes/Escherichia_coli_K12/oligo-frequencies/1nt_upstream-noorf_Escherichia_coli_K12-ovlp-1str.freq \
+-bgfile $RSAT/public_html/data/genomes/Escherichia_coli_K_12_substr__MG1655_uid57779/oligo-frequencies/1nt_upstream-noorf_Escherichia_coli_K_12_substr__MG1655_uid57779-ovlp-1str.freq.gz \
 -bg_format oligos -bg_pseudo 0.01 -return counts,consensus -to tf -o {output.tf}
+rm getPSSM?tfObject={wildcards.TF}
 """
