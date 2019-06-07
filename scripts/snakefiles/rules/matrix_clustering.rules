@@ -20,21 +20,26 @@ rule matrix_clustering:
     Contributors: Claire Rioualen
     """
     input: 
-        matrices = "{caller_dir}/peak-motifs/{peaks}_peak-motifs/results/discovered_motifs/peak-motifs_motifs_discovered.tf"
+        matrices = "{dir}/peak-motifs/results/discovered_motifs/{TF}_{peaks}_motifs_discovered.tf"
     output: 
-        html = "{caller_dir}/matrix-clustering/{peaks}_matrix-clustering_SUMMARY.html"
+        html = "{dir}/matrix-clustering/{TF}_{peaks}_SUMMARY.html"
     params:
-        prefix = "{caller_dir}/matrix-clustering/{peaks}_matrix-clustering",
-        qsub = config["qsub"] + " -e {caller_dir}/matrix-clustering/{peaks}_matrix-clustering_qsub.err" \
-                  + " -o {caller_dir}/matrix-clustering/{peaks}_matrix-clustering_qsub.out" 
-    log: "{caller_dir}/matrix-clustering/{peaks}_matrix-clustering.log"
-    benchmark: "{caller_dir}/matrix-clustering/{peaks}_matrix-clustering_bench.txt"
+        prefix = "{dir}/matrix-clustering/{TF}_{peaks}",
+        qsub = config["qsub"] + " -e {dir}/matrix-clustering/{TF}_{peaks}_matrix-clustering_qsub.err" \
+                  + " -o {dir}/matrix-clustering/{TF}_{peaks}_matrix-clustering_qsub.out" 
+    log: "{dir}/matrix-clustering/{TF}_{peaks}_matrix-clustering.log"
+    benchmark: "{dir}/matrix-clustering/{TF}_{peaks}_matrix-clustering_bench.txt"
     shell: """
 ($RSAT/perl-scripts/matrix-clustering \
 -v 1 -max_matrices 300 -matrix {wildcards.TF}_peakmotifs \
 {input.matrices} transfac \
 -hclust_method average -calc sum -title '{wildcards.TF}' -metric_build_tree 'Ncor' -lth w 5 -lth cor 0.6 -lth Ncor 0.4 \
 -quick -label_in_tree name -return json,heatmap \
--o {params.prefix} ) 2> {log}
+-o {params.prefix} ) 2> {log} \
+|| touch {output.html}
 
 """
+
+# $RSAT/perl-scripts/matrix-clustering  -v 1 -max_matrices 300 -matrix cysb peaks/CysB/peak-motifs/results/discovered_motifs/CysB_motifs_discovered.tf transfac \
+# -hclust_method average -calc sum -title 'cysb_test' -metric_build_tree 'Ncor' -lth w 5 -lth cor 0.6 -lth Ncor 0.4 -quick -label_in_tree name -return json,heatmap \
+# -o test/matrix-clustering
