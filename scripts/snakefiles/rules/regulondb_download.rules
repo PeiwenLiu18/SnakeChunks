@@ -30,6 +30,7 @@ rule RegulonDB_download:
     awk '($1 !~ "#") && ($4 != "NA") && ($5 != "NA") && ($4 != 0) && ($5 != 0) {{gsub( "forward", "+"); gsub( "reverse", "-"); print "Chromosome\t"$4-1"\t"$5"\t"$2"\t.\t"$6}}' {output.all_tfbs_txt} >  {output.all_tfbs_bed}
     wget -nc http://regulondb.ccg.unam.mx/menu/download/datasets/files/GeneProductSet.txt -O - | awk -F '\t' '!seen[$1]++' 1> {output.all_gene_products} 2> {log}
     awk '$2 >= 0' {output.all_tfbs_bed} > {output.all_tfbs_bed_cleaned}
+    rm TUSet.txt BindingSiteSet.txt
 """
 
 
