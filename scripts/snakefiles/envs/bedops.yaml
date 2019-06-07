@@ -7,4 +7,5 @@ channels:
   - bioconda
 dependencies:
   - bedops=2.4.35
+  - bedtools=2.27.1
 ...
