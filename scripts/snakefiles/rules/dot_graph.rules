@@ -5,10 +5,6 @@ if not "qsub" in config.keys():
 if not "configfile" in config["metadata"].keys():
     sys.exit("The parameter ['metadata']['configfile'] must be defined in the config file")
 
-if not "reports" in config["dir"].keys():
-    config["dir"]["reports"] = config["dir"]["results"];
-
-#dir_reports = config["dir"]["reports"]
 
 # Rule
 rule dot_graph:
