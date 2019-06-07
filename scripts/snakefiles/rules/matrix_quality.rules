@@ -4,8 +4,12 @@ if not "qsub" in config.keys():
 
 if not "matrix-quality" in config.keys():
     config["matrix-quality"] = {}
+     
+if not "regulonDB" in config["dir"].keys():
+   config["dir"]["regulonDB"] = "RegulonDB"
+
     
-TF=config["metadata"]["TF"]      ##### TEMP
+#TF=config["metadata"]["TF"]      ##### TEMP
 
 #if not "background" in config["matrix-quality"].keys():
 #    sys.exit("The parameter matrix-quality/background must be defined in the config file")
@@ -43,23 +47,23 @@ rule matrix_quality:
     Contributors: Claire Rioualen, Jacques van Helden
     """
     input: 
-        matrix = config["dir"]["regulondb"] + "/" + TF + "/" + TF + "_{matrix}.tf",
-        found = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_found.fasta",
-        not_found = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_not_found.fasta",
-        new = "{dir}/{TF}_vs_{control}/{TF}_vs_{control}_{prefix}_sites_new.fasta"#,
-        #upstream = config["dir"]["genome"] + "/upstream.fasta"
-    output: "{dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}_synthesis.html"
+        matrix = "peaks/{TF}/{TF}_{matrix}.tf",
+        found = "{dir}/{TF}/found/{TF}_peaks_found.fasta",
+        not_found = "{dir}/{TF}/not_found/{TF}_seq_not_found.fasta",
+        new = "{dir}/{TF}/new/{TF}_peaks_new.fasta",
+        upstream = config["dir"]["genome"] + "/upstream.fasta"
+    output: "{dir}/{TF}/{matrix}-quality/{TF}_synthesis.html"
     params:
         title = "Matrix-quality",
-        out_prefix = "{dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}",
-        background = "$RSAT/public_html/data/genomes/Escherichia_coli_K12/oligo-frequencies/1nt_upstream-noorf_Escherichia_coli_K12-ovlp-1str.freq.gz",
+        out_prefix = "{dir}/{TF}/{matrix}-quality/{TF}",
+        background = "$RSAT/public_html/data/genomes/Escherichia_coli_K_12_substr__MG1655_uid57779/oligo-frequencies/1nt_upstream-noorf_Escherichia_coli_K_12_substr__MG1655_uid57779-ovlp-1str.freq.gz",
         qsub = config["qsub"] \
-                + " -e {dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}_qsub.err" \
-                + " -o {dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}_qsub.out" 
-    log: "{dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}_matrix-quality.log"
-    benchmark: "{dir}/{TF}_vs_{control}/{matrix}-quality/{TF}_vs_{control}_{prefix}_matrix-quality_bench.txt"
+                + " -e {dir}/{TF}/{matrix}-quality/{TF}_qsub.err" \
+                + " -o {dir}/{TF}/{matrix}-quality/{TF}_qsub.out" 
+    log: "{dir}/{TF}/{matrix}-quality/{TF}_matrix-quality.log"
+    benchmark: "{dir}/{TF}/{matrix}-quality/{TF}_matrix-quality_bench.txt"
     shell:"""
-matrix-quality  -v 0 -html_title {params.title} \
+matrix-quality -v 0 -html_title {params.title} \
 -archive -o {params.out_prefix} \
 -ms {input.matrix} \
 -matrix_format transfac -pseudo 1 \
@@ -68,7 +72,7 @@ matrix-quality  -v 0 -html_title {params.title} \
 -seq_format fasta \
 -seq found {input.found} \
 -seq not_found {input.not_found} \
--seq new {input.new} -plot new nwd -perm new 0 \
+-seq new {input.new} # -plot upstream nwd -perm upstream 0
 """
 
 #-seq found {input.found} -plot found nwd -perm found 0 \
