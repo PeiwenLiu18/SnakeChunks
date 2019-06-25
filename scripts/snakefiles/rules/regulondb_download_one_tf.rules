@@ -22,6 +22,11 @@ rule RegulonDB_download_one_TF:
     params: qsub = config["qsub"] + " -e {dir}/{TF}/{TF}_BS_qsub.err -o {dir}/{TF}/{TF}_BS_qsub.out"
     log: "{dir}/{TF}/{TF}_BS.log"
     benchmark: "{dir}/{TF}/{TF}_BS_benchmark.tab"
+    #conda: "../bedtools.yaml"
     shell:"""
-    awk '$4 == "{wildcards.TF}"' {input.all_tfbs} > {output.selected_tfbs}
+    awk '$7 == "{wildcards.TF}"' {input.all_tfbs} > {output.selected_tfbs}
+    #wget http://regulondb.ccg.unam.mx/webresources/tools/getTFBS?tfObject={wildcards.TF}&extended=10
+    #mv getTFBS?tfObject={wildcards.TF} {output.selected_tfbs}
 """
+    # awk '$4 == "{wildcards.TF}"' {input.all_tfbs} > temp
+    # bedtools slop -b 5 -i temp -g  > {output.selected_tfbs}
