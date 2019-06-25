@@ -185,9 +185,8 @@ serverDict = {
 	"metazoa":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
 	"teaching":"http://teaching.rsat.eu/web_services/RSATWS.wsdl",
 	"plants":"http://rsat.eead.csic.es/plants//web_services/RSATWS.wsdl",
-	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS.wsdl",
-	"archaea":"http://archaea.rsat.eu/web_services/RSATWS.wsdl",
-	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS.wsdl"
+	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS2.wsdl",
+	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS2.wsdl"
 
 	}
 
@@ -199,9 +198,8 @@ serverDict = {
 	"metazoa":"http://metazoa.rsat.eu/web_services/RSATWS.wsdl",
 	"teaching":"http://teaching.rsat.eu/web_services/RSATWS.wsdl",
 	"plants":"http://rsat.eead.csic.es/plants//web_services/RSATWS.wsdl",
-	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS.wsdl",
-	"archaea":"http://archaea.rsat.eu/web_services/RSATWS.wsdl",
-	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS.wsdl"
+	"prokaryotes":"http://prokaryotes.rsat.eu/web_services/RSATWS2.wsdl",
+	"bacteria":"http://bacteria.rsat.eu/web_services/RSATWS2.wsdl"
 	
 	}
 """
