@@ -12,7 +12,7 @@ if not "fdr" in config["spp"].keys():
 #    config["spp"]["type"] = "narrow"
 
 dir_samples = config["dir"]["samples"]
-dir_spp = os.path.join(config["dir"]["peaks"], "{treatment}_vs_{control}/spp")
+dir_spp = os.path.join(config["dir"]["peaks"], "{dataset}/{treatment}_vs_{control}/spp")
 
 # Rule
 rule spp:
@@ -32,8 +32,8 @@ rule spp:
     Contributors: Claire Rioualen
     """
     input:
-        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}.bam",
-        control = dir_samples + "/{control}/{control}{preprocess,.*}.bam"
+        treatment = dir_samples + "/{dataset}/{treatment}{preprocess,.*}.bam",
+        control = dir_samples + "/{dataset}/{control}{preprocess,.*}.bam"
     output:
         peaks_narrowPeak = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp_peaks.narrowPeak",
         peaks_bed = dir_spp + "/{treatment}_vs_{control}{preprocess,.*}_spp.bed",
