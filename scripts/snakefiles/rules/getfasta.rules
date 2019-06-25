@@ -30,5 +30,5 @@ rule getfasta:
     shell:"""
 (bedtools sort -i {input.bed} > {input.bed}.temp &&
 mv {input.bed}.temp {input.bed} &&
-bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output}) 2> {log}"""
+bedtools getfasta -fi {input.genome_fasta} -bed {input.bed} -fo {output} -s -name) 2> {log}"""
 
