@@ -39,7 +39,7 @@ if not "peaks" in config["dir"].keys():
     sys.exit("The peaks dir must be defined in the config file")
 
 dir_samples = config["dir"]["samples"]
-dir_homer = os.path.join(config["dir"]["peaks"], "{dataset}/{treatment}_vs_{control}/homer")
+dir_homer = os.path.join(config["dir"]["peaks"], "{treatment}_vs_{control}/homer")
 
 # Rule
 rule homer:
@@ -67,8 +67,8 @@ rule homer:
     Contributors: Claire Rioualen
     """
     input:
-        treatment = dir_samples + "/{dataset}/{treatment}{preprocess,.*}.bed",
-        control = dir_samples + "/{dataset}/{control}{preprocess,.*}.bed"
+        treatment = dir_samples + "/{treatment}/{treatment}{preprocess,.*}.bed",
+        control = dir_samples + "/{control}/{control}{preprocess,.*}.bed"
     output: peaks_bed = dir_homer + "/{treatment}_vs_{control}{preprocess,.*}_homer.bed"
     params:    # name="{treatment}_vs_{control}_homer",
         treatment_tag = dir_homer + "/{treatment}_tag",
@@ -94,8 +94,9 @@ findPeaks {params.treatment_tag} -style {params.style} -L {params.L} -P {params.
 pos2bed.pl {params.treatment_tag}/peaks.txt > {output} &&
 makeUCSCfile {params.treatment_tag} -o auto &&
 makeUCSCfile {params.control_tag} -o auto &&
-bedtools sort -i {output} > {output}.temp &&
-mv {output}.temp {output}) &> {log} \
+bedtools sort -i {output} > temp &&
+mv temp {output} &&
+rm temp) &> {log} \
 || (touch {output})
 """
 
