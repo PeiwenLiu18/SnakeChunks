@@ -21,7 +21,7 @@ in order to build reproducible and flexible NGS analysis pipelines.
 
 # Contact
 
-- Claire Rioualen <claire.rioualen@inserm.fr>
+- Claire Rioualen <rioualenclaire@gmail.com>
 - Jacques van Helden <Jacques.van-helden@univ-amu.fr>
 
 # Reference
